@@ -456,6 +456,10 @@ html {
     border-bottom: 1px solid #222222;
 }
 
+.modal-setup .modal-header {
+    padding: 8px 20px;
+}
+
 .modal-header h2 {
     font-size: 20px;
     color: #ffffff;
@@ -468,6 +472,8 @@ html {
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 1px;
+    margin: 0;
+    padding: 0;
 }
 
 .modal-body {
