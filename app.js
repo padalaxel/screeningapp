@@ -849,13 +849,37 @@ function setupEventListeners() {
     if (dimSlider && dimOverlay) {
         // Set initial value
         dimSlider.value = state.dimLevel || 0;
-        updateDimOverlay(state.dimLevel);
+        updateDimOverlay(state.dimLevel || 0);
         
-        dimSlider.addEventListener('input', (e) => {
+        // Use both input and change events for better mobile support
+        const updateDim = (e) => {
             const value = parseInt(e.target.value);
             state.dimLevel = value;
             updateDimOverlay(value);
             saveState();
+        };
+        
+        dimSlider.addEventListener('input', updateDim);
+        dimSlider.addEventListener('change', updateDim);
+        
+        // Touch events for better mobile support
+        let isDragging = false;
+        dimSlider.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            e.preventDefault();
+        }, { passive: false });
+        dimSlider.addEventListener('touchmove', (e) => {
+            if (isDragging) {
+                e.preventDefault();
+                const rect = dimSlider.getBoundingClientRect();
+                const x = e.touches[0].clientX - rect.left;
+                const percent = Math.max(0, Math.min(100, (x / rect.width) * 100));
+                dimSlider.value = percent;
+                updateDim({ target: dimSlider });
+            }
+        }, { passive: false });
+        dimSlider.addEventListener('touchend', () => {
+            isDragging = false;
         });
     }
 }
