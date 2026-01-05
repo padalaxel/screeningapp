@@ -19,9 +19,12 @@
         <div class="header-top">
             <div id="screeningName" class="screening-name"></div>
             <div class="header-buttons">
-                <button id="newBtn" class="btn-small">New</button>
-                <button id="settingsBtn" class="btn-small">Settings</button>
-                <button id="dimToggle" class="btn-small">Dim</button>
+            <button id="newBtn" class="btn-small">New</button>
+            <button id="settingsBtn" class="btn-small">Settings</button>
+            <div class="dim-control">
+                <input type="range" id="dimSlider" class="dim-slider" min="0" max="100" value="0" />
+                <label for="dimSlider" class="dim-label">Dim</label>
+            </div>
             </div>
         </div>
         <div class="timer-section">
@@ -63,16 +66,6 @@
                 <button id="closeSettings" class="btn-close">&times;</button>
             </div>
             <div class="modal-body">
-                <div class="setting-group">
-                    <label for="fpsSelect">FPS:</label>
-                    <select id="fpsSelect" class="input-select">
-                        <option value="23.976">23.976</option>
-                        <option value="24" selected>24</option>
-                        <option value="25">25</option>
-                        <option value="29.97">29.97</option>
-                        <option value="30">30</option>
-                    </select>
-                </div>
                 <div class="setting-group">
                     <label>Button Labels (tap to edit):</label>
                     <div id="buttonLabelsContainer" class="button-labels-container">

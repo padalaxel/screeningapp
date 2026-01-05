@@ -22,7 +22,7 @@ let state = {
     fps: 24,
     session: null,
     buttonLabels: ['Note 1', 'Note 2', 'Note 3', 'Note 4', 'Note 5', 'Note 6'],
-    dimActive: false,
+    dimLevel: 0,
     genre: null,
     screeningName: '',
     setupComplete: false
@@ -89,6 +89,7 @@ function loadState() {
             }
             if (parsed.genre) state.genre = parsed.genre;
             if (parsed.screeningName) state.screeningName = parsed.screeningName;
+            if (parsed.dimLevel !== undefined) state.dimLevel = parseInt(parsed.dimLevel) || 0;
             // Only trust setupComplete if genre and name are also present
             if (parsed.setupComplete !== undefined && parsed.genre && parsed.screeningName) {
                 state.setupComplete = parsed.setupComplete;
@@ -102,18 +103,17 @@ function loadState() {
         state.setupComplete = false;
     }
     
-    // Update FPS select
-    const fpsSelect = $('fpsSelect');
-    if (fpsSelect) {
-        fpsSelect.value = state.fps.toString();
-    }
-    
     // Update header with screening name if available
     if (state.screeningName) {
         const screeningNameEl = $('screeningName');
         if (screeningNameEl) {
             screeningNameEl.textContent = state.screeningName;
         }
+    }
+    
+    // Restore dim level
+    if (state.dimLevel) {
+        updateDimOverlay(state.dimLevel);
     }
 }
 
@@ -126,7 +126,8 @@ function saveState() {
             buttonLabels: state.buttonLabels,
             genre: state.genre,
             screeningName: state.screeningName,
-            setupComplete: state.setupComplete
+            setupComplete: state.setupComplete,
+            dimLevel: state.dimLevel
         }));
     } catch (e) {
         console.error('Failed to save state:', e);
@@ -725,11 +726,6 @@ function setupEventListeners() {
     const saveSettings = $('saveSettings');
     if (saveSettings) {
         saveSettings.addEventListener('click', () => {
-            const fpsSelect = $('fpsSelect');
-            if (fpsSelect) {
-                state.fps = parseFloat(fpsSelect.value);
-            }
-            
             // Get button labels from inputs
             const inputs = document.querySelectorAll('#buttonLabelsContainer input');
             const labels = Array.from(inputs).map(input => input.value.trim() || 'Note').filter(Boolean);
@@ -834,18 +830,34 @@ function setupEventListeners() {
         });
     }
     
-    // Dim overlay toggle
-    const dimToggle = $('dimToggle');
+    // Dim slider
+    const dimSlider = $('dimSlider');
     const dimOverlay = $('dimOverlay');
-    if (dimToggle && dimOverlay) {
-        dimToggle.addEventListener('click', () => {
-            state.dimActive = !state.dimActive;
-            if (state.dimActive) {
-                dimOverlay.classList.add('active');
-            } else {
-                dimOverlay.classList.remove('active');
-            }
+    if (dimSlider && dimOverlay) {
+        // Set initial value
+        dimSlider.value = state.dimLevel || 0;
+        updateDimOverlay(state.dimLevel);
+        
+        dimSlider.addEventListener('input', (e) => {
+            const value = parseInt(e.target.value);
+            state.dimLevel = value;
+            updateDimOverlay(value);
+            saveState();
         });
+    }
+}
+
+// Update dim overlay opacity
+function updateDimOverlay(level) {
+    const dimOverlay = $('dimOverlay');
+    if (dimOverlay) {
+        const opacity = level / 100;
+        dimOverlay.style.opacity = opacity.toString();
+        if (opacity > 0) {
+            dimOverlay.classList.add('active');
+        } else {
+            dimOverlay.classList.remove('active');
+        }
     }
     
     // Close modals on background click (except setup modal)
