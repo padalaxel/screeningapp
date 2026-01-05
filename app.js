@@ -682,6 +682,8 @@ function showOtherNoteModal() {
     const modal = $('otherNoteModal');
     const input = $('otherNoteInput');
     if (modal) {
+        // Ensure dim overlay stays at current level (don't reset it)
+        // The dim overlay z-index is 9999, modal is 10001, so modal appears above
         modal.classList.add('active');
         if (input) {
             input.value = '';
