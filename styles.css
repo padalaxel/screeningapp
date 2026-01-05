@@ -481,7 +481,7 @@ html {
 }
 
 #setupModal .modal-content {
-    max-width: 260px !important;
+    max-width: 400px !important;
     width: 100% !important;
     max-height: auto !important;
     margin-top: 0 !important;
