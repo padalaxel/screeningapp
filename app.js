@@ -599,13 +599,17 @@ function startScreening() {
     createNewSession();
     saveState();
     
-    // Close setup modal
-    closeModal('setupModal');
-    
     // Update header with screening name
     const screeningNameEl = $('screeningName');
     if (screeningNameEl) {
         screeningNameEl.textContent = screeningName;
+    }
+    
+    // Close setup modal - force close
+    const setupModal = $('setupModal');
+    if (setupModal) {
+        setupModal.classList.remove('active');
+        setupModal.style.display = 'none';
     }
     
     // Initialize app

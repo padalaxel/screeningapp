@@ -16,16 +16,14 @@
     
     <!-- Header -->
     <header class="header">
-        <div class="header-top">
-            <div id="screeningName" class="screening-name"></div>
-            <div class="header-buttons">
+        <div id="screeningName" class="screening-name"></div>
+        <div class="header-controls">
             <button id="newBtn" class="btn-small">New</button>
-            <button id="settingsBtn" class="btn-small">Settings</button>
-            <div class="dim-control">
-                <input type="range" id="dimSlider" class="dim-slider" min="0" max="100" value="0" />
-                <label for="dimSlider" class="dim-label">Dim</label>
-            </div>
-            </div>
+            <button id="settingsBtn" class="btn-small">Customize Buttons</button>
+        </div>
+        <div class="dim-control-full">
+            <label for="dimSlider" class="dim-label">Dim</label>
+            <input type="range" id="dimSlider" class="dim-slider" min="0" max="100" value="0" />
         </div>
         <div class="timer-section">
             <div class="timer-controls">
@@ -62,7 +60,7 @@
     <div id="settingsModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Settings</h2>
+                <h2>Customize Buttons</h2>
                 <button id="closeSettings" class="btn-close">&times;</button>
             </div>
             <div class="modal-body">
