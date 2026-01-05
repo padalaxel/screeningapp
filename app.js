@@ -314,6 +314,20 @@ function deleteNote(index) {
     });
 }
 
+// Undo last note
+function undoLastNote() {
+    if (!state.session || !state.session.notes || state.session.notes.length === 0) {
+        showToast('No notes to undo', null);
+        return;
+    }
+    
+    const lastNote = state.session.notes[state.session.notes.length - 1];
+    state.session.notes.pop();
+    saveState();
+    renderNotes();
+    showToast(`Undid: ${lastNote.label}`, lastNote.timecode);
+}
+
 // Clear all notes
 function clearNotes() {
     showConfirm('Clear all notes? This cannot be undone.', () => {
@@ -570,7 +584,6 @@ function closeModal(modalId) {
 // Close all modals (except setup modal)
 function closeAllModals() {
     closeModal('settingsModal');
-    closeModal('summaryModal');
     closeModal('exportModal');
     closeModal('confirmModal');
     closeModal('otherNoteModal');
@@ -841,15 +854,10 @@ function setupEventListeners() {
         });
     }
     
-    // Summary
-    const summaryBtn = $('summaryBtn');
-    if (summaryBtn) {
-        summaryBtn.addEventListener('click', showSummary);
-    }
-    
-    const closeSummary = $('closeSummary');
-    if (closeSummary) {
-        closeSummary.addEventListener('click', () => closeModal('summaryModal'));
+    // Undo
+    const undoBtn = $('undoBtn');
+    if (undoBtn) {
+        undoBtn.addEventListener('click', undoLastNote);
     }
     
     // Export
