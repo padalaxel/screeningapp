@@ -427,6 +427,60 @@ body {
     }
 }
 
+/* Button click feedback */
+.note-button.clicked {
+    background-color: #2a4a6a !important;
+    border-color: #4a9eff !important;
+    transform: scale(0.95);
+    transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+
+.note-button.clicked-success {
+    background-color: #1a4a2a !important;
+    border-color: #4aff6b !important;
+    transform: scale(0.95);
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+}
+
+/* Toast Notification */
+.toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background-color: #1a1a1a;
+    color: #ffffff;
+    padding: 12px 24px;
+    border-radius: 8px;
+    border: 1px solid #333333;
+    font-size: 14px;
+    z-index: 10001;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    max-width: 90%;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
+}
+
+.toast .toast-timecode {
+    color: #4a9eff;
+    font-weight: 600;
+    margin-right: 8px;
+    font-variant-numeric: tabular-nums;
+}
+
+.toast .toast-label {
+    color: #ffffff;
+    font-weight: 500;
+}
+
 /* Prevent text selection on buttons */
 button, .note-button {
     -webkit-user-select: none;

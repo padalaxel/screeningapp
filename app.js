@@ -169,6 +169,46 @@ function toggleTimer() {
     updateTimer();
 }
 
+// Show toast notification
+function showToast(message, timecode) {
+    const toast = $('toast');
+    if (!toast) return;
+    
+    if (timecode) {
+        toast.innerHTML = `<span class="toast-timecode">${escapeHtml(timecode)}</span><span class="toast-label">${escapeHtml(message)}</span>`;
+    } else {
+        toast.innerHTML = `<span class="toast-label">${escapeHtml(message)}</span>`;
+    }
+    
+    toast.classList.add('show');
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 2000);
+}
+
+// Add visual feedback to button
+function addButtonFeedback(button) {
+    if (!button) return;
+    
+    // Remove any existing feedback classes
+    button.classList.remove('clicked', 'clicked-success');
+    
+    // Add clicked class for immediate feedback
+    button.classList.add('clicked');
+    
+    // After a brief moment, change to success state
+    setTimeout(() => {
+        button.classList.remove('clicked');
+        button.classList.add('clicked-success');
+        
+        // Remove success state after animation
+        setTimeout(() => {
+            button.classList.remove('clicked-success');
+        }, 300);
+    }, 100);
+}
+
 // Add note
 function addNote(label) {
     if (!state.session) return;
@@ -184,6 +224,17 @@ function addNote(label) {
     state.session.notes.push(note);
     saveState();
     renderNotes();
+    
+    // Show visual feedback
+    const buttons = document.querySelectorAll('.note-button');
+    buttons.forEach(btn => {
+        if (btn.textContent.trim() === label) {
+            addButtonFeedback(btn);
+        }
+    });
+    
+    // Show toast notification
+    showToast(label, note.timecode);
 }
 
 // Delete note
@@ -221,6 +272,10 @@ function renderButtons() {
         button.addEventListener('click', () => {
             if (state.isRunning || state.elapsedSeconds > 0) {
                 addNote(label);
+            } else {
+                // Show feedback even if timer hasn't started
+                addButtonFeedback(button);
+                showToast('Start the timer first', null);
             }
         });
         // Prevent iOS context menu
