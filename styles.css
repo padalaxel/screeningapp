@@ -75,7 +75,7 @@ body {
 
 .dim-slider {
     flex: 1;
-    height: 20px; /* Taller to accommodate triangle */
+    height: 12px; /* Shorter height for triangle */
     background: transparent;
     outline: none;
     -webkit-appearance: none;
@@ -89,21 +89,21 @@ body {
 .dim-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     background: #4a9eff;
     border-radius: 50%;
     cursor: pointer;
     border: 2px solid #1a1a1a;
-    margin-top: -10px;
+    margin-top: -3px; /* Position at bottom of track */
     touch-action: none;
     position: relative;
     z-index: 2;
 }
 
 .dim-slider::-moz-range-thumb {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     background: #4a9eff;
     border-radius: 50%;
     cursor: pointer;
@@ -113,14 +113,14 @@ body {
 
 .dim-slider::-webkit-slider-runnable-track {
     width: 100%;
-    height: 20px;
+    height: 12px;
     background: transparent;
     border-radius: 0;
 }
 
 .dim-slider::-moz-range-track {
     width: 100%;
-    height: 20px;
+    height: 12px;
     background: transparent;
     border-radius: 0;
 }
@@ -128,6 +128,7 @@ body {
 /* Triangle track background using pseudo-element */
 .dim-slider-container {
     position: relative;
+    padding: 8px 0; /* Add padding for thumb clearance */
 }
 
 .dim-slider-container::before {
@@ -135,32 +136,12 @@ body {
     position: absolute;
     left: 0;
     right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    height: 20px;
-    background: linear-gradient(to left, 
-        #2a2a2a 0%, 
-        #2a2a2a 50%, 
-        transparent 50%, 
-        transparent 100%);
+    bottom: 8px; /* Align to bottom where thumb sits */
+    height: 12px;
+    background: #2a2a2a;
     clip-path: polygon(0% 100%, 100% 0%, 100% 100%);
     pointer-events: none;
     z-index: 1;
-}
-
-/* Triangle track - create visual triangle shape */
-.dim-slider-container::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    height: 20px;
-    background: #1a1a1a;
-    clip-path: polygon(0% 100%, 100% 0%, 100% 100%);
-    pointer-events: none;
-    z-index: 0;
 }
 
 /* iOS specific slider fixes */
@@ -174,14 +155,18 @@ body {
     }
     
     .dim-slider::-webkit-slider-thumb {
-        width: 24px;
-        height: 24px;
-        margin-top: -12px;
+        width: 22px;
+        height: 22px;
+        margin-top: -11px;
     }
     
-    .dim-slider-container::before,
-    .dim-slider-container::after {
-        height: 44px;
+    .dim-slider-container {
+        padding: 11px 0; /* More padding for larger thumb */
+    }
+    
+    .dim-slider-container::before {
+        height: 12px;
+        bottom: 11px; /* Align with thumb position */
     }
 }
 
