@@ -321,11 +321,17 @@ function deleteNote(index) {
 
 // Undo last note
 function undoLastNote() {
-    if (!state.session || !state.session.notes || state.session.notes.length === 0) {
+    if (!state.session) {
+        showToast('No session active', null);
+        return;
+    }
+    
+    if (!state.session.notes || state.session.notes.length === 0) {
         showToast('No notes to undo', null);
         return;
     }
     
+    // Get the last note before removing it
     const lastNote = state.session.notes[state.session.notes.length - 1];
     const lastNoteLabel = lastNote.label;
     const lastNoteTimecode = lastNote.timecode;
@@ -337,24 +343,31 @@ function undoLastNote() {
     
     // Show visual feedback - find and highlight the button that was used
     const buttons = document.querySelectorAll('.note-button');
+    let buttonFound = false;
     buttons.forEach(btn => {
         const btnText = btn.textContent.trim();
-        // Check if this button matches the undone note (handle "other" notes specially)
-        if (lastNoteLabel.toLowerCase().startsWith('other')) {
+        // Extract base label (remove "other:" prefix if present)
+        const baseLabel = lastNoteLabel.split(':')[0].trim();
+        
+        // Check if this button matches the undone note
+        if (lastNoteLabel.toLowerCase().startsWith('other') || baseLabel.toLowerCase() === 'other') {
             // For "other" notes, highlight the "Other" button
             if (btnText.toLowerCase() === 'other') {
                 addButtonFeedback(btn);
+                buttonFound = true;
             }
         } else {
-            // For regular notes, match the button label
-            if (btnText.toLowerCase() === lastNoteLabel.toLowerCase() || 
-                btnText === capitalizeLabel(lastNoteLabel.split(':')[0])) {
+            // For regular notes, match the button label (case insensitive)
+            const btnLabelLower = btnText.toLowerCase();
+            const noteLabelLower = baseLabel.toLowerCase();
+            if (btnLabelLower === noteLabelLower || btnLabelLower === capitalizeLabel(baseLabel).toLowerCase()) {
                 addButtonFeedback(btn);
+                buttonFound = true;
             }
         }
     });
     
-    // Show toast notification
+    // Show toast notification with clear feedback
     showToast(`Undid: ${lastNoteLabel}`, lastNoteTimecode);
 }
 
