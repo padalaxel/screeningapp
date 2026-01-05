@@ -594,20 +594,25 @@ function showSetupModal() {
         // Ensure it's on top
         modal.style.zIndex = '10001';
     }
-    // Reset genre selection
-    document.querySelectorAll('.genre-btn').forEach(btn => {
-        btn.classList.remove('selected');
-    });
     // Clear inputs
     const nameInput = $('screeningNameInput');
     if (nameInput) {
         nameInput.value = '';
         nameInput.focus();
     }
+    
+    // Auto-select "Default" genre
+    document.querySelectorAll('.genre-btn').forEach(btn => {
+        btn.classList.remove('selected');
+        if (btn.dataset.genre === 'default') {
+            btn.classList.add('selected');
+            state.genre = 'default';
+        }
+    });
+    
+    // Enable start button since genre is selected
     const startBtn = $('startScreeningBtn');
-    if (startBtn) startBtn.disabled = true;
-    // Reset state
-    state.genre = null;
+    if (startBtn) startBtn.disabled = false;
 }
 
 // Start screening from setup
