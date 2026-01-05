@@ -32,7 +32,9 @@ function init() {
     
     // Register service worker
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW registration failed:', err));
+        // Use relative path for GitHub Pages compatibility
+        const swPath = './sw.js';
+        navigator.serviceWorker.register(swPath).catch(err => console.log('SW registration failed:', err));
     }
 }
 
