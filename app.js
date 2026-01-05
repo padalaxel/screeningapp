@@ -98,10 +98,24 @@ function loadState() {
                 state.session = parsed.session;
                 // Restore notes with proper structure
                 if (state.session.notes) {
-                    state.session.notes = state.session.notes.map(note => ({
-                        ...note,
-                        elapsedSeconds: parseFloat(note.elapsedSeconds) || 0
-                    }));
+                    // Migrate old notes that don't have baseLabel/context
+                    state.session.notes = state.session.notes.map(note => {
+                        // Migrate old notes that don't have baseLabel/context
+                        if (!note.baseLabel) {
+                            if (note.label.includes(':')) {
+                                const parts = note.label.split(':');
+                                note.baseLabel = parts[0].trim();
+                                note.context = parts.slice(1).join(':').trim();
+                            } else {
+                                note.baseLabel = note.label;
+                                note.context = '';
+                            }
+                        }
+                        return {
+                            ...note,
+                            elapsedSeconds: parseFloat(note.elapsedSeconds) || 0
+                        };
+                    });
                 }
             }
             if (parsed.fps) state.fps = parseFloat(parsed.fps);
