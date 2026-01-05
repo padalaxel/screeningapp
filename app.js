@@ -334,33 +334,23 @@ function undoLastNote() {
         return;
     }
     
-    // Get the last note index
-    const lastNoteIndex = state.session.notes.length - 1;
-    const lastNote = state.session.notes[lastNoteIndex];
+    // Get the last note
+    const lastNote = state.session.notes[state.session.notes.length - 1];
+    const lastNoteLabel = lastNote.label;
+    const lastNoteTimecode = lastNote.timecode;
     
-    // Add strikethrough to the last note item
-    const notesList = $('notesList');
-    if (notesList) {
-        const noteItems = notesList.querySelectorAll('.note-item');
-        if (noteItems[lastNoteIndex]) {
-            noteItems[lastNoteIndex].classList.add('note-undone');
-            
-            // Remove the note after showing strikethrough briefly
-            setTimeout(() => {
-                state.session.notes.pop();
-                saveState();
-                renderNotes();
-            }, 800); // Show strikethrough for 800ms
-        }
-    }
+    // Remove the last note
+    state.session.notes.pop();
+    saveState();
+    renderNotes();
     
     // Show visual feedback - find and highlight the button that was used
     const buttons = document.querySelectorAll('.note-button');
-    const baseLabel = lastNote.label.split(':')[0].trim();
+    const baseLabel = lastNoteLabel.split(':')[0].trim();
     buttons.forEach(btn => {
         const btnText = btn.textContent.trim();
         // Check if this button matches the undone note
-        if (lastNote.label.toLowerCase().startsWith('other') || baseLabel.toLowerCase() === 'other') {
+        if (lastNoteLabel.toLowerCase().startsWith('other') || baseLabel.toLowerCase() === 'other') {
             if (btnText.toLowerCase() === 'other') {
                 addButtonFeedback(btn);
             }
@@ -372,6 +362,16 @@ function undoLastNote() {
             }
         }
     });
+    
+    // Show toast with strikethrough text
+    const toast = $('toast');
+    if (toast) {
+        toast.innerHTML = `<span class="toast-timecode">${escapeHtml(lastNoteTimecode)}</span><span class="toast-label toast-strikethrough">${escapeHtml(lastNoteLabel)}</span>`;
+        toast.classList.add('show');
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 2000);
+    }
 }
 
 // Clear all notes
