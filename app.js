@@ -1025,8 +1025,11 @@ function updateDimOverlay(level) {
     const textColor = `rgb(${r}, ${g}, ${b})`;
     
     // Update specific text elements (including modal content)
-    const textElements = document.querySelectorAll('.screening-name, .elapsed-time, .note-item-label, .summary-label, .note-button, .btn-primary, .btn-small, .modal-header h2, .modal-body, .modal-body p, .input-text, .setting-group label');
+    // Exclude dimToggleBtn - it gets special treatment below
+    const textElements = document.querySelectorAll('.screening-name, .elapsed-time, .note-item-label, .summary-label, .note-button, .btn-primary, .btn-small:not(#dimToggleBtn), .modal-header h2, .modal-body, .modal-body p, .input-text, .setting-group label');
     textElements.forEach(el => {
+        // Skip dim button if it's in the list
+        if (el.id === 'dimToggleBtn') return;
         if (clampedLevel > 0) {
             el.style.color = textColor;
         } else {
