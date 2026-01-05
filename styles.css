@@ -297,6 +297,11 @@ html {
     margin: 0 auto;
 }
 
+.buttons-grid-large {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
 .note-button {
     background-color: #151515;
     color: #ffffff;
@@ -317,6 +322,12 @@ html {
     word-break: break-word;
     -webkit-user-select: none;
     user-select: none;
+}
+
+.buttons-grid-large .note-button {
+    padding: 32px 16px;
+    font-size: 22px;
+    min-height: 100px;
 }
 
 .note-button:active {
@@ -680,7 +691,7 @@ html {
 
 /* Responsive adjustments */
 @media (max-width: 480px) {
-    .buttons-grid {
+    .buttons-grid:not(.buttons-grid-large) {
         grid-template-columns: repeat(2, 1fr);
     }
     

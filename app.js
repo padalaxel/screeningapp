@@ -506,6 +506,14 @@ function renderButtons() {
     if (!grid) return;
     
     grid.innerHTML = '';
+    
+    // Add class based on number of buttons for responsive sizing
+    const buttonCount = state.buttonLabels.length;
+    grid.className = 'buttons-grid';
+    if (buttonCount === 2 || buttonCount === 4 || buttonCount === 6) {
+        grid.classList.add('buttons-grid-large');
+    }
+    
     state.buttonLabels.forEach((label, index) => {
         const button = document.createElement('button');
         button.className = 'note-button';
