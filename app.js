@@ -630,12 +630,25 @@ function startScreening() {
         screeningNameEl.textContent = screeningName;
     }
     
+    // Force scroll to top BEFORE closing modal
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    if (window.pageYOffset !== 0) {
+        window.scrollTo(0, 0);
+    }
+    
     // Close setup modal - force close
     const setupModal = $('setupModal');
     if (setupModal) {
         setupModal.classList.remove('active');
         setupModal.style.display = 'none';
     }
+    
+    // Force scroll to top immediately after closing modal
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
     
     // Initialize app
     renderButtons();
@@ -652,14 +665,16 @@ function startScreening() {
         }
     };
     
-    // Scroll immediately
+    // Scroll immediately after rendering
     forceScrollToTop();
     
-    // Scroll after a short delay (after buttons render)
+    // Scroll after multiple delays to catch any layout shifts
+    setTimeout(forceScrollToTop, 0);
     setTimeout(forceScrollToTop, 10);
     setTimeout(forceScrollToTop, 50);
     setTimeout(forceScrollToTop, 100);
     setTimeout(forceScrollToTop, 200);
+    setTimeout(forceScrollToTop, 300);
 }
 
 // Show other note modal
