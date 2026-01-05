@@ -75,15 +75,15 @@ body {
 
 .dim-slider {
     flex: 1;
-    height: 6px;
-    background: #1a1a1a;
-    border-radius: 3px;
+    height: 20px; /* Taller to accommodate triangle */
+    background: transparent;
     outline: none;
     -webkit-appearance: none;
     appearance: none;
     touch-action: none;
     -webkit-tap-highlight-color: transparent;
     direction: rtl; /* Reverse direction - right to left */
+    position: relative;
 }
 
 .dim-slider::-webkit-slider-thumb {
@@ -95,8 +95,10 @@ body {
     border-radius: 50%;
     cursor: pointer;
     border: 2px solid #1a1a1a;
-    margin-top: -7px;
+    margin-top: -10px;
     touch-action: none;
+    position: relative;
+    z-index: 2;
 }
 
 .dim-slider::-moz-range-thumb {
@@ -111,16 +113,54 @@ body {
 
 .dim-slider::-webkit-slider-runnable-track {
     width: 100%;
-    height: 6px;
-    background: #2a2a2a;
-    border-radius: 3px;
+    height: 20px;
+    background: transparent;
+    border-radius: 0;
 }
 
 .dim-slider::-moz-range-track {
     width: 100%;
-    height: 6px;
-    background: #2a2a2a;
-    border-radius: 3px;
+    height: 20px;
+    background: transparent;
+    border-radius: 0;
+}
+
+/* Triangle track background using pseudo-element */
+.dim-slider-container {
+    position: relative;
+}
+
+.dim-slider-container::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 20px;
+    background: linear-gradient(to left, 
+        #2a2a2a 0%, 
+        #2a2a2a 50%, 
+        transparent 50%, 
+        transparent 100%);
+    clip-path: polygon(0% 100%, 100% 0%, 100% 100%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Triangle track - create visual triangle shape */
+.dim-slider-container::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 20px;
+    background: #1a1a1a;
+    clip-path: polygon(0% 100%, 100% 0%, 100% 100%);
+    pointer-events: none;
+    z-index: 0;
 }
 
 /* iOS specific slider fixes */
@@ -136,7 +176,12 @@ body {
     .dim-slider::-webkit-slider-thumb {
         width: 24px;
         height: 24px;
-        margin-top: -9px;
+        margin-top: -12px;
+    }
+    
+    .dim-slider-container::before,
+    .dim-slider-container::after {
+        height: 44px;
     }
 }
 
