@@ -260,11 +260,11 @@ function addButtonFeedback(button) {
 function addNote(label, customText = null) {
     if (!state.session) return;
     
-    // Use custom text if provided, otherwise use label
-    const noteLabel = customText ? `${label}: ${customText}` : label;
+    // Use custom text if provided, otherwise use capitalized label
+    const displayLabel = customText ? `${capitalizeLabel(label)}: ${customText}` : capitalizeLabel(label);
     
     const note = {
-        label: noteLabel,
+        label: displayLabel,
         elapsedSeconds: state.elapsedSeconds,
         elapsedHMS: formatElapsed(state.elapsedSeconds),
         timecode: formatTimecode(state.elapsedSeconds, state.fps),
@@ -275,16 +275,17 @@ function addNote(label, customText = null) {
     saveState();
     renderNotes();
     
-    // Show visual feedback
+    // Show visual feedback - match by original label
     const buttons = document.querySelectorAll('.note-button');
     buttons.forEach(btn => {
-        if (btn.textContent.trim() === label) {
+        const btnLabel = btn.textContent.trim().toLowerCase();
+        if (btnLabel === label.toLowerCase() || btnLabel === capitalizeLabel(label).toLowerCase()) {
             addButtonFeedback(btn);
         }
     });
     
     // Show toast notification
-    showToast(noteLabel, note.timecode);
+    showToast(displayLabel, note.timecode);
 }
 
 // Delete note
@@ -309,6 +310,15 @@ function clearNotes() {
     });
 }
 
+// Capitalize button label
+function capitalizeLabel(label) {
+    // Capitalize first letter of each word
+    return label.split(' ').map(word => {
+        if (word.length === 0) return word;
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+    }).join(' ');
+}
+
 // Render buttons
 function renderButtons() {
     const grid = $('buttonsGrid');
@@ -318,14 +328,15 @@ function renderButtons() {
     state.buttonLabels.forEach((label, index) => {
         const button = document.createElement('button');
         button.className = 'note-button';
-        button.textContent = label;
+        const displayLabel = capitalizeLabel(label);
+        button.textContent = displayLabel;
         button.addEventListener('click', () => {
             if (state.isRunning || state.elapsedSeconds > 0) {
-                // Special handling for "other" button
+                // Special handling for "other" button (use original label for logic)
                 if (label.toLowerCase() === 'other') {
                     showOtherNoteModal();
                 } else {
-                    addNote(label);
+                    addNote(label); // Store original label
                 }
             } else {
                 // Show feedback even if timer hasn't started

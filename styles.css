@@ -39,17 +39,15 @@ body {
 
 .header-top {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
+    flex-direction: column;
     gap: 12px;
+    margin-bottom: 12px;
 }
 
 .screening-name {
     font-size: 14px;
     color: #cccccc;
     font-weight: 500;
-    flex: 1;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -59,6 +57,7 @@ body {
     display: flex;
     gap: 8px;
     align-items: center;
+    justify-content: flex-start;
 }
 
 /* Dim Slider */
@@ -76,47 +75,68 @@ body {
 }
 
 .dim-slider {
-    width: 80px;
-    height: 4px;
+    width: 100px;
+    height: 6px;
     background: #1a1a1a;
-    border-radius: 2px;
+    border-radius: 3px;
     outline: none;
     -webkit-appearance: none;
     appearance: none;
+    touch-action: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .dim-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 16px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
     background: #4a9eff;
     border-radius: 50%;
     cursor: pointer;
     border: 2px solid #1a1a1a;
+    margin-top: -7px;
+    touch-action: none;
 }
 
 .dim-slider::-moz-range-thumb {
-    width: 16px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
     background: #4a9eff;
     border-radius: 50%;
     cursor: pointer;
     border: 2px solid #1a1a1a;
+    touch-action: none;
 }
 
 .dim-slider::-webkit-slider-runnable-track {
     width: 100%;
-    height: 4px;
+    height: 6px;
     background: #2a2a2a;
-    border-radius: 2px;
+    border-radius: 3px;
 }
 
 .dim-slider::-moz-range-track {
     width: 100%;
-    height: 4px;
+    height: 6px;
     background: #2a2a2a;
-    border-radius: 2px;
+    border-radius: 3px;
+}
+
+/* iOS specific slider fixes */
+@supports (-webkit-touch-callout: none) {
+    .dim-slider {
+        -webkit-appearance: none;
+        height: 44px; /* Larger touch target for iOS */
+        padding: 0;
+        margin: 0;
+    }
+    
+    .dim-slider::-webkit-slider-thumb {
+        width: 24px;
+        height: 24px;
+        margin-top: -9px;
+    }
 }
 
 .timer-section {
