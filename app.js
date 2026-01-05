@@ -925,6 +925,31 @@ function setupEventListeners() {
         });
     }
     
+    const exportNotesBtn = $('exportNotesBtn');
+    if (exportNotesBtn) {
+        exportNotesBtn.addEventListener('click', async () => {
+            const notesText = exportToNotes();
+            if (notesText) {
+                if (navigator.share) {
+                    try {
+                        await navigator.share({
+                            text: notesText,
+                            title: `${state.session.name || 'Screening Notes'}`
+                        });
+                    } catch (e) {
+                        if (e.name !== 'AbortError') {
+                            // Fallback to copy if share fails
+                            await copyToClipboard(notesText);
+                        }
+                    }
+                } else {
+                    // Fallback to copy if Web Share API not available
+                    await copyToClipboard(notesText);
+                }
+            }
+        });
+    }
+    
     // Clear
     const clearBtn = $('clearBtn');
     if (clearBtn) {
