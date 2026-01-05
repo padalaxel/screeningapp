@@ -1,0 +1,645 @@
+// Selector helper that works with or without #
+function $(selector) {
+    if (selector.startsWith('#')) {
+        return document.getElementById(selector.substring(1));
+    }
+    return document.getElementById(selector);
+}
+
+// State
+let state = {
+    isRunning: false,
+    startTime: null,
+    pausedTime: 0,
+    elapsedSeconds: 0,
+    fps: 24,
+    session: null,
+    buttonLabels: ['Note 1', 'Note 2', 'Note 3', 'Note 4', 'Note 5', 'Note 6'],
+    dimActive: false
+};
+
+let timerInterval = null;
+let pendingConfirm = null;
+
+// Initialize
+function init() {
+    loadState();
+    setupEventListeners();
+    renderButtons();
+    renderNotes();
+    updateTimer();
+    closeAllModals();
+    
+    // Register service worker
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW registration failed:', err));
+    }
+}
+
+// Load state from localStorage
+function loadState() {
+    try {
+        const saved = localStorage.getItem('screeningAppState');
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            if (parsed.session) {
+                state.session = parsed.session;
+                // Restore notes with proper structure
+                if (state.session.notes) {
+                    state.session.notes = state.session.notes.map(note => ({
+                        ...note,
+                        elapsedSeconds: parseFloat(note.elapsedSeconds) || 0
+                    }));
+                }
+            }
+            if (parsed.fps) state.fps = parseFloat(parsed.fps);
+            if (parsed.buttonLabels && Array.isArray(parsed.buttonLabels)) {
+                state.buttonLabels = parsed.buttonLabels;
+            }
+        }
+    } catch (e) {
+        console.error('Failed to load state:', e);
+    }
+    
+    // Ensure we have a session
+    if (!state.session) {
+        createNewSession();
+    }
+    
+    // Update FPS select
+    const fpsSelect = $('fpsSelect');
+    if (fpsSelect) {
+        fpsSelect.value = state.fps.toString();
+    }
+}
+
+// Save state to localStorage
+function saveState() {
+    try {
+        localStorage.setItem('screeningAppState', JSON.stringify({
+            session: state.session,
+            fps: state.fps,
+            buttonLabels: state.buttonLabels
+        }));
+    } catch (e) {
+        console.error('Failed to save state:', e);
+    }
+}
+
+// Create new session
+function createNewSession() {
+    const now = new Date();
+    const sessionName = `Session ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`;
+    state.session = {
+        id: Date.now().toString(),
+        name: sessionName,
+        createdAt: now.toISOString(),
+        notes: []
+    };
+    saveState();
+}
+
+// Format elapsed seconds to HH:MM:SS
+function formatElapsed(seconds) {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = Math.floor(seconds % 60);
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+
+// Format elapsed seconds to timecode HH:MM:SS:FF
+function formatTimecode(seconds, fps) {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = Math.floor(seconds % 60);
+    const frames = Math.floor((seconds % 1) * fps);
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}:${String(frames).padStart(2, '0')}`;
+}
+
+// Update timer display
+function updateTimer() {
+    const statusEl = $('status');
+    const elapsedEl = $('elapsedTime');
+    const timecodeEl = $('timecode');
+    const startPauseBtn = $('startPauseBtn');
+    
+    if (!statusEl || !elapsedEl || !timecodeEl || !startPauseBtn) return;
+    
+    if (state.isRunning) {
+        const now = Date.now();
+        const elapsed = (now - state.startTime) / 1000 + state.pausedTime;
+        state.elapsedSeconds = elapsed;
+        
+        statusEl.textContent = 'RUNNING';
+        statusEl.className = 'status running';
+        startPauseBtn.textContent = 'Pause';
+    } else {
+        statusEl.textContent = state.elapsedSeconds > 0 ? 'PAUSED' : 'STOPPED';
+        statusEl.className = state.elapsedSeconds > 0 ? 'status paused' : 'status';
+        startPauseBtn.textContent = state.elapsedSeconds > 0 ? 'Resume' : 'Start';
+    }
+    
+    elapsedEl.textContent = formatElapsed(state.elapsedSeconds);
+    timecodeEl.textContent = formatTimecode(state.elapsedSeconds, state.fps);
+}
+
+// Start/Pause timer
+function toggleTimer() {
+    if (state.isRunning) {
+        // Pause
+        state.pausedTime = state.elapsedSeconds;
+        state.isRunning = false;
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+    } else {
+        // Start/Resume
+        if (state.elapsedSeconds === 0) {
+            state.startTime = Date.now();
+            state.pausedTime = 0;
+        } else {
+            state.startTime = Date.now() - (state.pausedTime * 1000);
+        }
+        state.isRunning = true;
+        timerInterval = setInterval(updateTimer, 100); // Update every 100ms
+    }
+    updateTimer();
+}
+
+// Add note
+function addNote(label) {
+    if (!state.session) return;
+    
+    const note = {
+        label: label,
+        elapsedSeconds: state.elapsedSeconds,
+        elapsedHMS: formatElapsed(state.elapsedSeconds),
+        timecode: formatTimecode(state.elapsedSeconds, state.fps),
+        deviceTimestamp: new Date().toISOString()
+    };
+    
+    state.session.notes.push(note);
+    saveState();
+    renderNotes();
+}
+
+// Delete note
+function deleteNote(index) {
+    if (!state.session || !state.session.notes[index]) return;
+    
+    showConfirm('Delete this note?', () => {
+        state.session.notes.splice(index, 1);
+        saveState();
+        renderNotes();
+    });
+}
+
+// Clear all notes
+function clearNotes() {
+    showConfirm('Clear all notes? This cannot be undone.', () => {
+        if (state.session) {
+            state.session.notes = [];
+            saveState();
+            renderNotes();
+        }
+    });
+}
+
+// Render buttons
+function renderButtons() {
+    const grid = $('buttonsGrid');
+    if (!grid) return;
+    
+    grid.innerHTML = '';
+    state.buttonLabels.forEach((label, index) => {
+        const button = document.createElement('button');
+        button.className = 'note-button';
+        button.textContent = label;
+        button.addEventListener('click', () => {
+            if (state.isRunning || state.elapsedSeconds > 0) {
+                addNote(label);
+            }
+        });
+        // Prevent iOS context menu
+        button.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            return false;
+        });
+        grid.appendChild(button);
+    });
+}
+
+// Render notes list
+function renderNotes() {
+    const list = $('notesList');
+    if (!list) return;
+    
+    if (!state.session || !state.session.notes || state.session.notes.length === 0) {
+        list.innerHTML = '<div style="color: #666; text-align: center; padding: 20px;">No notes yet</div>';
+        return;
+    }
+    
+    list.innerHTML = '';
+    state.session.notes.forEach((note, index) => {
+        const item = document.createElement('div');
+        item.className = 'note-item';
+        item.innerHTML = `
+            <span class="note-item-label">${escapeHtml(note.label)}</span>
+            <span class="note-item-timecode">${escapeHtml(note.timecode)}</span>
+        `;
+        item.addEventListener('click', () => deleteNote(index));
+        list.appendChild(item);
+    });
+}
+
+// Escape HTML
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Show summary
+function showSummary() {
+    if (!state.session || !state.session.notes || state.session.notes.length === 0) {
+        alert('No notes to summarize');
+        return;
+    }
+    
+    const counts = {};
+    state.session.notes.forEach(note => {
+        counts[note.label] = (counts[note.label] || 0) + 1;
+    });
+    
+    const sorted = Object.entries(counts)
+        .sort((a, b) => b[1] - a[1])
+        .map(([label, count]) => ({ label, count }));
+    
+    const content = $('summaryContent');
+    if (!content) return;
+    
+    content.innerHTML = '';
+    sorted.forEach(({ label, count }) => {
+        const item = document.createElement('div');
+        item.className = 'summary-item';
+        item.innerHTML = `
+            <span class="summary-label">${escapeHtml(label)}</span>
+            <span class="summary-count">${count}</span>
+        `;
+        content.appendChild(item);
+    });
+    
+    showModal('summaryModal');
+}
+
+// Export CSV
+function exportCsv() {
+    if (!state.session || !state.session.notes || state.session.notes.length === 0) {
+        alert('No notes to export');
+        return;
+    }
+    
+    const lines = ['SessionName,Date,Label,ElapsedTime,Timecode,FPS,DeviceTimestamp'];
+    state.session.notes.forEach(note => {
+        lines.push([
+            escapeCsv(state.session.name),
+            escapeCsv(state.session.createdAt),
+            escapeCsv(note.label),
+            note.elapsedSeconds.toFixed(3),
+            escapeCsv(note.timecode),
+            state.fps.toString(),
+            escapeCsv(note.deviceTimestamp)
+        ].join(','));
+    });
+    
+    return lines.join('\n');
+}
+
+// Export Text
+function exportText() {
+    if (!state.session || !state.session.notes || !state.session.notes.length === 0) {
+        alert('No notes to export');
+        return;
+    }
+    
+    return state.session.notes.map(note => `${note.timecode}  ${note.label}`).join('\n');
+}
+
+// Escape CSV
+function escapeCsv(text) {
+    if (text.includes(',') || text.includes('"') || text.includes('\n')) {
+        return `"${text.replace(/"/g, '""')}"`;
+    }
+    return text;
+}
+
+// Share or download file
+async function shareOrDownload(content, filename, mimeType) {
+    const blob = new Blob([content], { type: mimeType });
+    const file = new File([blob], filename, { type: mimeType });
+    
+    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+            await navigator.share({
+                files: [file],
+                title: filename
+            });
+            return;
+        } catch (e) {
+            if (e.name !== 'AbortError') {
+                console.error('Share failed:', e);
+            } else {
+                return; // User cancelled
+            }
+        }
+    }
+    
+    // Fallback to download
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+// Copy to clipboard
+async function copyToClipboard(text) {
+    try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(text);
+            alert('Copied to clipboard');
+        } else {
+            // Fallback for older browsers
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                alert('Copied to clipboard');
+            } catch (e) {
+                alert('Failed to copy. Please select and copy manually.');
+            }
+            document.body.removeChild(textarea);
+        }
+    } catch (e) {
+        console.error('Copy failed:', e);
+        alert('Failed to copy. Please select and copy manually.');
+    }
+}
+
+// Show modal
+function showModal(modalId) {
+    const modal = $(modalId);
+    if (modal) {
+        modal.classList.add('active');
+    }
+}
+
+// Close modal
+function closeModal(modalId) {
+    const modal = $(modalId);
+    if (modal) {
+        modal.classList.remove('active');
+    }
+}
+
+// Close all modals
+function closeAllModals() {
+    closeModal('settingsModal');
+    closeModal('summaryModal');
+    closeModal('exportModal');
+    closeModal('confirmModal');
+}
+
+// Show confirmation
+function showConfirm(message, callback) {
+    const messageEl = $('confirmMessage');
+    if (messageEl) {
+        messageEl.textContent = message;
+    }
+    pendingConfirm = callback;
+    showModal('confirmModal');
+}
+
+// Setup event listeners
+function setupEventListeners() {
+    // Start/Pause button
+    const startPauseBtn = $('startPauseBtn');
+    if (startPauseBtn) {
+        startPauseBtn.addEventListener('click', toggleTimer);
+    }
+    
+    // New session
+    const newBtn = $('newBtn');
+    if (newBtn) {
+        newBtn.addEventListener('click', () => {
+            showConfirm('Start a new session? This will reset the timer and clear all notes.', () => {
+                state.isRunning = false;
+                state.elapsedSeconds = 0;
+                state.pausedTime = 0;
+                state.startTime = null;
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                }
+                createNewSession();
+                updateTimer();
+                renderNotes();
+            });
+        });
+    }
+    
+    // Settings
+    const settingsBtn = $('settingsBtn');
+    if (settingsBtn) {
+        settingsBtn.addEventListener('click', () => {
+            renderSettings();
+            showModal('settingsModal');
+        });
+    }
+    
+    const closeSettings = $('closeSettings');
+    if (closeSettings) {
+        closeSettings.addEventListener('click', () => closeModal('settingsModal'));
+    }
+    
+    const saveSettings = $('saveSettings');
+    if (saveSettings) {
+        saveSettings.addEventListener('click', () => {
+            const fpsSelect = $('fpsSelect');
+            if (fpsSelect) {
+                state.fps = parseFloat(fpsSelect.value);
+            }
+            
+            // Get button labels from inputs
+            const inputs = document.querySelectorAll('#buttonLabelsContainer input');
+            const labels = Array.from(inputs).map(input => input.value.trim() || 'Note').filter(Boolean);
+            if (labels.length >= 6 && labels.length <= 9) {
+                state.buttonLabels = labels;
+            } else {
+                alert('Please provide 6-9 button labels');
+                return;
+            }
+            
+            saveState();
+            renderButtons();
+            closeModal('settingsModal');
+        });
+    }
+    
+    // Summary
+    const summaryBtn = $('summaryBtn');
+    if (summaryBtn) {
+        summaryBtn.addEventListener('click', showSummary);
+    }
+    
+    const closeSummary = $('closeSummary');
+    if (closeSummary) {
+        closeSummary.addEventListener('click', () => closeModal('summaryModal'));
+    }
+    
+    // Export
+    const exportBtn = $('exportBtn');
+    if (exportBtn) {
+        exportBtn.addEventListener('click', () => showModal('exportModal'));
+    }
+    
+    const closeExport = $('closeExport');
+    if (closeExport) {
+        closeExport.addEventListener('click', () => closeModal('exportModal'));
+    }
+    
+    const shareCsvBtn = $('shareCsvBtn');
+    if (shareCsvBtn) {
+        shareCsvBtn.addEventListener('click', async () => {
+            const csv = exportCsv();
+            if (csv) {
+                await shareOrDownload(csv, `${state.session.name.replace(/[^a-z0-9]/gi, '_')}.csv`, 'text/csv');
+            }
+        });
+    }
+    
+    const shareTextBtn = $('shareTextBtn');
+    if (shareTextBtn) {
+        shareTextBtn.addEventListener('click', async () => {
+            const text = exportText();
+            if (text) {
+                await shareOrDownload(text, `${state.session.name.replace(/[^a-z0-9]/gi, '_')}.txt`, 'text/plain');
+            }
+        });
+    }
+    
+    const copyCsvBtn = $('copyCsvBtn');
+    if (copyCsvBtn) {
+        copyCsvBtn.addEventListener('click', async () => {
+            const csv = exportCsv();
+            if (csv) {
+                await copyToClipboard(csv);
+            }
+        });
+    }
+    
+    const copyTextBtn = $('copyTextBtn');
+    if (copyTextBtn) {
+        copyTextBtn.addEventListener('click', async () => {
+            const text = exportText();
+            if (text) {
+                await copyToClipboard(text);
+            }
+        });
+    }
+    
+    // Clear
+    const clearBtn = $('clearBtn');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', clearNotes);
+    }
+    
+    // Confirmation
+    const confirmOk = $('confirmOk');
+    if (confirmOk) {
+        confirmOk.addEventListener('click', () => {
+            if (pendingConfirm) {
+                pendingConfirm();
+                pendingConfirm = null;
+            }
+            closeModal('confirmModal');
+        });
+    }
+    
+    const confirmCancel = $('confirmCancel');
+    if (confirmCancel) {
+        confirmCancel.addEventListener('click', () => {
+            pendingConfirm = null;
+            closeModal('confirmModal');
+        });
+    }
+    
+    // Dim overlay toggle
+    const dimToggle = $('dimToggle');
+    const dimOverlay = $('dimOverlay');
+    if (dimToggle && dimOverlay) {
+        dimToggle.addEventListener('click', () => {
+            state.dimActive = !state.dimActive;
+            if (state.dimActive) {
+                dimOverlay.classList.add('active');
+            } else {
+                dimOverlay.classList.remove('active');
+            }
+        });
+    }
+    
+    // Close modals on background click
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+    });
+}
+
+// Render settings
+function renderSettings() {
+    const container = $('buttonLabelsContainer');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    state.buttonLabels.forEach((label, index) => {
+        const div = document.createElement('div');
+        div.className = 'button-label-input';
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'input-text';
+        input.value = label;
+        input.placeholder = `Button ${index + 1}`;
+        div.appendChild(input);
+        container.appendChild(div);
+    });
+    
+    // Add one empty input for adding more buttons (up to 9)
+    if (state.buttonLabels.length < 9) {
+        const div = document.createElement('div');
+        div.className = 'button-label-input';
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'input-text';
+        input.placeholder = 'Add button (optional)';
+        div.appendChild(input);
+        container.appendChild(div);
+    }
+}
+
+// Initialize on load
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}

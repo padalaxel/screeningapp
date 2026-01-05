@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#000000">
+    <title>Screening Notes</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.webmanifest">
+</head>
+<body>
+    <!-- Dim overlay toggle -->
+    <div id="dimOverlay" class="dim-overlay"></div>
+    
+    <!-- Header -->
+    <header class="header">
+        <div class="header-top">
+            <button id="newBtn" class="btn-small">New</button>
+            <button id="settingsBtn" class="btn-small">Settings</button>
+            <button id="dimToggle" class="btn-small">Dim</button>
+        </div>
+        <div class="timer-section">
+            <div id="status" class="status">STOPPED</div>
+            <div id="elapsedTime" class="elapsed-time">00:00:00</div>
+            <div id="timecode" class="timecode">00:00:00:00</div>
+            <button id="startPauseBtn" class="btn-primary">Start</button>
+        </div>
+    </header>
+
+    <!-- Buttons Grid -->
+    <main class="main-content">
+        <div id="buttonsGrid" class="buttons-grid">
+            <!-- Buttons will be dynamically generated -->
+        </div>
+    </main>
+
+    <!-- Notes List -->
+    <section class="notes-section">
+        <div class="notes-header">
+            <h2>Notes</h2>
+            <div class="notes-actions">
+                <button id="summaryBtn" class="btn-small">Summary</button>
+                <button id="exportBtn" class="btn-small">Export</button>
+                <button id="clearBtn" class="btn-small btn-danger">Clear</button>
+            </div>
+        </div>
+        <div id="notesList" class="notes-list">
+            <!-- Notes will be dynamically generated -->
+        </div>
+    </section>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Settings</h2>
+                <button id="closeSettings" class="btn-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-group">
+                    <label for="fpsSelect">FPS:</label>
+                    <select id="fpsSelect" class="input-select">
+                        <option value="23.976">23.976</option>
+                        <option value="24" selected>24</option>
+                        <option value="25">25</option>
+                        <option value="29.97">29.97</option>
+                        <option value="30">30</option>
+                    </select>
+                </div>
+                <div class="setting-group">
+                    <label>Button Labels (tap to edit):</label>
+                    <div id="buttonLabelsContainer" class="button-labels-container">
+                        <!-- Dynamically generated -->
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="saveSettings" class="btn-primary">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Modal -->
+    <div id="summaryModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Summary</h2>
+                <button id="closeSummary" class="btn-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="summaryContent" class="summary-content">
+                    <!-- Dynamically generated -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div id="exportModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Export</h2>
+                <button id="closeExport" class="btn-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="export-actions">
+                    <button id="shareCsvBtn" class="btn-primary">Share CSV</button>
+                    <button id="shareTextBtn" class="btn-primary">Share Text</button>
+                    <button id="copyCsvBtn" class="btn-primary">Copy CSV</button>
+                    <button id="copyTextBtn" class="btn-primary">Copy Text</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content modal-small">
+            <div class="modal-body">
+                <p id="confirmMessage"></p>
+            </div>
+            <div class="modal-footer">
+                <button id="confirmCancel" class="btn-small">Cancel</button>
+                <button id="confirmOk" class="btn-small btn-danger">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
