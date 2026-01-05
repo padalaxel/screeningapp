@@ -951,6 +951,21 @@ function renderSettings() {
         // Show capitalized version in input, but store original
         input.value = capitalizeLabel(label);
         input.placeholder = `Button ${index + 1}`;
+        
+        // Add remove button (red X) - only show if more than 6 buttons
+        if (state.buttonLabels.length > 6) {
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'btn-remove';
+            removeBtn.innerHTML = '&times;';
+            removeBtn.title = 'Remove button';
+            removeBtn.addEventListener('click', () => {
+                state.buttonLabels.splice(index, 1);
+                saveState();
+                renderSettings();
+            });
+            div.appendChild(removeBtn);
+        }
+        
         div.appendChild(input);
         container.appendChild(div);
     });

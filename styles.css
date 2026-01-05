@@ -490,6 +490,33 @@ body {
     flex: 1;
 }
 
+.btn-remove {
+    background: none;
+    border: none;
+    color: #ff6b6b;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background-color 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+    flex-shrink: 0;
+}
+
+.btn-remove:hover {
+    background-color: rgba(255, 107, 107, 0.1);
+}
+
+.btn-remove:active {
+    background-color: rgba(255, 107, 107, 0.2);
+}
+
 /* Summary */
 .summary-content {
     display: flex;
