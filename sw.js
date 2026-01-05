@@ -1,6 +1,6 @@
 // Service Worker for Screening Notes
-// Version for cache busting
-const CACHE_VERSION = 'v1';
+// Use timestamp for aggressive cache busting during development
+const CACHE_VERSION = Date.now().toString();
 const CACHE_NAME = `screening-notes-${CACHE_VERSION}`;
 
 // Assets to cache (relative to service worker location)
@@ -30,63 +30,45 @@ self.addEventListener('activate', (event) => {
         caches.keys().then((cacheNames) => {
             return Promise.all(
                 cacheNames.map((cacheName) => {
-                    if (cacheName !== CACHE_NAME) {
+                    // Delete all old screening-notes caches
+                    if (cacheName.startsWith('screening-notes-') && cacheName !== CACHE_NAME) {
                         return caches.delete(cacheName);
                     }
                 })
             );
         })
     );
-    self.clients.claim();
+    // Take control immediately
+    return self.clients.claim();
 });
 
-// Fetch event - network first for navigation, cache first for assets
+// Fetch event - network first for ALL requests to prevent stale cache
 self.addEventListener('fetch', (event) => {
-    const url = new URL(event.request.url);
-    
-    // Network first for navigation requests (always get fresh HTML)
-    if (event.request.mode === 'navigate') {
-        event.respondWith(
-            fetch(event.request)
-                .then((response) => {
-                    // Cache the fresh response
+    // Network-first strategy for all requests to ensure fresh content during development
+    event.respondWith(
+        fetch(event.request)
+            .then((response) => {
+                // Only cache successful responses for offline use
+                if (response && response.status === 200) {
                     const responseClone = response.clone();
                     caches.open(CACHE_NAME).then((cache) => {
                         cache.put(event.request, responseClone);
                     });
-                    return response;
-                })
-                .catch(() => {
-                    // Fallback to cache if network fails
-                    return caches.match(event.request).then((cachedResponse) => {
-                        if (cachedResponse) {
-                            return cachedResponse;
-                        }
-                        // Fallback to index.html for SPA routing
-                        return caches.match('./index.html');
-                    });
-                })
-        );
-    } else {
-        // Cache first for assets
-        event.respondWith(
-            caches.match(event.request)
-                .then((cachedResponse) => {
+                }
+                return response;
+            })
+            .catch(() => {
+                // Fallback to cache only if network fails (offline mode)
+                return caches.match(event.request).then((cachedResponse) => {
                     if (cachedResponse) {
                         return cachedResponse;
                     }
-                    return fetch(event.request).then((response) => {
-                        // Don't cache non-successful responses
-                        if (!response || response.status !== 200 || response.type !== 'basic') {
-                            return response;
-                        }
-                        const responseToCache = response.clone();
-                        caches.open(CACHE_NAME).then((cache) => {
-                            cache.put(event.request, responseToCache);
-                        });
-                        return response;
-                    });
-                })
-        );
-    }
+                    // For navigation requests, fallback to index.html
+                    if (event.request.mode === 'navigate') {
+                        return caches.match('./index.html');
+                    }
+                    return new Response('Offline', { status: 503 });
+                });
+            })
+    );
 });
