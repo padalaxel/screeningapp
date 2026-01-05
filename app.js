@@ -552,6 +552,12 @@ function startScreening() {
     // Close setup modal
     closeModal('setupModal');
     
+    // Update header with screening name
+    const screeningNameEl = $('screeningName');
+    if (screeningNameEl) {
+        screeningNameEl.textContent = screeningName;
+    }
+    
     // Initialize app
     renderButtons();
     renderNotes();

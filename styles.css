@@ -46,6 +46,22 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 12px;
+    gap: 12px;
+}
+
+.screening-name {
+    font-size: 14px;
+    color: #cccccc;
+    font-weight: 500;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.header-buttons {
+    display: flex;
+    gap: 8px;
 }
 
 .timer-section {
