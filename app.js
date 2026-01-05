@@ -6,6 +6,13 @@ function $(selector) {
     return document.getElementById(selector);
 }
 
+// Genre button configurations
+const GENRE_BUTTONS = {
+    comedy: ['funny', 'not funny', 'timing weird', 'performance', 'music', 'other'],
+    action: ['vfx', 'performance', 'too long', 'confusing', 'music', 'other'],
+    documentary: ['too long', 'needs context', 're-order', 'confusing', 'story', 'other']
+};
+
 // State
 let state = {
     isRunning: false,
@@ -15,7 +22,10 @@ let state = {
     fps: 24,
     session: null,
     buttonLabels: ['Note 1', 'Note 2', 'Note 3', 'Note 4', 'Note 5', 'Note 6'],
-    dimActive: false
+    dimActive: false,
+    genre: null,
+    screeningName: '',
+    setupComplete: false
 };
 
 let timerInterval = null;
@@ -25,9 +35,16 @@ let pendingConfirm = null;
 function init() {
     loadState();
     setupEventListeners();
-    renderButtons();
-    renderNotes();
-    updateTimer();
+    
+    // Check if setup is needed
+    if (!state.setupComplete || !state.genre || !state.screeningName) {
+        showSetupModal();
+    } else {
+        renderButtons();
+        renderNotes();
+        updateTimer();
+    }
+    
     closeAllModals();
     
     // Register service worker
@@ -58,14 +75,12 @@ function loadState() {
             if (parsed.buttonLabels && Array.isArray(parsed.buttonLabels)) {
                 state.buttonLabels = parsed.buttonLabels;
             }
+            if (parsed.genre) state.genre = parsed.genre;
+            if (parsed.screeningName) state.screeningName = parsed.screeningName;
+            if (parsed.setupComplete !== undefined) state.setupComplete = parsed.setupComplete;
         }
     } catch (e) {
         console.error('Failed to load state:', e);
-    }
-    
-    // Ensure we have a session
-    if (!state.session) {
-        createNewSession();
     }
     
     // Update FPS select
@@ -81,7 +96,10 @@ function saveState() {
         localStorage.setItem('screeningAppState', JSON.stringify({
             session: state.session,
             fps: state.fps,
-            buttonLabels: state.buttonLabels
+            buttonLabels: state.buttonLabels,
+            genre: state.genre,
+            screeningName: state.screeningName,
+            setupComplete: state.setupComplete
         }));
     } catch (e) {
         console.error('Failed to save state:', e);
@@ -91,12 +109,13 @@ function saveState() {
 // Create new session
 function createNewSession() {
     const now = new Date();
-    const sessionName = `Session ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`;
+    const sessionName = state.screeningName || `Session ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`;
     state.session = {
         id: Date.now().toString(),
         name: sessionName,
         createdAt: now.toISOString(),
-        notes: []
+        notes: [],
+        genre: state.genre
     };
     saveState();
 }
@@ -208,11 +227,14 @@ function addButtonFeedback(button) {
 }
 
 // Add note
-function addNote(label) {
+function addNote(label, customText = null) {
     if (!state.session) return;
     
+    // Use custom text if provided, otherwise use label
+    const noteLabel = customText ? `${label}: ${customText}` : label;
+    
     const note = {
-        label: label,
+        label: noteLabel,
         elapsedSeconds: state.elapsedSeconds,
         elapsedHMS: formatElapsed(state.elapsedSeconds),
         timecode: formatTimecode(state.elapsedSeconds, state.fps),
@@ -232,7 +254,7 @@ function addNote(label) {
     });
     
     // Show toast notification
-    showToast(label, note.timecode);
+    showToast(noteLabel, note.timecode);
 }
 
 // Delete note
@@ -269,7 +291,12 @@ function renderButtons() {
         button.textContent = label;
         button.addEventListener('click', () => {
             if (state.isRunning || state.elapsedSeconds > 0) {
-                addNote(label);
+                // Special handling for "other" button
+                if (label.toLowerCase() === 'other') {
+                    showOtherNoteModal();
+                } else {
+                    addNote(label);
+                }
             } else {
                 // Show feedback even if timer hasn't started
                 addButtonFeedback(button);
@@ -483,12 +510,140 @@ function showConfirm(message, callback) {
     showModal('confirmModal');
 }
 
+// Show setup modal
+function showSetupModal() {
+    const modal = $('setupModal');
+    if (modal) {
+        modal.classList.add('active');
+    }
+    // Reset genre selection
+    document.querySelectorAll('.genre-btn').forEach(btn => {
+        btn.classList.remove('selected');
+    });
+    // Clear inputs
+    const nameInput = $('screeningNameInput');
+    if (nameInput) nameInput.value = '';
+    const startBtn = $('startScreeningBtn');
+    if (startBtn) startBtn.disabled = true;
+}
+
+// Start screening from setup
+function startScreening() {
+    const nameInput = $('screeningNameInput');
+    const selectedGenre = state.genre;
+    
+    if (!nameInput || !selectedGenre) return;
+    
+    const screeningName = nameInput.value.trim();
+    if (!screeningName) {
+        alert('Please enter a screening name');
+        return;
+    }
+    
+    state.screeningName = screeningName;
+    state.genre = selectedGenre;
+    state.buttonLabels = GENRE_BUTTONS[selectedGenre];
+    state.setupComplete = true;
+    
+    createNewSession();
+    saveState();
+    
+    // Close setup modal
+    closeModal('setupModal');
+    
+    // Initialize app
+    renderButtons();
+    renderNotes();
+    updateTimer();
+}
+
+// Show other note modal
+function showOtherNoteModal() {
+    const modal = $('otherNoteModal');
+    const input = $('otherNoteInput');
+    if (modal) {
+        modal.classList.add('active');
+        if (input) {
+            input.value = '';
+            input.focus();
+        }
+    }
+}
+
+// Log other note
+function logOtherNote() {
+    const input = $('otherNoteInput');
+    const customText = input ? input.value.trim() : '';
+    
+    // Close modal first
+    closeModal('otherNoteModal');
+    
+    // Add note (with or without custom text)
+    addNote('other', customText || null);
+}
+
 // Setup event listeners
 function setupEventListeners() {
     // Start/Pause button
     const startPauseBtn = $('startPauseBtn');
     if (startPauseBtn) {
         startPauseBtn.addEventListener('click', toggleTimer);
+    }
+    
+    // Setup modal - genre selection
+    document.querySelectorAll('.genre-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            // Remove selection from all
+            document.querySelectorAll('.genre-btn').forEach(b => b.classList.remove('selected'));
+            // Add to clicked
+            btn.classList.add('selected');
+            state.genre = btn.dataset.genre;
+            
+            // Enable start button if name is entered
+            const nameInput = $('screeningNameInput');
+            const startBtn = $('startScreeningBtn');
+            if (nameInput && startBtn) {
+                startBtn.disabled = !nameInput.value.trim();
+            }
+        });
+    });
+    
+    // Setup modal - name input
+    const nameInput = $('screeningNameInput');
+    if (nameInput) {
+        nameInput.addEventListener('input', () => {
+            const startBtn = $('startScreeningBtn');
+            if (startBtn) {
+                startBtn.disabled = !nameInput.value.trim() || !state.genre;
+            }
+        });
+    }
+    
+    // Setup modal - start button
+    const startScreeningBtn = $('startScreeningBtn');
+    if (startScreeningBtn) {
+        startScreeningBtn.addEventListener('click', startScreening);
+    }
+    
+    // Other note modal
+    const closeOtherNote = $('closeOtherNote');
+    if (closeOtherNote) {
+        closeOtherNote.addEventListener('click', () => closeModal('otherNoteModal'));
+    }
+    
+    const logOtherNoteBtn = $('logOtherNoteBtn');
+    if (logOtherNoteBtn) {
+        logOtherNoteBtn.addEventListener('click', logOtherNote);
+    }
+    
+    // Allow Enter key in other note input
+    const otherNoteInput = $('otherNoteInput');
+    if (otherNoteInput) {
+        otherNoteInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                logOtherNote();
+            }
+        });
     }
     
     // New session
@@ -500,13 +655,12 @@ function setupEventListeners() {
                 state.elapsedSeconds = 0;
                 state.pausedTime = 0;
                 state.startTime = null;
+                state.setupComplete = false;
                 if (timerInterval) {
                     clearInterval(timerInterval);
                     timerInterval = null;
                 }
-                createNewSession();
-                updateTimer();
-                renderNotes();
+                showSetupModal();
             });
         });
     }
