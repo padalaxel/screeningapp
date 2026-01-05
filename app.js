@@ -925,6 +925,36 @@ function setupEventListeners() {
         });
     }
     
+    const shareEmailBtn = $('shareEmailBtn');
+    if (shareEmailBtn) {
+        shareEmailBtn.addEventListener('click', async () => {
+            const emailText = exportForEmail();
+            if (emailText) {
+                if (navigator.share) {
+                    try {
+                        await navigator.share({
+                            text: emailText,
+                            title: `Screening Notes: ${state.session.name || 'Untitled Screening'}`,
+                            subject: `Screening Notes: ${state.session.name || 'Untitled Screening'}`
+                        });
+                    } catch (e) {
+                        if (e.name !== 'AbortError') {
+                            // Fallback to mailto link if share fails
+                            const subject = encodeURIComponent(`Screening Notes: ${state.session.name || 'Untitled Screening'}`);
+                            const body = encodeURIComponent(emailText);
+                            window.location.href = `mailto:?subject=${subject}&body=${body}`;
+                        }
+                    }
+                } else {
+                    // Fallback to mailto link if Web Share API not available
+                    const subject = encodeURIComponent(`Screening Notes: ${state.session.name || 'Untitled Screening'}`);
+                    const body = encodeURIComponent(emailText);
+                    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+                }
+            }
+        });
+    }
+    
     const exportNotesBtn = $('exportNotesBtn');
     if (exportNotesBtn) {
         exportNotesBtn.addEventListener('click', async () => {
