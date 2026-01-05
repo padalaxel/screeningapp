@@ -1242,10 +1242,10 @@ function setupEventListeners() {
                     if (label.toUpperCase() === 'VFX') return 'VFX';
                     return label.toLowerCase();
                 });
-            if (labels.length >= 6 && labels.length <= 9) {
+            if (labels.length >= 6 && labels.length <= 10) {
                 state.buttonLabels = labels;
             } else {
-                alert('Please provide 6-9 button labels');
+                alert('Please provide 6-10 button labels');
                 return;
             }
             
@@ -1640,15 +1640,21 @@ function renderSettings() {
         container.appendChild(div);
     });
     
-    // Add button with plus sign (up to 9 buttons)
-    if (state.buttonLabels.length < 9) {
-        const addButtonDiv = document.createElement('div');
-        addButtonDiv.className = 'add-button-container';
-        const addBtn = document.createElement('button');
-        addBtn.className = 'btn-add-button';
-        addBtn.innerHTML = '<span class="add-button-plus">+</span> Add Button';
+    // Add button with plus sign (up to 10 buttons) - always show at bottom
+    const addButtonDiv = document.createElement('div');
+    addButtonDiv.className = 'add-button-container';
+    const addBtn = document.createElement('button');
+    addBtn.className = 'btn-add-button';
+    addBtn.innerHTML = '<span class="add-button-plus">+</span> Add Button';
+    
+    if (state.buttonLabels.length >= 10) {
+        addBtn.disabled = true;
+        addBtn.style.opacity = '0.5';
+        addBtn.style.cursor = 'not-allowed';
+        addBtn.title = 'Maximum 10 buttons reached';
+    } else {
         addBtn.addEventListener('click', () => {
-            if (state.buttonLabels.length < 9) {
+            if (state.buttonLabels.length < 10) {
                 // Add new button label
                 state.buttonLabels.push(`button ${state.buttonLabels.length + 1}`);
                 renderSettings();
@@ -1662,9 +1668,10 @@ function renderSettings() {
                 }, 100);
             }
         });
-        addButtonDiv.appendChild(addBtn);
-        container.appendChild(addButtonDiv);
     }
+    
+    addButtonDiv.appendChild(addBtn);
+    container.appendChild(addButtonDiv);
 }
 
 // Initialize on load
