@@ -743,6 +743,74 @@ html {
     opacity: 0.7;
 }
 
+/* Sessions List */
+.sessions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.session-item {
+    background-color: #151515;
+    border: 1px solid #222222;
+    padding: 16px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.session-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.session-name-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.session-name {
+    font-size: 16px;
+    color: #ffffff;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.session-current-badge {
+    font-size: 10px;
+    color: #4a9eff;
+    background-color: rgba(74, 158, 255, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.session-meta {
+    font-size: 12px;
+    color: #888888;
+}
+
+.session-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.session-load-btn,
+.session-rename-btn,
+.session-delete-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+}
+
 /* Prevent text selection on buttons */
 button, .note-button {
     -webkit-user-select: none;

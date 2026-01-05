@@ -27,6 +27,7 @@
         <div id="screeningName" class="screening-name"></div>
         <div class="header-controls">
             <button id="newBtn" class="btn-small">New</button>
+            <button id="sessionsBtn" class="btn-small">Sessions</button>
             <button id="settingsBtn" class="btn-small">Customize Buttons</button>
             <button id="dimToggleBtn" class="btn-small">Dim</button>
         </div>
@@ -131,6 +132,21 @@
             </div>
             <div class="modal-footer modal-footer-sticky">
                 <button id="startScreeningBtn" class="btn-primary" disabled>Start Screening</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sessions Modal -->
+    <div id="sessionsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Sessions</h2>
+                <button id="closeSessions" class="btn-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="sessionsList" class="sessions-list">
+                    <!-- Dynamically generated -->
+                </div>
             </div>
         </div>
     </div>

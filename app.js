@@ -26,7 +26,8 @@ let state = {
     dimLevel: 0,
     genre: null,
     screeningName: '',
-    setupComplete: false
+    setupComplete: false,
+    sessionHistory: [] // Array of past sessions
 };
 
 let timerInterval = null;
@@ -110,6 +111,9 @@ function loadState() {
             if (parsed.genre) state.genre = parsed.genre;
             if (parsed.screeningName) state.screeningName = parsed.screeningName;
             if (parsed.dimLevel !== undefined) state.dimLevel = parseInt(parsed.dimLevel) || 0;
+            if (parsed.sessionHistory && Array.isArray(parsed.sessionHistory)) {
+                state.sessionHistory = parsed.sessionHistory;
+            }
             // Only trust setupComplete if genre and name are also present
             if (parsed.setupComplete !== undefined && parsed.genre && parsed.screeningName) {
                 state.setupComplete = parsed.setupComplete;
@@ -144,7 +148,8 @@ function saveState() {
             genre: state.genre,
             screeningName: state.screeningName,
             setupComplete: state.setupComplete,
-            dimLevel: state.dimLevel
+            dimLevel: state.dimLevel,
+            sessionHistory: state.sessionHistory
         }));
     } catch (e) {
         console.error('Failed to save state:', e);
@@ -153,6 +158,29 @@ function saveState() {
 
 // Create new session
 function createNewSession() {
+    // Save current session to history if it exists and has notes
+    if (state.session && state.session.notes && state.session.notes.length > 0) {
+        // Check if session already exists in history (by ID)
+        const existingIndex = state.sessionHistory.findIndex(s => s.id === state.session.id);
+        if (existingIndex >= 0) {
+            // Update existing session in history
+            state.sessionHistory[existingIndex] = { 
+                ...state.session,
+                buttonLabels: state.buttonLabels // Save button labels with session
+            };
+        } else {
+            // Add new session to history
+            state.sessionHistory.push({ 
+                ...state.session,
+                buttonLabels: state.buttonLabels // Save button labels with session
+            });
+        }
+        // Keep only last 50 sessions to avoid storage issues
+        if (state.sessionHistory.length > 50) {
+            state.sessionHistory = state.sessionHistory.slice(-50);
+        }
+    }
+    
     const now = new Date();
     const sessionName = state.screeningName || `Session ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`;
     state.session = {
@@ -557,6 +585,205 @@ function exportForEmail() {
     return emailText;
 }
 
+// Render sessions list
+function renderSessionsList() {
+    const list = $('sessionsList');
+    if (!list) return;
+    
+    // Include current session if it exists
+    const allSessions = [...state.sessionHistory];
+    if (state.session && state.session.notes && state.session.notes.length > 0) {
+        // Check if current session is already in history
+        const existsInHistory = state.sessionHistory.some(s => s.id === state.session.id);
+        if (!existsInHistory) {
+            allSessions.unshift({ ...state.session, isCurrent: true });
+        } else {
+            // Mark current session
+            const index = allSessions.findIndex(s => s.id === state.session.id);
+            if (index >= 0) {
+                allSessions[index] = { ...allSessions[index], isCurrent: true };
+            }
+        }
+    }
+    
+    if (allSessions.length === 0) {
+        list.innerHTML = '<div style="color: #666; text-align: center; padding: 20px;">No saved sessions</div>';
+        return;
+    }
+    
+    // Sort by date (newest first)
+    allSessions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    
+    list.innerHTML = '';
+    allSessions.forEach(session => {
+        const item = document.createElement('div');
+        item.className = 'session-item';
+        const date = new Date(session.createdAt);
+        const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const noteCount = session.notes ? session.notes.length : 0;
+        const isCurrent = session.isCurrent || (state.session && state.session.id === session.id);
+        
+        item.innerHTML = `
+            <div class="session-info">
+                <div class="session-name-row">
+                    <span class="session-name">${escapeHtml(session.name)}</span>
+                    ${isCurrent ? '<span class="session-current-badge">Current</span>' : ''}
+                </div>
+                <div class="session-meta">${dateStr} • ${noteCount} note${noteCount !== 1 ? 's' : ''}</div>
+            </div>
+            <div class="session-actions">
+                <button class="btn-small session-load-btn" data-session-id="${session.id}">Load</button>
+                <button class="btn-small session-rename-btn" data-session-id="${session.id}">Rename</button>
+                <button class="btn-small btn-danger session-delete-btn" data-session-id="${session.id}">Delete</button>
+            </div>
+        `;
+        
+        list.appendChild(item);
+    });
+    
+    // Add event listeners
+    list.querySelectorAll('.session-load-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const sessionId = btn.dataset.sessionId;
+            loadSession(sessionId);
+        });
+    });
+    
+    list.querySelectorAll('.session-rename-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const sessionId = btn.dataset.sessionId;
+            renameSession(sessionId);
+        });
+    });
+    
+    list.querySelectorAll('.session-delete-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const sessionId = btn.dataset.sessionId;
+            deleteSession(sessionId);
+        });
+    });
+}
+
+// Load a session
+function loadSession(sessionId) {
+    // Save current session to history first
+    if (state.session && state.session.notes && state.session.notes.length > 0) {
+        const existingIndex = state.sessionHistory.findIndex(s => s.id === state.session.id);
+        if (existingIndex >= 0) {
+            state.sessionHistory[existingIndex] = { ...state.session };
+        } else {
+            state.sessionHistory.push({ ...state.session });
+        }
+    }
+    
+    // Find session in history or use current
+    let sessionToLoad = null;
+    if (state.session && state.session.id === sessionId) {
+        sessionToLoad = state.session;
+    } else {
+        sessionToLoad = state.sessionHistory.find(s => s.id === sessionId);
+    }
+    
+    if (!sessionToLoad) {
+        alert('Session not found');
+        return;
+    }
+    
+    // Load the session
+    state.session = { ...sessionToLoad };
+    state.screeningName = sessionToLoad.name;
+    if (sessionToLoad.genre) {
+        state.genre = sessionToLoad.genre;
+    }
+    
+    // Restore button labels if available
+    if (sessionToLoad.buttonLabels) {
+        state.buttonLabels = sessionToLoad.buttonLabels;
+    }
+    
+    // Update UI
+    const screeningNameEl = $('screeningName');
+    if (screeningNameEl) {
+        screeningNameEl.textContent = sessionToLoad.name;
+    }
+    
+    renderButtons();
+    renderNotes();
+    
+    // Reset timer
+    state.isRunning = false;
+    state.startTime = null;
+    state.pausedTime = 0;
+    state.elapsedSeconds = 0;
+    updateTimer();
+    
+    saveState();
+    closeModal('sessionsModal');
+    showToast('Session loaded', null);
+}
+
+// Rename a session
+function renameSession(sessionId) {
+    let sessionToRename = null;
+    if (state.session && state.session.id === sessionId) {
+        sessionToRename = state.session;
+    } else {
+        sessionToRename = state.sessionHistory.find(s => s.id === sessionId);
+    }
+    
+    if (!sessionToRename) {
+        alert('Session not found');
+        return;
+    }
+    
+    const newName = prompt('Enter new session name:', sessionToRename.name);
+    if (!newName || newName.trim() === '') {
+        return;
+    }
+    
+    const trimmedName = newName.trim();
+    
+    // Update session
+    if (state.session && state.session.id === sessionId) {
+        state.session.name = trimmedName;
+        state.screeningName = trimmedName;
+        const screeningNameEl = $('screeningName');
+        if (screeningNameEl) {
+            screeningNameEl.textContent = trimmedName;
+        }
+    } else {
+        const index = state.sessionHistory.findIndex(s => s.id === sessionId);
+        if (index >= 0) {
+            state.sessionHistory[index].name = trimmedName;
+        }
+    }
+    
+    saveState();
+    renderSessionsList();
+    showToast('Session renamed', null);
+}
+
+// Delete a session
+function deleteSession(sessionId) {
+    // Don't allow deleting current session
+    if (state.session && state.session.id === sessionId) {
+        alert('Cannot delete the current session. Start a new session first.');
+        return;
+    }
+    
+    if (!confirm('Are you sure you want to delete this session?')) {
+        return;
+    }
+    
+    const index = state.sessionHistory.findIndex(s => s.id === sessionId);
+    if (index >= 0) {
+        state.sessionHistory.splice(index, 1);
+        saveState();
+        renderSessionsList();
+        showToast('Session deleted', null);
+    }
+}
+
 // Escape CSV
 function escapeCsv(text) {
     if (text.includes(',') || text.includes('"') || text.includes('\n')) {
@@ -630,6 +857,10 @@ function showModal(modalId) {
     const modal = $(modalId);
     if (modal) {
         modal.classList.add('active');
+        // Special handling for sessions modal - render list
+        if (modalId === 'sessionsModal') {
+            renderSessionsList();
+        }
     }
 }
 
@@ -918,6 +1149,17 @@ function setupEventListeners() {
     const undoBtn = $('undoBtn');
     if (undoBtn) {
         undoBtn.addEventListener('click', undoLastNote);
+    }
+    
+    // Sessions
+    const sessionsBtn = $('sessionsBtn');
+    if (sessionsBtn) {
+        sessionsBtn.addEventListener('click', () => showModal('sessionsModal'));
+    }
+    
+    const closeSessions = $('closeSessions');
+    if (closeSessions) {
+        closeSessions.addEventListener('click', () => closeModal('sessionsModal'));
     }
     
     // Export
