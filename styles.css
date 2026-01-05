@@ -395,6 +395,16 @@ html {
     background-color: #1f1f1f;
 }
 
+.note-item.note-undone {
+    opacity: 0.5;
+}
+
+.note-item.note-undone .note-item-label,
+.note-item.note-undone .note-item-timecode {
+    text-decoration: line-through;
+    color: #666666;
+}
+
 .note-item-label {
     font-size: 16px;
     color: #ffffff;

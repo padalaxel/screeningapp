@@ -334,44 +334,44 @@ function undoLastNote() {
         return;
     }
     
-    // Get the last note before removing it
-    const lastNote = state.session.notes[state.session.notes.length - 1];
-    const lastNoteLabel = lastNote.label;
-    const lastNoteTimecode = lastNote.timecode;
+    // Get the last note index
+    const lastNoteIndex = state.session.notes.length - 1;
+    const lastNote = state.session.notes[lastNoteIndex];
     
-    // Remove the last note
-    state.session.notes.pop();
-    saveState();
-    renderNotes();
+    // Add strikethrough to the last note item
+    const notesList = $('notesList');
+    if (notesList) {
+        const noteItems = notesList.querySelectorAll('.note-item');
+        if (noteItems[lastNoteIndex]) {
+            noteItems[lastNoteIndex].classList.add('note-undone');
+            
+            // Remove the note after showing strikethrough briefly
+            setTimeout(() => {
+                state.session.notes.pop();
+                saveState();
+                renderNotes();
+            }, 800); // Show strikethrough for 800ms
+        }
+    }
     
     // Show visual feedback - find and highlight the button that was used
     const buttons = document.querySelectorAll('.note-button');
-    let buttonFound = false;
+    const baseLabel = lastNote.label.split(':')[0].trim();
     buttons.forEach(btn => {
         const btnText = btn.textContent.trim();
-        // Extract base label (remove "other:" prefix if present)
-        const baseLabel = lastNoteLabel.split(':')[0].trim();
-        
         // Check if this button matches the undone note
-        if (lastNoteLabel.toLowerCase().startsWith('other') || baseLabel.toLowerCase() === 'other') {
-            // For "other" notes, highlight the "Other" button
+        if (lastNote.label.toLowerCase().startsWith('other') || baseLabel.toLowerCase() === 'other') {
             if (btnText.toLowerCase() === 'other') {
                 addButtonFeedback(btn);
-                buttonFound = true;
             }
         } else {
-            // For regular notes, match the button label (case insensitive)
             const btnLabelLower = btnText.toLowerCase();
             const noteLabelLower = baseLabel.toLowerCase();
             if (btnLabelLower === noteLabelLower || btnLabelLower === capitalizeLabel(baseLabel).toLowerCase()) {
                 addButtonFeedback(btn);
-                buttonFound = true;
             }
         }
     });
-    
-    // Show toast notification with clear feedback
-    showToast(`Undid: ${lastNoteLabel}`, lastNoteTimecode);
 }
 
 // Clear all notes
