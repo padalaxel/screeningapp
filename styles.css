@@ -57,11 +57,12 @@ body {
     gap: 8px;
 }
 
-.dim-control-full {
+.dim-slider-container {
     display: flex;
     align-items: center;
     gap: 12px;
     width: 100%;
+    padding: 8px 0;
 }
 
 /* Dim Slider */

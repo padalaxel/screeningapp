@@ -20,8 +20,9 @@
         <div class="header-controls">
             <button id="newBtn" class="btn-small">New</button>
             <button id="settingsBtn" class="btn-small">Customize Buttons</button>
+            <button id="dimToggleBtn" class="btn-small">Dim</button>
         </div>
-        <div class="dim-control-full">
+        <div id="dimSliderContainer" class="dim-slider-container" style="display: none;">
             <label for="dimSlider" class="dim-label">Dim</label>
             <input type="range" id="dimSlider" class="dim-slider" min="0" max="100" value="0" />
         </div>
@@ -127,6 +128,7 @@
                         <button class="genre-btn" data-genre="comedy">Comedy</button>
                         <button class="genre-btn" data-genre="action">Action</button>
                         <button class="genre-btn" data-genre="documentary">Documentary</button>
+                        <button class="genre-btn" data-genre="other">Other</button>
                     </div>
                 </div>
             </div>
