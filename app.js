@@ -1615,9 +1615,40 @@ function renderSettings() {
         const input = document.createElement('input');
         input.type = 'text';
         input.className = 'input-text';
-        input.placeholder = 'Add button (optional)';
+        input.placeholder = 'Add button (type and press Enter or click outside)';
         div.appendChild(input);
         container.appendChild(div);
+        
+        // When user types and leaves the field, add the button
+        input.addEventListener('blur', () => {
+            const newValue = input.value.trim();
+            if (newValue && state.buttonLabels.length < 9) {
+                // Store lowercase version for logic, but display will be capitalized
+                if (newValue.toUpperCase() === 'VFX') {
+                    state.buttonLabels.push('VFX');
+                } else {
+                    state.buttonLabels.push(newValue.toLowerCase());
+                }
+                // Clear the input and re-render to show the new button + new empty field
+                input.value = '';
+                renderSettings();
+                // Focus the new empty input
+                setTimeout(() => {
+                    const inputs = container.querySelectorAll('input');
+                    if (inputs.length > 0) {
+                        inputs[inputs.length - 1].focus();
+                    }
+                }, 100);
+            }
+        });
+        
+        // Also add on Enter key
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                input.blur(); // Trigger blur which will add the button
+            }
+        });
     }
 }
 
