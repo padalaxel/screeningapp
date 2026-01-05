@@ -3,22 +3,14 @@
 const CACHE_VERSION = 'v1';
 const CACHE_NAME = `screening-notes-${CACHE_VERSION}`;
 
-// Get base path for GitHub Pages compatibility
-const getBasePath = () => {
-    // Service worker scope determines the base path
-    const scope = self.registration?.scope || self.location.pathname.replace(/sw\.js$/, '');
-    return scope.endsWith('/') ? scope : scope + '/';
-};
-
-const BASE_PATH = getBasePath();
-
 // Assets to cache (relative to service worker location)
+// For GitHub Pages, these will be resolved relative to the service worker's location
 const ASSETS_TO_CACHE = [
-    'index.html',
-    'styles.css',
-    'app.js',
-    'manifest.webmanifest'
-].map(path => new URL(path, BASE_PATH).href);
+    './index.html',
+    './styles.css',
+    './app.js',
+    './manifest.webmanifest'
+];
 
 // Install event - cache assets
 self.addEventListener('install', (event) => {
@@ -71,7 +63,7 @@ self.addEventListener('fetch', (event) => {
                             return cachedResponse;
                         }
                         // Fallback to index.html for SPA routing
-                        return caches.match(new URL('index.html', BASE_PATH).href);
+                        return caches.match('./index.html');
                     });
                 })
         );
