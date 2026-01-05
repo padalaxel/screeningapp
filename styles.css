@@ -480,11 +480,13 @@ html {
     flex-direction: column;
 }
 
-.modal-setup .modal-content {
-    max-width: 280px !important;
+#setupModal .modal-content {
+    max-width: 260px !important;
     width: 100% !important;
     max-height: auto !important;
     margin-top: 0 !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
 }
 
 .modal-small {
@@ -509,7 +511,7 @@ html {
     font-weight: 600;
 }
 
-.modal-setup .modal-header h2 {
+#setupModal .modal-header h2 {
     font-size: 10px;
     color: #666666;
     font-weight: 400;
@@ -546,11 +548,11 @@ html {
     max-height: calc(100vh - env(safe-area-inset-top, 0px) - 20px) !important;
 }
 
-.modal-setup .modal-body {
+#setupModal .modal-body {
     flex: 1;
     overflow-y: auto;
     min-height: 0;
-    padding: 12px !important;
+    padding: 10px !important;
 }
 
 .modal-footer-sticky {
