@@ -322,10 +322,35 @@ function undoLastNote() {
     }
     
     const lastNote = state.session.notes[state.session.notes.length - 1];
+    const lastNoteLabel = lastNote.label;
+    const lastNoteTimecode = lastNote.timecode;
+    
+    // Remove the last note
     state.session.notes.pop();
     saveState();
     renderNotes();
-    showToast(`Undid: ${lastNote.label}`, lastNote.timecode);
+    
+    // Show visual feedback - find and highlight the button that was used
+    const buttons = document.querySelectorAll('.note-button');
+    buttons.forEach(btn => {
+        const btnText = btn.textContent.trim();
+        // Check if this button matches the undone note (handle "other" notes specially)
+        if (lastNoteLabel.toLowerCase().startsWith('other')) {
+            // For "other" notes, highlight the "Other" button
+            if (btnText.toLowerCase() === 'other') {
+                addButtonFeedback(btn);
+            }
+        } else {
+            // For regular notes, match the button label
+            if (btnText.toLowerCase() === lastNoteLabel.toLowerCase() || 
+                btnText === capitalizeLabel(lastNoteLabel.split(':')[0])) {
+                addButtonFeedback(btn);
+            }
+        }
+    });
+    
+    // Show toast notification
+    showToast(`Undid: ${lastNoteLabel}`, lastNoteTimecode);
 }
 
 // Clear all notes

@@ -476,10 +476,25 @@ html {
     gap: 12px;
 }
 
-.modal-footer-top {
-    border-top: none;
-    border-bottom: 1px solid #222222;
+.modal-setup {
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-setup .modal-body {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+}
+
+.modal-footer-sticky {
+    position: sticky;
+    bottom: 0;
+    background-color: #151515;
+    border-top: 1px solid #222222;
     justify-content: center;
+    z-index: 1;
 }
 
 /* Settings */
