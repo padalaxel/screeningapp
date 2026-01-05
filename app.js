@@ -311,11 +311,14 @@ function addButtonFeedback(button) {
 function addNote(label, customText = null) {
     if (!state.session) return;
     
-    // Use custom text if provided, otherwise use capitalized label
-    const displayLabel = customText ? `${capitalizeLabel(label)}: ${customText}` : capitalizeLabel(label);
+    // Store base label and context separately
+    const baseLabel = capitalizeLabel(label);
+    const context = customText ? customText.trim() : '';
     
     const note = {
-        label: displayLabel,
+        baseLabel: baseLabel,
+        context: context,
+        label: context ? `${baseLabel}: ${context}` : baseLabel, // Keep for backward compatibility
         elapsedSeconds: state.elapsedSeconds,
         elapsedHMS: formatElapsed(state.elapsedSeconds),
         timecode: formatTimecode(state.elapsedSeconds, state.fps),
@@ -336,7 +339,56 @@ function addNote(label, customText = null) {
     });
     
     // Show toast notification
+    const displayLabel = context ? `${baseLabel}: ${context}` : baseLabel;
     showToast(displayLabel, note.timecode);
+}
+
+// Edit note
+function editNote(index) {
+    if (!state.session || !state.session.notes[index]) return;
+    
+    const note = state.session.notes[index];
+    const baseLabel = note.baseLabel || (note.label.includes(':') ? note.label.split(':')[0].trim() : note.label);
+    const context = note.context || (note.label.includes(':') ? note.label.split(':').slice(1).join(':').trim() : '');
+    
+    // Show edit modal
+    const editInput = $('editNoteInput');
+    if (editInput) {
+        editInput.value = context;
+    }
+    
+    // Store the index being edited
+    const editIndexEl = $('editNoteIndex');
+    if (editIndexEl) {
+        editIndexEl.dataset.index = index;
+    }
+    
+    showModal('editNoteModal');
+}
+
+// Save edited note
+function saveEditedNote() {
+    const editIndexEl = $('editNoteIndex');
+    if (!editIndexEl) return;
+    
+    const index = parseInt(editIndexEl.dataset.index);
+    if (isNaN(index) || !state.session || !state.session.notes[index]) return;
+    
+    const editInput = $('editNoteInput');
+    const context = editInput ? editInput.value.trim() : '';
+    
+    const note = state.session.notes[index];
+    const baseLabel = note.baseLabel || (note.label.includes(':') ? note.label.split(':')[0].trim() : note.label);
+    
+    // Update note
+    note.baseLabel = baseLabel;
+    note.context = context;
+    note.label = context ? `${baseLabel}: ${context}` : baseLabel;
+    
+    saveState();
+    renderNotes();
+    closeModal('editNoteModal');
+    showToast('Note updated', null);
 }
 
 // Delete note
@@ -489,11 +541,20 @@ function renderNotes() {
     state.session.notes.forEach((note, index) => {
         const item = document.createElement('div');
         item.className = 'note-item';
+        
+        // Get base label and context (handle backward compatibility)
+        const baseLabel = note.baseLabel || (note.label.includes(':') ? note.label.split(':')[0].trim() : note.label);
+        const context = note.context || (note.label.includes(':') ? note.label.split(':').slice(1).join(':').trim() : '');
+        const displayLabel = context ? `${baseLabel}: ${context}` : baseLabel;
+        
         item.innerHTML = `
-            <span class="note-item-label">${escapeHtml(note.label)}</span>
+            <div class="note-item-content">
+                <span class="note-item-label">${escapeHtml(displayLabel)}</span>
+                ${context ? '<span class="note-item-context-indicator">✎</span>' : ''}
+            </div>
             <span class="note-item-timecode">${escapeHtml(note.timecode)}</span>
         `;
-        item.addEventListener('click', () => deleteNote(index));
+        item.addEventListener('click', () => editNote(index));
         list.appendChild(item);
     });
 }
@@ -1273,6 +1334,29 @@ function setupEventListeners() {
     const clearBtn = $('clearBtn');
     if (clearBtn) {
         clearBtn.addEventListener('click', clearNotes);
+    }
+    
+    // Edit Note Modal
+    const closeEditNote = $('closeEditNote');
+    if (closeEditNote) {
+        closeEditNote.addEventListener('click', () => closeModal('editNoteModal'));
+    }
+    
+    const saveEditNoteBtn = $('saveEditNoteBtn');
+    if (saveEditNoteBtn) {
+        saveEditNoteBtn.addEventListener('click', saveEditedNote);
+    }
+    
+    const deleteNoteBtn = $('deleteNoteBtn');
+    if (deleteNoteBtn) {
+        deleteNoteBtn.addEventListener('click', () => {
+            const editIndexEl = $('editNoteIndex');
+            if (editIndexEl && editIndexEl.dataset.index) {
+                const index = parseInt(editIndexEl.dataset.index);
+                closeModal('editNoteModal');
+                deleteNote(index);
+            }
+        });
     }
     
     // Confirmation
