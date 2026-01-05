@@ -875,15 +875,21 @@ function setupEventListeners() {
     const dimSlider = $('dimSlider');
     const dimOverlay = $('dimOverlay');
     if (dimSlider && dimOverlay) {
-        // Set initial value (slider is reversed, so 0 starts on left, 100 on right)
-        dimSlider.value = state.dimLevel || 0;
+        // Set initial value (slider is reversed, so invert the stored dim level)
+        // Stored dimLevel: 0 = bright, 100 = dim
+        // Slider value: 0 = right (should be dim), 100 = left (should be bright)
+        const sliderValue = 100 - (state.dimLevel || 0);
+        dimSlider.value = sliderValue;
         updateDimOverlay(state.dimLevel || 0);
         
         // Use both input and change events for better mobile support
+        // Invert value: slider is reversed (0 on right = dim, 100 on left = bright)
         const updateDim = (e) => {
-            const value = parseInt(e.target.value);
-            state.dimLevel = value;
-            updateDimOverlay(value);
+            const sliderValue = parseInt(e.target.value);
+            // Invert: 0 becomes 100 (dim), 100 becomes 0 (bright)
+            const dimLevel = 100 - sliderValue;
+            state.dimLevel = dimLevel;
+            updateDimOverlay(dimLevel);
             saveState();
         };
         
@@ -901,9 +907,11 @@ function setupEventListeners() {
                 e.preventDefault();
                 const rect = dimSlider.getBoundingClientRect();
                 const x = e.touches[0].clientX - rect.left;
-                // Reverse: right side (higher x) = more dim, left side (lower x) = less dim
-                const percent = Math.max(0, Math.min(100, 100 - (x / rect.width) * 100));
-                dimSlider.value = percent;
+                // With RTL direction: right side (higher x) = slider value 0, left side (lower x) = slider value 100
+                // But we want: right side = dim (100%), left side = bright (0%)
+                // So: right side (high x) = slider value 0, left side (low x) = slider value 100
+                const sliderValue = Math.max(0, Math.min(100, 100 - (x / rect.width) * 100));
+                dimSlider.value = sliderValue;
                 updateDim({ target: dimSlider });
             }
         }, { passive: false });
