@@ -1104,15 +1104,7 @@ function setupEventListeners() {
         });
     }
     
-    // Settings
-    const settingsBtn = $('settingsBtn');
-    if (settingsBtn) {
-        settingsBtn.addEventListener('click', () => {
-            renderSettings();
-            showModal('settingsModal');
-        });
-    }
-    
+    // Settings (accessed via Menu now)
     const closeSettings = $('closeSettings');
     if (closeSettings) {
         closeSettings.addEventListener('click', () => closeModal('settingsModal'));
@@ -1185,12 +1177,7 @@ function setupEventListeners() {
         closeSessions.addEventListener('click', () => closeModal('sessionsModal'));
     }
     
-    // Settings (keep for direct access if needed, but also accessible via menu)
-    const settingsBtn = $('settingsBtn');
-    if (settingsBtn) {
-        // Remove direct button, but keep function available
-        settingsBtn.style.display = 'none';
-    }
+    // Settings button removed - now accessed via Menu
     
     // Export
     const exportBtn = $('exportBtn');
