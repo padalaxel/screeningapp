@@ -124,11 +124,19 @@ function loadState() {
         }
     }
     
-    // Restore dim level (will be set up in setupEventListeners)
-    // Just ensure the slider value is set
+    // Restore dim level and apply text colors immediately
+    if (state.dimLevel) {
+        // Apply dim overlay and text colors on load
+        updateDimOverlay(state.dimLevel);
+    }
+    
+    // Set slider value (will be set up in setupEventListeners too, but set it here for immediate display)
     const dimSlider = $('dimSlider');
     if (dimSlider) {
-        dimSlider.value = state.dimLevel || 0;
+        // With RTL: slider value 0 = right (bright), so dim level = slider value
+        // But we need to invert: dimLevel 90 = slider value 10 (100 - 90)
+        const sliderValue = state.dimLevel ? (100 - state.dimLevel) : 0;
+        dimSlider.value = sliderValue;
     }
 }
 
@@ -942,17 +950,21 @@ function setupEventListeners() {
     const dimOverlay = $('dimOverlay');
     if (dimSlider && dimOverlay) {
         // Set initial value
-        // With RTL: 0 = right (bright), 100 = left (dim)
-        // Start at 0 (right side, bright)
-        dimSlider.value = state.dimLevel || 0;
+        // With RTL: 0 = right (bright), 90 = left (dim)
+        // Invert: dimLevel 90 = slider value 10 (100 - 90)
+        const sliderValue = state.dimLevel ? (100 - state.dimLevel) : 0;
+        dimSlider.value = sliderValue;
+        // Apply dim overlay and text colors
         updateDimOverlay(state.dimLevel || 0);
         
         // Use both input and change events for better mobile support
-        // With RTL direction: 0 is on right (bright), 90 is on left (dim)
-        // So slider value directly maps to dim level (max 90%)
+        // With RTL direction: slider value 0 = right (bright), slider value 10 = left (90% dim)
+        // Invert: slider value needs to be converted to dim level
         const updateDim = (e) => {
-            let dimLevel = parseInt(e.target.value);
+            let sliderValue = parseInt(e.target.value);
             const maxDim = 90;
+            // Convert slider value to dim level: slider 0 = dim 0, slider 10 = dim 90
+            let dimLevel = 100 - sliderValue;
             if (dimLevel > maxDim) {
                 dimLevel = maxDim;
                 dimSlider.value = 100 - maxDim; // With RTL, max dim = slider value 10
@@ -985,7 +997,11 @@ function setupEventListeners() {
                     sliderValue = 100 - maxDim;
                 }
                 dimSlider.value = sliderValue;
-                updateDim({ target: dimSlider });
+                // Convert slider value to dim level for updateDim
+                const dimLevel = 100 - sliderValue;
+                state.dimLevel = dimLevel > maxDim ? maxDim : dimLevel;
+                updateDimOverlay(state.dimLevel);
+                saveState();
             }
         }, { passive: false });
         dimSlider.addEventListener('touchend', () => {
