@@ -986,9 +986,13 @@ function setupEventListeners() {
 
 // Update dim overlay opacity and text brightness
 function updateDimOverlay(level) {
+    // Limit maximum dim to 85% to prevent complete blackout
+    const maxDim = 85;
+    const clampedLevel = Math.min(level, maxDim);
+    
     const dimOverlay = $('dimOverlay');
     if (dimOverlay) {
-        const opacity = level / 100;
+        const opacity = clampedLevel / 100;
         dimOverlay.style.opacity = opacity.toString();
         if (opacity > 0) {
             dimOverlay.classList.add('active');
@@ -998,17 +1002,17 @@ function updateDimOverlay(level) {
     }
     
     // Also dim text brightness - convert white to dark grey based on dim level
-    const dimPercent = level / 100;
+    const dimPercent = clampedLevel / 100;
     // Interpolate from white (#ffffff) to dark grey (#333333)
     const r = Math.round(255 - (255 - 51) * dimPercent);
     const g = Math.round(255 - (255 - 51) * dimPercent);
     const b = Math.round(255 - (255 - 51) * dimPercent);
     const textColor = `rgb(${r}, ${g}, ${b})`;
     
-    // Update specific text elements
-    const textElements = document.querySelectorAll('.screening-name, .elapsed-time, .note-item-label, .summary-label, .note-button, .btn-primary, .btn-small');
+    // Update specific text elements (including modal content)
+    const textElements = document.querySelectorAll('.screening-name, .elapsed-time, .note-item-label, .summary-label, .note-button, .btn-primary, .btn-small, .modal-header h2, .modal-body, .modal-body p, .input-text, .setting-group label');
     textElements.forEach(el => {
-        if (level > 0) {
+        if (clampedLevel > 0) {
             el.style.color = textColor;
         } else {
             el.style.color = ''; // Reset to default
@@ -1016,27 +1020,27 @@ function updateDimOverlay(level) {
     });
     
     // Update timecode and status (lighter text)
-    const lightTextElements = document.querySelectorAll('.timecode, .status, .note-item-timecode, .summary-count');
+    const lightTextElements = document.querySelectorAll('.timecode, .status, .note-item-timecode, .summary-count, .btn-close');
     const lightR = Math.round(170 - (170 - 51) * dimPercent);
     const lightG = Math.round(170 - (170 - 51) * dimPercent);
     const lightB = Math.round(170 - (170 - 51) * dimPercent);
     const lightTextColor = `rgb(${lightR}, ${lightG}, ${lightB})`;
     lightTextElements.forEach(el => {
-        if (level > 0) {
+        if (clampedLevel > 0) {
             el.style.color = lightTextColor;
         } else {
             el.style.color = ''; // Reset to default
         }
     });
     
-    // Close modals on background click (except setup modal)
-    document.querySelectorAll('.modal').forEach(modal => {
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal && modal.id !== 'setupModal') {
-                modal.classList.remove('active');
-            }
-        });
-    });
+    // Update slider value if it exceeds max
+    const dimSlider = $('dimSlider');
+    if (dimSlider && level > maxDim) {
+        // With RTL: slider value 0 = right (bright), so max dim (85) = slider value 15
+        dimSlider.value = 100 - maxDim;
+        state.dimLevel = maxDim;
+        saveState();
+    }
 }
 
 // Render settings
