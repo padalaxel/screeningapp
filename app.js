@@ -492,12 +492,13 @@ function closeModal(modalId) {
     }
 }
 
-// Close all modals
+// Close all modals (except setup modal)
 function closeAllModals() {
     closeModal('settingsModal');
     closeModal('summaryModal');
     closeModal('exportModal');
     closeModal('confirmModal');
+    closeModal('otherNoteModal');
 }
 
 // Show confirmation
