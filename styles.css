@@ -248,6 +248,12 @@ html {
     background-color: #252525;
 }
 
+/* Dim button slightly brighter */
+#dimToggleBtn {
+    color: #e0e0e0;
+    background-color: #1a1a1a;
+}
+
 .btn-danger {
     color: #ff6b6b;
     border-color: #4a2222;

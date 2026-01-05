@@ -939,8 +939,14 @@ function setupEventListeners() {
         // Use both input and change events for better mobile support
         // With RTL direction: 0 is on right (bright), 100 is on left (dim)
         // So slider value directly maps to dim level
+        // Limit max dim to 85%
         const updateDim = (e) => {
-            const dimLevel = parseInt(e.target.value);
+            let dimLevel = parseInt(e.target.value);
+            const maxDim = 85;
+            if (dimLevel > maxDim) {
+                dimLevel = maxDim;
+                dimSlider.value = 100 - maxDim; // With RTL, max dim = slider value 15
+            }
             state.dimLevel = dimLevel;
             updateDimOverlay(dimLevel);
             saveState();
@@ -962,7 +968,12 @@ function setupEventListeners() {
                 const x = e.touches[0].clientX - rect.left;
                 // With RTL direction: right side (higher x) = slider value 0 (bright), left side (lower x) = slider value 100 (dim)
                 // So: right side (high x) = 0, left side (low x) = 100
-                const sliderValue = Math.max(0, Math.min(100, 100 - (x / rect.width) * 100));
+                let sliderValue = Math.max(0, Math.min(100, 100 - (x / rect.width) * 100));
+                // Limit to max dim of 85% (slider value 15 with RTL)
+                const maxDim = 85;
+                if (sliderValue > (100 - maxDim)) {
+                    sliderValue = 100 - maxDim;
+                }
                 dimSlider.value = sliderValue;
                 updateDim({ target: dimSlider });
             }
