@@ -1249,10 +1249,10 @@ function setupEventListeners() {
                     if (label.toUpperCase() === 'VFX') return 'VFX';
                     return label.toLowerCase();
                 });
-            if (labels.length >= 6 && labels.length <= 10) {
+            if (labels.length >= 3 && labels.length <= 10) {
                 state.buttonLabels = labels;
             } else {
-                alert('Please provide 6-10 button labels');
+                alert('Please provide 3-10 button labels');
                 return;
             }
             
@@ -1614,18 +1614,20 @@ function renderSettings() {
         input.value = capitalizeLabel(label);
         input.placeholder = `Button ${index + 1}`;
         
-        // Add remove button (red X) - show if more than minimum (6 buttons)
-        // Always allow deletion as long as we have more than 6
-        if (state.buttonLabels.length > 6) {
+        // Add remove button (red X) - show if more than minimum (3 buttons)
+        // Always allow deletion as long as we have more than 3
+        if (state.buttonLabels.length > 3) {
             const removeBtn = document.createElement('button');
             removeBtn.className = 'btn-remove';
             removeBtn.innerHTML = '&times;';
             removeBtn.title = 'Remove button';
             removeBtn.addEventListener('click', () => {
-                if (state.buttonLabels.length > 6) {
+                if (state.buttonLabels.length > 3) {
                     state.buttonLabels.splice(index, 1);
                     saveState();
                     renderSettings();
+                } else {
+                    alert('Minimum 3 buttons required');
                 }
             });
             div.appendChild(removeBtn);
