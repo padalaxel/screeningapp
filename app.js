@@ -875,7 +875,7 @@ function setupEventListeners() {
     const dimSlider = $('dimSlider');
     const dimOverlay = $('dimOverlay');
     if (dimSlider && dimOverlay) {
-        // Set initial value
+        // Set initial value (slider is reversed, so 0 starts on left, 100 on right)
         dimSlider.value = state.dimLevel || 0;
         updateDimOverlay(state.dimLevel || 0);
         
@@ -890,7 +890,7 @@ function setupEventListeners() {
         dimSlider.addEventListener('input', updateDim);
         dimSlider.addEventListener('change', updateDim);
         
-        // Touch events for better mobile support
+        // Touch events for better mobile support (reversed direction)
         let isDragging = false;
         dimSlider.addEventListener('touchstart', (e) => {
             isDragging = true;
@@ -901,7 +901,8 @@ function setupEventListeners() {
                 e.preventDefault();
                 const rect = dimSlider.getBoundingClientRect();
                 const x = e.touches[0].clientX - rect.left;
-                const percent = Math.max(0, Math.min(100, (x / rect.width) * 100));
+                // Reverse: right side (higher x) = more dim, left side (lower x) = less dim
+                const percent = Math.max(0, Math.min(100, 100 - (x / rect.width) * 100));
                 dimSlider.value = percent;
                 updateDim({ target: dimSlider });
             }
