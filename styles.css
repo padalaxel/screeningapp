@@ -447,6 +447,14 @@ html {
     padding: 20px;
 }
 
+.modal-setup {
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: env(safe-area-inset-top, 20px);
+    padding-top: calc(env(safe-area-inset-top, 0px) + 20px);
+    overflow-y: auto;
+}
+
 .modal.active {
     display: flex;
 }
@@ -515,11 +523,10 @@ html {
 }
 
 .modal-setup {
-    max-height: 85vh;
+    max-height: calc(100vh - env(safe-area-inset-top, 0px) - 40px);
     display: flex;
     flex-direction: column;
-    margin-top: env(safe-area-inset-top, 0);
-    margin-top: calc(env(safe-area-inset-top, 0) + 20px);
+    margin-top: 0;
 }
 
 .modal-setup .modal-body {
