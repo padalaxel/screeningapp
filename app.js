@@ -951,11 +951,11 @@ function setupEventListeners() {
         updateDimOverlay(state.dimLevel || 0);
         
         // Use both input and change events for better mobile support
-        // With RTL direction: slider value 0 = right (bright), slider value 90 = left (dim)
+        // With RTL direction: slider value 0 = right (bright), slider value 85 = left (dim)
         // Slider value directly maps to dim level
         const updateDim = (e) => {
             let dimLevel = parseInt(e.target.value);
-            const maxDim = 90;
+            const maxDim = 85;
             if (dimLevel > maxDim) {
                 dimLevel = maxDim;
                 dimSlider.value = maxDim;
@@ -981,9 +981,9 @@ function setupEventListeners() {
                 const x = e.touches[0].clientX - rect.left;
                 // With RTL direction: right side (higher x) = slider value 0 (bright), left side (lower x) = slider value 100 (dim)
                 // So: right side (high x) = 0, left side (low x) = 100
-                let sliderValue = Math.max(0, Math.min(90, 100 - (x / rect.width) * 100));
-                // Limit to max dim of 90%
-                const maxDim = 90;
+                let sliderValue = Math.max(0, Math.min(85, 100 - (x / rect.width) * 100));
+                // Limit to max dim of 85%
+                const maxDim = 85;
                 if (sliderValue > maxDim) {
                     sliderValue = maxDim;
                 }
@@ -1001,8 +1001,8 @@ function setupEventListeners() {
 
 // Update dim overlay opacity and text brightness
 function updateDimOverlay(level) {
-    // Limit maximum dim to 90%
-    const maxDim = 90;
+    // Limit maximum dim to 85%
+    const maxDim = 85;
     const clampedLevel = Math.min(level, maxDim);
     
     const dimOverlay = $('dimOverlay');
@@ -1051,8 +1051,8 @@ function updateDimOverlay(level) {
     // Update slider value if it exceeds max
     const dimSlider = $('dimSlider');
     if (dimSlider && level > maxDim) {
-        // With RTL: slider value 0 = right (bright), so max dim (90) = slider value 10
-        dimSlider.value = 100 - maxDim;
+        // With RTL: slider value 0 = right (bright), so max dim (85) = slider value 15
+        dimSlider.value = maxDim;
         state.dimLevel = maxDim;
         saveState();
     }
