@@ -1167,6 +1167,7 @@ function setupEventListeners() {
     if (menuSettingsBtn) {
         menuSettingsBtn.addEventListener('click', () => {
             closeModal('menuModal');
+            renderSettings();
             showModal('settingsModal');
         });
     }
