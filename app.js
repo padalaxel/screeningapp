@@ -121,11 +121,10 @@ function formatTimecode(seconds, fps) {
 // Update timer display
 function updateTimer() {
     const statusEl = $('status');
-    const elapsedEl = $('elapsedTime');
     const timecodeEl = $('timecode');
     const startPauseBtn = $('startPauseBtn');
     
-    if (!statusEl || !elapsedEl || !timecodeEl || !startPauseBtn) return;
+    if (!statusEl || !timecodeEl || !startPauseBtn) return;
     
     if (state.isRunning) {
         const now = Date.now();
@@ -141,7 +140,6 @@ function updateTimer() {
         startPauseBtn.textContent = state.elapsedSeconds > 0 ? 'Resume' : 'Start';
     }
     
-    elapsedEl.textContent = formatElapsed(state.elapsedSeconds);
     timecodeEl.textContent = formatTimecode(state.elapsedSeconds, state.fps);
 }
 
