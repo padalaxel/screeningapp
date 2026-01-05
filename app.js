@@ -431,38 +431,6 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// Show summary
-function showSummary() {
-    if (!state.session || !state.session.notes || state.session.notes.length === 0) {
-        alert('No notes to summarize');
-        return;
-    }
-    
-    const counts = {};
-    state.session.notes.forEach(note => {
-        counts[note.label] = (counts[note.label] || 0) + 1;
-    });
-    
-    const sorted = Object.entries(counts)
-        .sort((a, b) => b[1] - a[1])
-        .map(([label, count]) => ({ label, count }));
-    
-    const content = $('summaryContent');
-    if (!content) return;
-    
-    content.innerHTML = '';
-    sorted.forEach(({ label, count }) => {
-        const item = document.createElement('div');
-        item.className = 'summary-item';
-        item.innerHTML = `
-            <span class="summary-label">${escapeHtml(label)}</span>
-            <span class="summary-count">${count}</span>
-        `;
-        content.appendChild(item);
-    });
-    
-    showModal('summaryModal');
-}
 
 // Export CSV
 function exportCsv() {
