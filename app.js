@@ -210,8 +210,11 @@ function updateTimer() {
 // Start/Pause timer
 function toggleTimer() {
     if (state.isRunning) {
-        // Pause
-        state.pausedTime = state.elapsedSeconds;
+        // Pause - save current elapsed time
+        const now = Date.now();
+        const elapsed = (now - state.startTime) / 1000 + state.pausedTime;
+        state.elapsedSeconds = elapsed;
+        state.pausedTime = elapsed; // Store total elapsed time
         state.isRunning = false;
         if (timerInterval) {
             clearInterval(timerInterval);
@@ -220,9 +223,11 @@ function toggleTimer() {
     } else {
         // Start/Resume
         if (state.elapsedSeconds === 0) {
+            // Starting fresh
             state.startTime = Date.now();
             state.pausedTime = 0;
         } else {
+            // Resuming - set startTime so that elapsed will be pausedTime
             state.startTime = Date.now() - (state.pausedTime * 1000);
         }
         state.isRunning = true;
