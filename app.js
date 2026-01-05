@@ -913,7 +913,7 @@ function setupEventListeners() {
     }
 }
 
-// Update dim overlay opacity
+// Update dim overlay opacity and text brightness
 function updateDimOverlay(level) {
     const dimOverlay = $('dimOverlay');
     if (dimOverlay) {
@@ -925,6 +925,38 @@ function updateDimOverlay(level) {
             dimOverlay.classList.remove('active');
         }
     }
+    
+    // Also dim text brightness - convert white to dark grey based on dim level
+    const dimPercent = level / 100;
+    // Interpolate from white (#ffffff) to dark grey (#333333)
+    const r = Math.round(255 - (255 - 51) * dimPercent);
+    const g = Math.round(255 - (255 - 51) * dimPercent);
+    const b = Math.round(255 - (255 - 51) * dimPercent);
+    const textColor = `rgb(${r}, ${g}, ${b})`;
+    
+    // Update specific text elements
+    const textElements = document.querySelectorAll('.screening-name, .elapsed-time, .note-item-label, .summary-label, .note-button, .btn-primary, .btn-small');
+    textElements.forEach(el => {
+        if (level > 0) {
+            el.style.color = textColor;
+        } else {
+            el.style.color = ''; // Reset to default
+        }
+    });
+    
+    // Update timecode and status (lighter text)
+    const lightTextElements = document.querySelectorAll('.timecode, .status, .note-item-timecode, .summary-count');
+    const lightR = Math.round(170 - (170 - 51) * dimPercent);
+    const lightG = Math.round(170 - (170 - 51) * dimPercent);
+    const lightB = Math.round(170 - (170 - 51) * dimPercent);
+    const lightTextColor = `rgb(${lightR}, ${lightG}, ${lightB})`;
+    lightTextElements.forEach(el => {
+        if (level > 0) {
+            el.style.color = lightTextColor;
+        } else {
+            el.style.color = ''; // Reset to default
+        }
+    });
     
     // Close modals on background click (except setup modal)
     document.querySelectorAll('.modal').forEach(modal => {
