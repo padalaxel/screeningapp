@@ -1151,15 +1151,45 @@ function setupEventListeners() {
         undoBtn.addEventListener('click', undoLastNote);
     }
     
-    // Sessions
-    const sessionsBtn = $('sessionsBtn');
-    if (sessionsBtn) {
-        sessionsBtn.addEventListener('click', () => showModal('sessionsModal'));
+    // Menu
+    const menuBtn = $('menuBtn');
+    if (menuBtn) {
+        menuBtn.addEventListener('click', () => showModal('menuModal'));
     }
     
+    const closeMenu = $('closeMenu');
+    if (closeMenu) {
+        closeMenu.addEventListener('click', () => closeModal('menuModal'));
+    }
+    
+    // Menu actions
+    const menuSessionsBtn = $('menuSessionsBtn');
+    if (menuSessionsBtn) {
+        menuSessionsBtn.addEventListener('click', () => {
+            closeModal('menuModal');
+            showModal('sessionsModal');
+        });
+    }
+    
+    const menuSettingsBtn = $('menuSettingsBtn');
+    if (menuSettingsBtn) {
+        menuSettingsBtn.addEventListener('click', () => {
+            closeModal('menuModal');
+            showModal('settingsModal');
+        });
+    }
+    
+    // Sessions
     const closeSessions = $('closeSessions');
     if (closeSessions) {
         closeSessions.addEventListener('click', () => closeModal('sessionsModal'));
+    }
+    
+    // Settings (keep for direct access if needed, but also accessible via menu)
+    const settingsBtn = $('settingsBtn');
+    if (settingsBtn) {
+        // Remove direct button, but keep function available
+        settingsBtn.style.display = 'none';
     }
     
     // Export
