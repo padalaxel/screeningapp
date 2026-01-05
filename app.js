@@ -382,12 +382,18 @@ function renderButtons() {
 // Render notes list
 function renderNotes() {
     const list = $('notesList');
+    const arrow = $('notesArrow');
     if (!list) return;
     
     if (!state.session || !state.session.notes || state.session.notes.length === 0) {
         list.innerHTML = '<div style="color: #666; text-align: center; padding: 20px;">No notes yet</div>';
+        // Hide arrow when no notes
+        if (arrow) arrow.style.display = 'none';
         return;
     }
+    
+    // Show arrow when there are notes
+    if (arrow) arrow.style.display = 'inline-block';
     
     list.innerHTML = '';
     state.session.notes.forEach((note, index) => {

@@ -339,10 +339,32 @@ html {
     margin-bottom: 12px;
 }
 
+.notes-title-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .notes-header h2 {
     font-size: 18px;
     color: #aaaaaa;
     font-weight: 500;
+}
+
+.notes-arrow {
+    font-size: 14px;
+    color: #666666;
+    animation: bounce 2s infinite;
+    display: inline-block;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(4px);
+    }
 }
 
 .notes-actions {
