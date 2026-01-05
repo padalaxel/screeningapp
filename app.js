@@ -631,13 +631,11 @@ function showSetupModal() {
     }
     
     // Auto-select "Default" genre
-    document.querySelectorAll('.genre-btn').forEach(btn => {
-        btn.classList.remove('selected');
-        if (btn.dataset.genre === 'default') {
-            btn.classList.add('selected');
-            state.genre = 'default';
-        }
-    });
+    const genreSelect = $('genreSelect');
+    if (genreSelect) {
+        genreSelect.value = 'default';
+        state.genre = 'default';
+    }
     
     // Enable start button since genre is selected
     const startBtn = $('startScreeningBtn');
@@ -753,13 +751,10 @@ function setupEventListeners() {
     }
     
     // Setup modal - genre selection
-    document.querySelectorAll('.genre-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            // Remove selection from all
-            document.querySelectorAll('.genre-btn').forEach(b => b.classList.remove('selected'));
-            // Add to clicked
-            btn.classList.add('selected');
-            state.genre = btn.dataset.genre;
+    const genreSelect = $('genreSelect');
+    if (genreSelect) {
+        genreSelect.addEventListener('change', () => {
+            state.genre = genreSelect.value;
             
             // Enable start button (name is optional, defaults to "Untitled Screening")
             const startBtn = $('startScreeningBtn');
@@ -767,7 +762,7 @@ function setupEventListeners() {
                 startBtn.disabled = false;
             }
         });
-    });
+    }
     
     // Setup modal - name input (no longer required, but update button state)
     const nameInput = $('screeningNameInput');
