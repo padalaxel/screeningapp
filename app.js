@@ -88,6 +88,14 @@ function loadState() {
     if (fpsSelect) {
         fpsSelect.value = state.fps.toString();
     }
+    
+    // Update header with screening name if available
+    if (state.screeningName) {
+        const screeningNameEl = $('screeningName');
+        if (screeningNameEl) {
+            screeningNameEl.textContent = state.screeningName;
+        }
+    }
 }
 
 // Save state to localStorage
