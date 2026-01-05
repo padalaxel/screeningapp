@@ -1012,6 +1012,13 @@ function showSetupModal() {
         modal.classList.add('active');
         // Ensure it's on top
         modal.style.zIndex = '10001';
+        // Force top positioning
+        modal.style.alignItems = 'flex-start';
+        modal.style.justifyContent = 'center';
+        modal.style.paddingTop = '10px';
+        modal.style.paddingBottom = '10px';
+        modal.style.paddingLeft = '10px';
+        modal.style.paddingRight = '10px';
     }
     // Clear inputs
     const nameInput = $('screeningNameInput');
