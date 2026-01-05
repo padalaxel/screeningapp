@@ -77,10 +77,17 @@ function loadState() {
             }
             if (parsed.genre) state.genre = parsed.genre;
             if (parsed.screeningName) state.screeningName = parsed.screeningName;
-            if (parsed.setupComplete !== undefined) state.setupComplete = parsed.setupComplete;
+            // Only trust setupComplete if genre and name are also present
+            if (parsed.setupComplete !== undefined && parsed.genre && parsed.screeningName) {
+                state.setupComplete = parsed.setupComplete;
+            } else {
+                // Force setup if data is incomplete
+                state.setupComplete = false;
+            }
         }
     } catch (e) {
         console.error('Failed to load state:', e);
+        state.setupComplete = false;
     }
     
     // Update FPS select
