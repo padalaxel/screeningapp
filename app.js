@@ -230,13 +230,10 @@ function formatElapsed(seconds) {
     return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
-// Format elapsed seconds to timecode HH:MM:SS:FF
+// Format elapsed seconds to timecode HH:MM:SS (no frames)
 function formatTimecode(seconds, fps) {
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = Math.floor(seconds % 60);
-    const frames = Math.floor((seconds % 1) * fps);
-    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}:${String(frames).padStart(2, '0')}`;
+    // Just use the same format as formatElapsed - HH:MM:SS
+    return formatElapsed(seconds);
 }
 
 // Update timer display
