@@ -1037,10 +1037,10 @@ function updateDimOverlay(level) {
         }
     });
     
-    // Dim button gets special treatment - only dims to 70% max so it stays visible
+    // Dim button gets special treatment - only dims to 50% max so it stays visible
     const dimButton = $('dimToggleBtn');
     if (dimButton && clampedLevel > 0) {
-        const dimButtonPercent = Math.min(clampedLevel, 70) / 100;
+        const dimButtonPercent = Math.min(clampedLevel, 50) / 100;
         const dimButtonR = Math.round(255 - (255 - 51) * dimButtonPercent);
         const dimButtonG = Math.round(255 - (255 - 51) * dimButtonPercent);
         const dimButtonB = Math.round(255 - (255 - 51) * dimButtonPercent);
