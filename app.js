@@ -511,6 +511,52 @@ function exportText() {
     return state.session.notes.map(note => `${note.timecode}  ${note.label}`).join('\n');
 }
 
+// Export to Notes app (formatted for Notes)
+function exportToNotes() {
+    if (!state.session || !state.session.notes || state.session.notes.length === 0) {
+        alert('No notes to export');
+        return;
+    }
+    
+    const sessionName = state.session.name || 'Untitled Screening';
+    const sessionDate = new Date(state.session.createdAt).toLocaleString();
+    
+    let notesText = `${sessionName}\n${sessionDate}\n\n`;
+    notesText += 'Notes:\n';
+    notesText += '─'.repeat(30) + '\n\n';
+    
+    state.session.notes.forEach((note, index) => {
+        notesText += `${index + 1}. ${note.timecode} - ${note.label}\n`;
+    });
+    
+    return notesText;
+}
+
+// Export formatted for email
+function exportForEmail() {
+    if (!state.session || !state.session.notes || state.session.notes.length === 0) {
+        alert('No notes to export');
+        return;
+    }
+    
+    const sessionName = state.session.name || 'Untitled Screening';
+    const sessionDate = new Date(state.session.createdAt).toLocaleString();
+    
+    let emailText = `Screening Notes: ${sessionName}\n`;
+    emailText += `Date: ${sessionDate}\n\n`;
+    emailText += 'Notes:\n';
+    emailText += '─'.repeat(40) + '\n\n';
+    
+    state.session.notes.forEach((note, index) => {
+        emailText += `${index + 1}. ${note.timecode} - ${note.label}\n`;
+    });
+    
+    emailText += '\n' + '─'.repeat(40) + '\n';
+    emailText += `Total Notes: ${state.session.notes.length}\n`;
+    
+    return emailText;
+}
+
 // Escape CSV
 function escapeCsv(text) {
     if (text.includes(',') || text.includes('"') || text.includes('\n')) {
