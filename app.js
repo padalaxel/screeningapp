@@ -9,9 +9,9 @@ function $(selector) {
 // Genre button configurations
 const GENRE_BUTTONS = {
     comedy: ['funny', 'not funny', 'timing weird', 'performance', 'music', 'other'],
-    action: ['vfx', 'performance', 'too long', 'confusing', 'music', 'other'],
+    action: ['VFX', 'performance', 'too long', 'confusing', 'music', 'other'],
     documentary: ['too long', 'needs context', 're-order', 'confusing', 'story', 'other'],
-    other: ['edit', 'music', 'performance', 'sound', 'color', 'vfx']
+    default: ['edit', 'music', 'performance', 'sound', 'color', 'VFX']
 };
 
 // State
