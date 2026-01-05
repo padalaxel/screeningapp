@@ -503,7 +503,7 @@ function exportCsv() {
 
 // Export Text
 function exportText() {
-    if (!state.session || !state.session.notes || !state.session.notes.length === 0) {
+    if (!state.session || !state.session.notes || state.session.notes.length === 0) {
         alert('No notes to export');
         return;
     }
