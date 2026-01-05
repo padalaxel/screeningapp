@@ -10,14 +10,13 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    background: linear-gradient(135deg, #0d0d0d 0%, #0a0a0a 100%);
-    color: #e8e8e8;
+    background-color: #0a0a0a;
+    color: #e0e0e0;
     min-height: 100vh;
     padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
     overflow-x: hidden;
     scroll-behavior: auto;
     overflow-anchor: none; /* Prevent scroll anchoring */
-    letter-spacing: -0.01em;
 }
 
 html {
@@ -49,15 +48,13 @@ html {
 }
 
 .screening-name {
-    font-size: 17px;
+    font-size: 16px;
     color: #ffffff;
     font-weight: 600;
     text-align: center;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    letter-spacing: -0.02em;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .header-controls {
@@ -78,11 +75,9 @@ html {
 /* Dim Slider */
 .dim-label {
     font-size: 12px;
-    color: #b0b0b0;
+    color: #aaaaaa;
     white-space: nowrap;
     min-width: 40px;
-    font-weight: 500;
-    letter-spacing: 0.5px;
 }
 
 .dim-slider {
@@ -101,9 +96,9 @@ html {
 .dim-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 20px;
-    height: 20px;
-    background: linear-gradient(135deg, #5ab0ff 0%, #4a9eff 100%);
+    width: 18px;
+    height: 18px;
+    background: #4a9eff;
     border-radius: 50%;
     cursor: pointer;
     border: 2px solid #1a1a1a;
@@ -111,20 +106,16 @@ html {
     touch-action: none;
     position: relative;
     z-index: 2;
-    box-shadow: 0 2px 8px rgba(74, 158, 255, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
-    transition: all 0.2s ease;
 }
 
 .dim-slider::-moz-range-thumb {
-    width: 20px;
-    height: 20px;
-    background: linear-gradient(135deg, #5ab0ff 0%, #4a9eff 100%);
+    width: 18px;
+    height: 18px;
+    background: #4a9eff;
     border-radius: 50%;
     cursor: pointer;
     border: 2px solid #1a1a1a;
     touch-action: none;
-    box-shadow: 0 2px 8px rgba(74, 158, 255, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
-    transition: all 0.2s ease;
 }
 
 .dim-slider::-webkit-slider-runnable-track {
@@ -154,11 +145,10 @@ html {
     right: 0;
     bottom: 9px; /* Align to bottom where thumb sits */
     height: 12px;
-    background: linear-gradient(90deg, #2a2a2a 0%, #333333 100%);
+    background: #2a2a2a;
     clip-path: polygon(0% 100%, 100% 0%, 100% 100%);
     pointer-events: none;
     z-index: 1;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 /* iOS specific slider fixes */
@@ -172,10 +162,9 @@ html {
     }
     
     .dim-slider::-webkit-slider-thumb {
-        width: 24px;
-        height: 24px;
+        width: 22px;
+        height: 22px;
         margin-top: 11px; /* Position at bottom for iOS */
-        box-shadow: 0 2px 10px rgba(74, 158, 255, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
     }
     
     .dim-slider-container {
@@ -202,29 +191,24 @@ html {
 
 .status {
     font-size: 11px;
-    color: #999999;
+    color: #888888;
     text-transform: uppercase;
-    letter-spacing: 1.2px;
-    font-weight: 600;
+    letter-spacing: 1px;
 }
 
 .status.running {
-    color: #5ab0ff;
-    text-shadow: 0 0 8px rgba(74, 158, 255, 0.3);
+    color: #4a9eff;
 }
 
 .status.paused {
-    color: #ffb85a;
-    text-shadow: 0 0 8px rgba(255, 170, 74, 0.3);
+    color: #ffaa4a;
 }
 
 .timecode {
-    font-size: 15px;
-    color: #b8b8b8;
+    font-size: 14px;
+    color: #aaaaaa;
     font-variant-numeric: tabular-nums;
     font-weight: 500;
-    letter-spacing: 0.5px;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
 /* Buttons */
@@ -248,30 +232,26 @@ html {
 }
 
 .btn-small {
-    background: linear-gradient(135deg, #181818 0%, #151515 100%);
-    color: #d0d0d0;
-    border: 1px solid rgba(45, 45, 45, 0.6);
-    padding: 9px 18px;
+    background-color: #151515;
+    color: #cccccc;
+    border: 1px solid #2a2a2a;
+    padding: 8px 16px;
     font-size: 14px;
-    border-radius: 8px;
+    border-radius: 6px;
     cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: background-color 0.15s ease;
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.03);
-    letter-spacing: -0.01em;
 }
 
 .btn-small:active {
-    background: linear-gradient(135deg, #252525 0%, #202020 100%);
-    transform: scale(0.97);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    background-color: #252525;
 }
 
 /* Dim button slightly brighter */
 #dimToggleBtn {
-    color: #e8e8e8;
-    background: linear-gradient(135deg, #1d1d1d 0%, #181818 100%);
+    color: #e0e0e0;
+    background-color: #1a1a1a;
 }
 
 .btn-danger {
@@ -286,59 +266,50 @@ html {
 .btn-close {
     background: none;
     border: none;
-    color: #d0d0d0;
+    color: #cccccc;
     font-size: 32px;
     line-height: 1;
     cursor: pointer;
     padding: 0;
-    width: 38px;
-    height: 38px;
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
     -webkit-tap-highlight-color: transparent;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-}
-
-.btn-close:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: #ffffff;
 }
 
 .btn-close:active {
     color: #ffffff;
-    background: rgba(255, 255, 255, 0.1);
-    transform: scale(0.95);
 }
 
 /* Main Content - Buttons Grid */
 .main-content {
-    padding: 24px 20px;
+    padding: 20px 16px;
     min-height: 50vh;
 }
 
 .buttons-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 14px;
+    gap: 12px;
     max-width: 600px;
     margin: 0 auto;
 }
 
 .note-button {
-    background: linear-gradient(135deg, #181818 0%, #151515 100%);
+    background-color: #151515;
     color: #ffffff;
-    border: 2px solid rgba(50, 50, 50, 0.5);
-    padding: 26px 14px;
+    border: 2px solid #2a2a2a;
+    padding: 24px 12px;
     font-size: 20px;
     font-weight: 600;
-    border-radius: 12px;
+    border-radius: 10px;
     cursor: pointer;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: background-color 0.15s ease, border-color 0.15s ease;
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
-    min-height: 85px;
+    min-height: 80px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -346,43 +317,19 @@ html {
     word-break: break-word;
     -webkit-user-select: none;
     user-select: none;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    letter-spacing: -0.02em;
-    position: relative;
-    overflow: hidden;
-}
-
-.note-button::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, transparent 100%);
-    opacity: 0;
-    transition: opacity 0.25s ease;
-    pointer-events: none;
 }
 
 .note-button:active {
-    background: linear-gradient(135deg, #222222 0%, #1d1d1d 100%);
-    border-color: rgba(70, 70, 70, 0.7);
-    transform: scale(0.97);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.03);
-}
-
-.note-button:active::before {
-    opacity: 1;
+    background-color: #1f1f1f;
+    border-color: #333333;
 }
 
 /* Notes Section */
 .notes-section {
-    background: linear-gradient(180deg, #0f0f0f 0%, #0d0d0d 100%);
-    border-top: 1px solid rgba(40, 40, 40, 0.5);
-    padding: 20px;
+    background-color: #0f0f0f;
+    border-top: 1px solid #222222;
+    padding: 16px;
     min-height: 30vh;
-    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .notes-header {
@@ -400,9 +347,8 @@ html {
 
 .notes-header h2 {
     font-size: 18px;
-    color: #b0b0b0;
+    color: #aaaaaa;
     font-weight: 500;
-    letter-spacing: -0.01em;
 }
 
 .notes-arrow {
@@ -433,23 +379,20 @@ html {
 }
 
 .note-item {
-    background: linear-gradient(135deg, #181818 0%, #151515 100%);
-    border: 1px solid rgba(40, 40, 40, 0.5);
-    padding: 14px;
-    border-radius: 8px;
+    background-color: #151515;
+    border: 1px solid #222222;
+    padding: 12px;
+    border-radius: 6px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: background-color 0.15s ease;
     -webkit-tap-highlight-color: transparent;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .note-item:active {
-    background: linear-gradient(135deg, #222222 0%, #1d1d1d 100%);
-    transform: scale(0.98);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    background-color: #1f1f1f;
 }
 
 .note-item-label {
@@ -460,10 +403,9 @@ html {
 
 .note-item-timecode {
     font-size: 14px;
-    color: #999999;
+    color: #888888;
     font-variant-numeric: tabular-nums;
     margin-left: 12px;
-    letter-spacing: 0.5px;
 }
 
 /* Modal */
@@ -510,16 +452,14 @@ html {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 24px;
-    border-bottom: 1px solid rgba(40, 40, 40, 0.5);
+    padding: 20px;
+    border-bottom: 1px solid #222222;
 }
 
 .modal-header h2 {
-    font-size: 21px;
+    font-size: 20px;
     color: #ffffff;
     font-weight: 600;
-    letter-spacing: -0.02em;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .modal-body {
@@ -551,11 +491,10 @@ html {
 .modal-footer-sticky {
     position: sticky;
     bottom: 0;
-    background: linear-gradient(180deg, transparent 0%, #151515 10%, #151515 100%);
-    border-top: 1px solid rgba(40, 40, 40, 0.5);
+    background-color: #151515;
+    border-top: 1px solid #222222;
     justify-content: center;
     z-index: 1;
-    padding-top: 20px;
 }
 
 /* Settings */
@@ -580,75 +519,52 @@ html {
 .genre-btn {
     flex: 1;
     min-width: 100px;
-    background: linear-gradient(135deg, #1d1d1d 0%, #181818 100%);
-    color: #d0d0d0;
-    border: 2px solid rgba(50, 50, 50, 0.6);
-    padding: 14px 22px;
+    background-color: #1a1a1a;
+    color: #cccccc;
+    border: 2px solid #2a2a2a;
+    padding: 12px 20px;
     font-size: 16px;
     font-weight: 500;
-    border-radius: 10px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: background-color 0.15s ease, border-color 0.15s ease;
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.03);
-    letter-spacing: -0.01em;
 }
 
 .genre-btn:hover {
-    background: linear-gradient(135deg, #252525 0%, #202020 100%);
-    border-color: rgba(70, 70, 70, 0.8);
-    transform: translateY(-1px);
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    background-color: #222222;
+    border-color: #333333;
 }
 
 .genre-btn.selected {
-    background: linear-gradient(135deg, #1e2f3f 0%, #1a2835 100%);
-    border-color: #5ab0ff;
+    background-color: #1a2a3a;
+    border-color: #4a9eff;
     color: #ffffff;
-    box-shadow: 0 3px 12px rgba(74, 158, 255, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .input-select {
     width: 100%;
-    background: linear-gradient(135deg, #1d1d1d 0%, #181818 100%);
+    background-color: #1a1a1a;
     color: #ffffff;
-    border: 1px solid rgba(50, 50, 50, 0.6);
-    padding: 12px 14px;
+    border: 1px solid #2a2a2a;
+    padding: 10px 12px;
     font-size: 16px;
-    border-radius: 8px;
+    border-radius: 6px;
     -webkit-appearance: none;
     appearance: none;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
-    transition: all 0.2s ease;
-    letter-spacing: -0.01em;
-}
-
-.input-select:focus {
-    outline: none;
-    border-color: rgba(90, 176, 255, 0.5);
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3), 0 0 0 2px rgba(90, 176, 255, 0.1);
 }
 
 .input-text {
     width: 100%;
-    background: linear-gradient(135deg, #1d1d1d 0%, #181818 100%);
+    background-color: #1a1a1a;
     color: #ffffff;
-    border: 1px solid rgba(50, 50, 50, 0.6);
-    padding: 12px 14px;
+    border: 1px solid #2a2a2a;
+    padding: 10px 12px;
     font-size: 16px;
-    border-radius: 8px;
+    border-radius: 6px;
     -webkit-user-select: text;
     user-select: text;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
-    transition: all 0.2s ease;
-    letter-spacing: -0.01em;
-}
-
-.input-text:focus {
-    outline: none;
-    border-color: rgba(90, 176, 255, 0.5);
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3), 0 0 0 2px rgba(90, 176, 255, 0.1);
 }
 
 .button-labels-container {
@@ -675,25 +591,23 @@ html {
     line-height: 1;
     cursor: pointer;
     padding: 0;
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 6px;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 4px;
+    transition: background-color 0.15s ease;
     -webkit-tap-highlight-color: transparent;
     flex-shrink: 0;
 }
 
 .btn-remove:hover {
-    background-color: rgba(255, 107, 107, 0.15);
-    transform: scale(1.1);
+    background-color: rgba(255, 107, 107, 0.1);
 }
 
 .btn-remove:active {
-    background-color: rgba(255, 107, 107, 0.25);
-    transform: scale(0.95);
+    background-color: rgba(255, 107, 107, 0.2);
 }
 
 /* Summary */
@@ -707,10 +621,9 @@ html {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 14px;
-    background: linear-gradient(135deg, #1d1d1d 0%, #181818 100%);
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    padding: 12px;
+    background-color: #1a1a1a;
+    border-radius: 6px;
 }
 
 .summary-label {
@@ -721,9 +634,8 @@ html {
 .summary-count {
     font-size: 18px;
     font-weight: 600;
-    color: #5ab0ff;
+    color: #4a9eff;
     font-variant-numeric: tabular-nums;
-    text-shadow: 0 0 8px rgba(74, 158, 255, 0.3);
 }
 
 /* Export */
@@ -760,19 +672,17 @@ html {
 
 /* Button click feedback - very subtle for dark theater */
 .note-button.clicked {
-    background: linear-gradient(135deg, #252525 0%, #202020 100%) !important;
-    border-color: rgba(80, 80, 80, 0.8) !important;
-    transform: scale(0.97);
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.03) !important;
+    background-color: #1f1f1f !important;
+    border-color: #3a3a3a !important;
+    transform: scale(0.98);
+    transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
 }
 
 .note-button.clicked-success {
-    background: linear-gradient(135deg, #1f251f 0%, #1a201a 100%) !important;
-    border-color: rgba(60, 90, 60, 0.6) !important;
-    transform: scale(0.97);
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.03) !important;
+    background-color: #1a1f1a !important;
+    border-color: #2a3a2a !important;
+    transform: scale(0.98);
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
 }
 
 /* Toast Notification */
@@ -803,11 +713,10 @@ html {
 }
 
 .toast .toast-timecode {
-    color: #5ab0ff;
+    color: #4a9eff;
     font-weight: 600;
     margin-right: 8px;
     font-variant-numeric: tabular-nums;
-    text-shadow: 0 0 8px rgba(74, 158, 255, 0.3);
 }
 
 .toast .toast-label {
