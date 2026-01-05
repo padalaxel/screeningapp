@@ -1598,65 +1598,63 @@ function renderSettings() {
         input.value = capitalizeLabel(label);
         input.placeholder = `Button ${index + 1}`;
         
-        // Add remove button (red X) - only show if more than 6 buttons
+        // Add remove button (red X) - show if more than minimum (6 buttons)
+        // Always allow deletion as long as we have more than 6
         if (state.buttonLabels.length > 6) {
             const removeBtn = document.createElement('button');
             removeBtn.className = 'btn-remove';
             removeBtn.innerHTML = '&times;';
             removeBtn.title = 'Remove button';
             removeBtn.addEventListener('click', () => {
-                state.buttonLabels.splice(index, 1);
-                saveState();
-                renderSettings();
+                if (state.buttonLabels.length > 6) {
+                    state.buttonLabels.splice(index, 1);
+                    saveState();
+                    renderSettings();
+                }
             });
             div.appendChild(removeBtn);
         }
+        
+        input.addEventListener('blur', () => {
+            const newValue = input.value.trim();
+            if (newValue) {
+                // Store lowercase version for logic, but display will be capitalized
+                if (newValue.toUpperCase() === 'VFX') {
+                    state.buttonLabels[index] = 'VFX';
+                } else {
+                    state.buttonLabels[index] = newValue.toLowerCase();
+                }
+            }
+        });
         
         div.appendChild(input);
         container.appendChild(div);
     });
     
-    // Add one empty input for adding more buttons (up to 9)
+    // Add button with plus sign (up to 9 buttons)
     if (state.buttonLabels.length < 9) {
-        const div = document.createElement('div');
-        div.className = 'button-label-input';
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.className = 'input-text';
-        input.placeholder = 'Add button (type and press Enter or click outside)';
-        div.appendChild(input);
-        container.appendChild(div);
-        
-        // When user types and leaves the field, add the button
-        input.addEventListener('blur', () => {
-            const newValue = input.value.trim();
-            if (newValue && state.buttonLabels.length < 9) {
-                // Store lowercase version for logic, but display will be capitalized
-                if (newValue.toUpperCase() === 'VFX') {
-                    state.buttonLabels.push('VFX');
-                } else {
-                    state.buttonLabels.push(newValue.toLowerCase());
-                }
-                // Clear the input and re-render to show the new button + new empty field
-                input.value = '';
+        const addButtonDiv = document.createElement('div');
+        addButtonDiv.className = 'add-button-container';
+        const addBtn = document.createElement('button');
+        addBtn.className = 'btn-add-button';
+        addBtn.innerHTML = '<span class="add-button-plus">+</span> Add Button';
+        addBtn.addEventListener('click', () => {
+            if (state.buttonLabels.length < 9) {
+                // Add new button label
+                state.buttonLabels.push(`button ${state.buttonLabels.length + 1}`);
                 renderSettings();
-                // Focus the new empty input
+                // Focus the new input
                 setTimeout(() => {
                     const inputs = container.querySelectorAll('input');
                     if (inputs.length > 0) {
                         inputs[inputs.length - 1].focus();
+                        inputs[inputs.length - 1].select();
                     }
                 }, 100);
             }
         });
-        
-        // Also add on Enter key
-        input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                input.blur(); // Trigger blur which will add the button
-            }
-        });
+        addButtonDiv.appendChild(addBtn);
+        container.appendChild(addButtonDiv);
     }
 }
 
