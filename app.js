@@ -34,6 +34,11 @@ let pendingConfirm = null;
 
 // Initialize
 function init() {
+    // Scroll to top on load
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    
     // Check for app version - force setup if version changed
     const APP_VERSION = '2.0';
     const storedVersion = localStorage.getItem('screeningAppVersion');
@@ -59,6 +64,13 @@ function init() {
         renderNotes();
         updateTimer();
     }
+    
+    // Ensure we're at the top after rendering
+    setTimeout(() => {
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+    }, 100);
     
     // Register service worker
     if ('serviceWorker' in navigator) {
@@ -618,10 +630,20 @@ function startScreening() {
         setupModal.style.display = 'none';
     }
     
+    // Scroll to top when starting screening
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    
     // Initialize app
     renderButtons();
     renderNotes();
     updateTimer();
+    
+    // Ensure we stay at top after rendering
+    setTimeout(() => {
+        window.scrollTo(0, 0);
+    }, 50);
 }
 
 // Show other note modal

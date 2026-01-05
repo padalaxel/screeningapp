@@ -9,6 +9,14 @@
     <title>Screening Notes</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="manifest" href="manifest.webmanifest">
+    <script>
+        // Prevent scroll restoration
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+        // Scroll to top immediately
+        window.scrollTo(0, 0);
+    </script>
 </head>
 <body>
     <!-- Dim overlay toggle -->
