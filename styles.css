@@ -652,17 +652,6 @@ html {
     font-variant-numeric: tabular-nums;
 }
 
-/* Menu */
-.menu-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.menu-actions .btn-primary {
-    width: 100%;
-}
-
 /* Export */
 .export-actions {
     display: flex;

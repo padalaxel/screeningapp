@@ -1104,7 +1104,7 @@ function setupEventListeners() {
         });
     }
     
-    // Settings (accessed via Menu now)
+    // Settings
     const closeSettings = $('closeSettings');
     if (closeSettings) {
         closeSettings.addEventListener('click', () => closeModal('settingsModal'));
@@ -1143,42 +1143,25 @@ function setupEventListeners() {
         undoBtn.addEventListener('click', undoLastNote);
     }
     
-    // Menu
-    const menuBtn = $('menuBtn');
-    if (menuBtn) {
-        menuBtn.addEventListener('click', () => showModal('menuModal'));
-    }
-    
-    const closeMenu = $('closeMenu');
-    if (closeMenu) {
-        closeMenu.addEventListener('click', () => closeModal('menuModal'));
-    }
-    
-    // Menu actions
-    const menuSessionsBtn = $('menuSessionsBtn');
-    if (menuSessionsBtn) {
-        menuSessionsBtn.addEventListener('click', () => {
-            closeModal('menuModal');
-            showModal('sessionsModal');
-        });
-    }
-    
-    const menuSettingsBtn = $('menuSettingsBtn');
-    if (menuSettingsBtn) {
-        menuSettingsBtn.addEventListener('click', () => {
-            closeModal('menuModal');
-            renderSettings();
-            showModal('settingsModal');
-        });
-    }
-    
     // Sessions
+    const sessionsBtn = $('sessionsBtn');
+    if (sessionsBtn) {
+        sessionsBtn.addEventListener('click', () => showModal('sessionsModal'));
+    }
+    
     const closeSessions = $('closeSessions');
     if (closeSessions) {
         closeSessions.addEventListener('click', () => closeModal('sessionsModal'));
     }
     
-    // Settings button removed - now accessed via Menu
+    // Settings
+    const settingsBtn = $('settingsBtn');
+    if (settingsBtn) {
+        settingsBtn.addEventListener('click', () => {
+            renderSettings();
+            showModal('settingsModal');
+        });
+    }
     
     // Export
     const exportBtn = $('exportBtn');
