@@ -477,8 +477,10 @@ html {
 }
 
 .modal-setup .modal-content {
-    max-width: 350px;
-    max-height: auto;
+    max-width: 280px !important;
+    width: 100% !important;
+    max-height: auto !important;
+    margin-top: 0 !important;
 }
 
 .modal-small {
@@ -540,22 +542,17 @@ html {
 }
 
 .modal-setup {
-    max-height: calc(100vh - env(safe-area-inset-top, 0px) - 40px);
+    max-height: calc(100vh - env(safe-area-inset-top, 0px) - 20px) !important;
     display: flex;
     flex-direction: column;
-    margin-top: 0;
-    padding: 10px 20px;
-}
-
-.modal-setup .modal-content {
-    max-width: 320px;
-    width: 100%;
+    margin-top: 0 !important;
 }
 
 .modal-setup .modal-body {
     flex: 1;
     overflow-y: auto;
     min-height: 0;
+    padding: 12px !important;
 }
 
 .modal-footer-sticky {
