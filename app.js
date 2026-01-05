@@ -8,10 +8,10 @@ function $(selector) {
 
 // Genre button configurations
 const GENRE_BUTTONS = {
+    default: ['edit', 'music', 'performance', 'sound', 'color', 'VFX', 'story', 'other'],
     comedy: ['funny', 'not funny', 'timing weird', 'performance', 'music', 'other'],
     action: ['VFX', 'performance', 'too long', 'confusing', 'music', 'other'],
-    documentary: ['too long', 'needs context', 're-order', 'confusing', 'story', 'other'],
-    default: ['edit', 'music', 'performance', 'sound', 'color', 'VFX']
+    documentary: ['too long', 'needs context', 're-order', 'confusing', 'story', 'other']
 };
 
 // State
@@ -311,11 +311,17 @@ function clearNotes() {
     });
 }
 
-// Capitalize button label
+// Capitalize button label - force capitalization on all buttons
 function capitalizeLabel(label) {
-    // Capitalize first letter of each word
+    // Handle special cases first
+    if (label.toLowerCase() === 'vfx') return 'VFX';
+    if (label.toLowerCase() === 'vfx') return 'VFX';
+    
+    // Capitalize first letter of each word, rest lowercase
     return label.split(' ').map(word => {
         if (word.length === 0) return word;
+        // Keep acronyms like VFX uppercase
+        if (word.toUpperCase() === 'VFX') return 'VFX';
         return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
     }).join(' ');
 }
@@ -744,9 +750,17 @@ function setupEventListeners() {
     const saveSettings = $('saveSettings');
     if (saveSettings) {
         saveSettings.addEventListener('click', () => {
-            // Get button labels from inputs
+            // Get button labels from inputs and force capitalization
             const inputs = document.querySelectorAll('#buttonLabelsContainer input');
-            const labels = Array.from(inputs).map(input => input.value.trim() || 'Note').filter(Boolean);
+            const labels = Array.from(inputs)
+                .map(input => input.value.trim())
+                .filter(Boolean)
+                .map(label => {
+                    // Store lowercase version for logic, but display will be capitalized
+                    // Keep special cases like VFX
+                    if (label.toUpperCase() === 'VFX') return 'VFX';
+                    return label.toLowerCase();
+                });
             if (labels.length >= 6 && labels.length <= 9) {
                 state.buttonLabels = labels;
             } else {
@@ -934,7 +948,8 @@ function renderSettings() {
         const input = document.createElement('input');
         input.type = 'text';
         input.className = 'input-text';
-        input.value = label;
+        // Show capitalized version in input, but store original
+        input.value = capitalizeLabel(label);
         input.placeholder = `Button ${index + 1}`;
         div.appendChild(input);
         container.appendChild(div);
