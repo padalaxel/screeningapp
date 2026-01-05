@@ -848,6 +848,16 @@ function setupEventListeners() {
         });
     }
     
+    // Dim toggle button
+    const dimToggleBtn = $('dimToggleBtn');
+    const dimSliderContainer = $('dimSliderContainer');
+    if (dimToggleBtn && dimSliderContainer) {
+        dimToggleBtn.addEventListener('click', () => {
+            const isVisible = dimSliderContainer.style.display !== 'none';
+            dimSliderContainer.style.display = isVisible ? 'none' : 'flex';
+        });
+    }
+    
     // Dim slider
     const dimSlider = $('dimSlider');
     const dimOverlay = $('dimOverlay');
