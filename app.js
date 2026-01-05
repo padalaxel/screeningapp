@@ -63,6 +63,13 @@ function init() {
         renderButtons();
         renderNotes();
         updateTimer();
+        
+        // Apply dim text colors after rendering (if dim level was restored)
+        if (state.dimLevel) {
+            setTimeout(() => {
+                updateDimOverlay(state.dimLevel);
+            }, 50);
+        }
     }
     
     // Ensure we're at the top after rendering
