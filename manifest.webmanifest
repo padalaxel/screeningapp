@@ -2,7 +2,7 @@
     "name": "Screening Notes",
     "short_name": "Screening Notes",
     "description": "Time-coded note-taking app for film screenings",
-    "start_url": "/",
+    "start_url": "./",
     "display": "standalone",
     "background_color": "#0a0a0a",
     "theme_color": "#000000",
