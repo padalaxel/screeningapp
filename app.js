@@ -33,6 +33,18 @@ let pendingConfirm = null;
 
 // Initialize
 function init() {
+    // Check for app version - force setup if version changed
+    const APP_VERSION = '2.0';
+    const storedVersion = localStorage.getItem('screeningAppVersion');
+    if (storedVersion !== APP_VERSION) {
+        // New version - clear old state and force setup
+        localStorage.removeItem('screeningAppState');
+        localStorage.setItem('screeningAppVersion', APP_VERSION);
+        state.setupComplete = false;
+        state.genre = null;
+        state.screeningName = '';
+    }
+    
     loadState();
     setupEventListeners();
     
