@@ -806,10 +806,10 @@ function setupEventListeners() {
         });
     }
     
-    // Close modals on background click
+    // Close modals on background click (except setup modal)
     document.querySelectorAll('.modal').forEach(modal => {
         modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
+            if (e.target === modal && modal.id !== 'setupModal') {
                 modal.classList.remove('active');
             }
         });
