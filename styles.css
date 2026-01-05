@@ -476,6 +476,12 @@ html {
     gap: 12px;
 }
 
+.modal-footer-top {
+    border-top: none;
+    border-bottom: 1px solid #222222;
+    justify-content: center;
+}
+
 /* Settings */
 .setting-group {
     margin-bottom: 24px;
