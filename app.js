@@ -227,8 +227,11 @@ function toggleTimer() {
             state.startTime = Date.now();
             state.pausedTime = 0;
         } else {
-            // Resuming - set startTime so that elapsed will be pausedTime
-            state.startTime = Date.now() - (state.pausedTime * 1000);
+            // Resuming - set startTime to now minus the elapsed time we want to continue from
+            // pausedTime already contains the total elapsed, so use that
+            const elapsedToContinue = state.pausedTime;
+            state.startTime = Date.now() - (elapsedToContinue * 1000);
+            state.pausedTime = 0; // Reset pausedTime since we're now running
         }
         state.isRunning = true;
         timerInterval = setInterval(updateTimer, 100); // Update every 100ms
