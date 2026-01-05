@@ -38,14 +38,14 @@ function init() {
     
     // Check if setup is needed
     if (!state.setupComplete || !state.genre || !state.screeningName) {
+        // Don't close setup modal - show it
         showSetupModal();
     } else {
+        closeAllModals();
         renderButtons();
         renderNotes();
         updateTimer();
     }
-    
-    closeAllModals();
     
     // Register service worker
     if ('serviceWorker' in navigator) {
@@ -524,6 +524,8 @@ function showSetupModal() {
     const modal = $('setupModal');
     if (modal) {
         modal.classList.add('active');
+        // Ensure modal is visible
+        modal.style.display = 'flex';
     }
     // Reset genre selection
     document.querySelectorAll('.genre-btn').forEach(btn => {
@@ -534,6 +536,8 @@ function showSetupModal() {
     if (nameInput) nameInput.value = '';
     const startBtn = $('startScreeningBtn');
     if (startBtn) startBtn.disabled = true;
+    // Reset state
+    state.genre = null;
 }
 
 // Start screening from setup
