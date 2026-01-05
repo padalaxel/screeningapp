@@ -100,7 +100,7 @@ html {
     border-radius: 50%;
     cursor: pointer;
     border: 2px solid #1a1a1a;
-    margin-top: -3px; /* Position at bottom of track */
+    margin-top: 3px; /* Position at bottom of track - positive margin moves it down */
     touch-action: none;
     position: relative;
     z-index: 2;
@@ -133,7 +133,7 @@ html {
 /* Triangle track background using pseudo-element */
 .dim-slider-container {
     position: relative;
-    padding: 8px 0; /* Add padding for thumb clearance */
+    padding: 0 0 9px 0; /* Add bottom padding for thumb clearance */
 }
 
 .dim-slider-container::before {
@@ -141,7 +141,7 @@ html {
     position: absolute;
     left: 0;
     right: 0;
-    bottom: 8px; /* Align to bottom where thumb sits */
+    bottom: 9px; /* Align to bottom where thumb sits */
     height: 12px;
     background: #2a2a2a;
     clip-path: polygon(0% 100%, 100% 0%, 100% 100%);
@@ -162,11 +162,11 @@ html {
     .dim-slider::-webkit-slider-thumb {
         width: 22px;
         height: 22px;
-        margin-top: -11px;
+        margin-top: 11px; /* Position at bottom for iOS */
     }
     
     .dim-slider-container {
-        padding: 11px 0; /* More padding for larger thumb */
+        padding: 0 0 11px 0; /* Bottom padding for larger thumb */
     }
     
     .dim-slider-container::before {
