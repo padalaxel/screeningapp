@@ -370,6 +370,13 @@ function renderButtons() {
         });
         grid.appendChild(button);
     });
+    
+    // Ensure scroll stays at top after rendering buttons
+    setTimeout(() => {
+        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+    }, 10);
 }
 
 // Render notes list
@@ -630,20 +637,29 @@ function startScreening() {
         setupModal.style.display = 'none';
     }
     
-    // Scroll to top when starting screening
-    window.scrollTo(0, 0);
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
-    
     // Initialize app
     renderButtons();
     renderNotes();
     updateTimer();
     
-    // Ensure we stay at top after rendering
-    setTimeout(() => {
-        window.scrollTo(0, 0);
-    }, 50);
+    // Force scroll to top multiple times to ensure it sticks
+    const forceScrollToTop = () => {
+        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+        if (window.pageYOffset > 0) {
+            window.scrollTo(0, 0);
+        }
+    };
+    
+    // Scroll immediately
+    forceScrollToTop();
+    
+    // Scroll after a short delay (after buttons render)
+    setTimeout(forceScrollToTop, 10);
+    setTimeout(forceScrollToTop, 50);
+    setTimeout(forceScrollToTop, 100);
+    setTimeout(forceScrollToTop, 200);
 }
 
 // Show other note modal

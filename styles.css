@@ -15,11 +15,13 @@ body {
     min-height: 100vh;
     padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
     overflow-x: hidden;
-    scroll-behavior: smooth;
+    scroll-behavior: auto;
+    overflow-anchor: none; /* Prevent scroll anchoring */
 }
 
 html {
-    scroll-behavior: smooth;
+    scroll-behavior: auto;
+    overflow-anchor: none; /* Prevent scroll anchoring */
 }
 
 .dim-overlay {
