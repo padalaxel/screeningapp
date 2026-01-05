@@ -590,13 +590,12 @@ function startScreening() {
     const nameInput = $('screeningNameInput');
     const selectedGenre = state.genre;
     
-    if (!nameInput || !selectedGenre) return;
+    if (!selectedGenre) return;
     
-    const screeningName = nameInput.value.trim();
-    if (!screeningName) {
-        alert('Please enter a screening name');
-        return;
-    }
+    // Use entered name or default to "Untitled Screening"
+    const screeningName = nameInput && nameInput.value.trim() 
+        ? nameInput.value.trim() 
+        : 'Untitled Screening';
     
     state.screeningName = screeningName;
     state.genre = selectedGenre;
@@ -667,22 +666,22 @@ function setupEventListeners() {
             btn.classList.add('selected');
             state.genre = btn.dataset.genre;
             
-            // Enable start button if name is entered
-            const nameInput = $('screeningNameInput');
+            // Enable start button (name is optional, defaults to "Untitled Screening")
             const startBtn = $('startScreeningBtn');
-            if (nameInput && startBtn) {
-                startBtn.disabled = !nameInput.value.trim();
+            if (startBtn) {
+                startBtn.disabled = false;
             }
         });
     });
     
-    // Setup modal - name input
+    // Setup modal - name input (no longer required, but update button state)
     const nameInput = $('screeningNameInput');
     if (nameInput) {
         nameInput.addEventListener('input', () => {
+            // Button is enabled as long as genre is selected
             const startBtn = $('startScreeningBtn');
             if (startBtn) {
-                startBtn.disabled = !nameInput.value.trim() || !state.genre;
+                startBtn.disabled = !state.genre;
             }
         });
     }
