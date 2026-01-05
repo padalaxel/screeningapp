@@ -363,10 +363,10 @@ function undoLastNote() {
         }
     });
     
-    // Show toast with strikethrough text
+    // Show toast with strikethrough text (both timecode and label)
     const toast = $('toast');
     if (toast) {
-        toast.innerHTML = `<span class="toast-timecode">${escapeHtml(lastNoteTimecode)}</span><span class="toast-label toast-strikethrough">${escapeHtml(lastNoteLabel)}</span>`;
+        toast.innerHTML = `<span class="toast-timecode toast-strikethrough">${escapeHtml(lastNoteTimecode)}</span><span class="toast-label toast-strikethrough">${escapeHtml(lastNoteLabel)}</span>`;
         toast.classList.add('show');
         setTimeout(() => {
             toast.classList.remove('show');
