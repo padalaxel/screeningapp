@@ -174,6 +174,10 @@ function saveState() {
 function createNewSession() {
     // Save current session to history if it exists and has notes
     if (state.session && state.session.notes && state.session.notes.length > 0) {
+        // Save elapsed time with session
+        state.session.elapsedSeconds = state.elapsedSeconds;
+        state.session.isRunning = state.isRunning;
+        
         // Check if session already exists in history (by ID)
         const existingIndex = state.sessionHistory.findIndex(s => s.id === state.session.id);
         if (existingIndex >= 0) {
@@ -202,7 +206,9 @@ function createNewSession() {
         name: sessionName,
         createdAt: now.toISOString(),
         notes: [],
-        genre: state.genre
+        genre: state.genre,
+        elapsedSeconds: 0,
+        isRunning: false
     };
     saveState();
 }
@@ -694,7 +700,8 @@ function renderSessionsList() {
         const item = document.createElement('div');
         item.className = 'session-item';
         const date = new Date(session.createdAt);
-        const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const dateStr = date.toLocaleDateString();
+        const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         const noteCount = session.notes ? session.notes.length : 0;
         const isCurrent = session.isCurrent || (state.session && state.session.id === session.id);
         
@@ -704,7 +711,7 @@ function renderSessionsList() {
                     <span class="session-name">${escapeHtml(session.name)}</span>
                     ${isCurrent ? '<span class="session-current-badge">Current</span>' : ''}
                 </div>
-                <div class="session-meta">${dateStr} • ${noteCount} note${noteCount !== 1 ? 's' : ''}</div>
+                <div class="session-meta">${dateStr} ${timeStr} • ${noteCount} note${noteCount !== 1 ? 's' : ''}</div>
             </div>
             <div class="session-actions">
                 <button class="btn-small session-load-btn" data-session-id="${session.id}">Load</button>
@@ -743,6 +750,10 @@ function renderSessionsList() {
 function loadSession(sessionId) {
     // Save current session to history first
     if (state.session && state.session.notes && state.session.notes.length > 0) {
+        // Save elapsed time
+        state.session.elapsedSeconds = state.elapsedSeconds;
+        state.session.isRunning = state.isRunning;
+        
         const existingIndex = state.sessionHistory.findIndex(s => s.id === state.session.id);
         if (existingIndex >= 0) {
             state.sessionHistory[existingIndex] = { ...state.session };
@@ -776,20 +787,23 @@ function loadSession(sessionId) {
         state.buttonLabels = sessionToLoad.buttonLabels;
     }
     
+    // Restore elapsed time and running state
+    state.elapsedSeconds = sessionToLoad.elapsedSeconds || 0;
+    state.isRunning = false; // Always start paused when loading
+    state.pausedTime = 0;
+    state.startTime = null;
+    
     // Update UI
     const screeningNameEl = $('screeningName');
     if (screeningNameEl) {
-        screeningNameEl.textContent = sessionToLoad.name;
+        const date = new Date(sessionToLoad.createdAt);
+        const dateStr = date.toLocaleDateString();
+        screeningNameEl.textContent = `${sessionToLoad.name} • ${dateStr}`;
+        screeningNameEl.dataset.sessionId = sessionToLoad.id;
     }
     
     renderButtons();
     renderNotes();
-    
-    // Reset timer
-    state.isRunning = false;
-    state.startTime = null;
-    state.pausedTime = 0;
-    state.elapsedSeconds = 0;
     updateTimer();
     
     saveState();
@@ -811,7 +825,12 @@ function renameSession(sessionId) {
         return;
     }
     
-    const newName = prompt('Enter new session name:', sessionToRename.name);
+    // Extract just the name part (remove date if present)
+    const currentName = sessionToRename.name.includes(' • ') 
+        ? sessionToRename.name.split(' • ')[0] 
+        : sessionToRename.name;
+    
+    const newName = prompt('Enter new session name:', currentName);
     if (!newName || newName.trim() === '') {
         return;
     }
@@ -824,7 +843,9 @@ function renameSession(sessionId) {
         state.screeningName = trimmedName;
         const screeningNameEl = $('screeningName');
         if (screeningNameEl) {
-            screeningNameEl.textContent = trimmedName;
+            const date = new Date(state.session.createdAt);
+            const dateStr = date.toLocaleDateString();
+            screeningNameEl.textContent = `${trimmedName} • ${dateStr}`;
         }
     } else {
         const index = state.sessionHistory.findIndex(s => s.id === sessionId);
@@ -1016,10 +1037,15 @@ function startScreening() {
     createNewSession();
     saveState();
     
-    // Update header with screening name
+    // Update header with screening name and date
     const screeningNameEl = $('screeningName');
     if (screeningNameEl) {
-        screeningNameEl.textContent = screeningName;
+        const date = new Date();
+        const dateStr = date.toLocaleDateString();
+        screeningNameEl.textContent = `${screeningName} • ${dateStr}`;
+        screeningNameEl.dataset.sessionId = state.session.id;
+        screeningNameEl.style.cursor = 'pointer';
+        screeningNameEl.title = 'Tap to rename';
     }
     
     // Force scroll to top BEFORE closing modal
@@ -1209,6 +1235,16 @@ function setupEventListeners() {
             saveState();
             renderButtons();
             closeModal('settingsModal');
+        });
+    }
+    
+    // Make screening name clickable to rename
+    const screeningNameEl = $('screeningName');
+    if (screeningNameEl) {
+        screeningNameEl.addEventListener('click', () => {
+            if (state.session && state.session.id) {
+                renameSession(state.session.id);
+            }
         });
     }
     
