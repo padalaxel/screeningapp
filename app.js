@@ -80,11 +80,20 @@ function init() {
         document.body.scrollTop = 0;
     }, 100);
     
-    // Register service worker
+    // Register service worker with cache-busting
     if ('serviceWorker' in navigator) {
-        // Use relative path for GitHub Pages compatibility
-        const swPath = './sw.js';
-        navigator.serviceWorker.register(swPath).catch(err => console.log('SW registration failed:', err));
+        // Use relative path for GitHub Pages compatibility with cache-busting query param
+        const swPath = `./sw.js?v=${Date.now()}`;
+        navigator.serviceWorker.register(swPath)
+            .then(() => {
+                // Unregister old service workers to force update
+                navigator.serviceWorker.getRegistrations().then((registrations) => {
+                    registrations.forEach((registration) => {
+                        registration.update();
+                    });
+                });
+            })
+            .catch(err => console.log('SW registration failed:', err));
     }
 }
 
