@@ -530,9 +530,11 @@ function showConfirm(message, callback) {
 function showSetupModal() {
     const modal = $('setupModal');
     if (modal) {
-        modal.classList.add('active');
-        // Ensure modal is visible
+        // Force show the modal
         modal.style.display = 'flex';
+        modal.classList.add('active');
+        // Ensure it's on top
+        modal.style.zIndex = '10001';
     }
     // Reset genre selection
     document.querySelectorAll('.genre-btn').forEach(btn => {
@@ -540,7 +542,10 @@ function showSetupModal() {
     });
     // Clear inputs
     const nameInput = $('screeningNameInput');
-    if (nameInput) nameInput.value = '';
+    if (nameInput) {
+        nameInput.value = '';
+        nameInput.focus();
+    }
     const startBtn = $('startScreeningBtn');
     if (startBtn) startBtn.disabled = true;
     // Reset state
