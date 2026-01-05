@@ -111,9 +111,11 @@ function loadState() {
         }
     }
     
-    // Restore dim level
-    if (state.dimLevel) {
-        updateDimOverlay(state.dimLevel);
+    // Restore dim level (will be set up in setupEventListeners)
+    // Just ensure the slider value is set
+    const dimSlider = $('dimSlider');
+    if (dimSlider) {
+        dimSlider.value = state.dimLevel || 0;
     }
 }
 
