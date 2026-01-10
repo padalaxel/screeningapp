@@ -1180,10 +1180,13 @@ function showModal(modalId) {
                 // Only close if clicking directly on the modal backdrop (not on modal content)
                 if (e.target === modal) {
                     closeModal(modalId);
-                    modal.removeEventListener('click', handleOutsideClick);
+                    // Remove listener after closing
+                    modal.removeEventListener('click', handleOutsideClick, true);
                 }
             };
             // Use capture phase to catch clicks on the modal backdrop
+            // Store handler reference so we can remove it later
+            modal._outsideClickHandler = handleOutsideClick;
             modal.addEventListener('click', handleOutsideClick, true);
         }
         
