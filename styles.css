@@ -1290,15 +1290,62 @@ button:disabled {
     }
     
     .timecode {
-        font-size: var(--font-sm);
+        font-size: 40px;
     }
     
     .timer-controls {
         gap: var(--space-2);
     }
     
+    .timer-section {
+        padding: var(--space-3) var(--space-3) var(--space-2);
+        margin-bottom: var(--space-3);
+    }
+    
+    .timer-display {
+        margin-bottom: var(--space-2);
+        gap: var(--space-1);
+    }
+    
+    .main-content {
+        padding: var(--space-1) var(--space-3) var(--space-4);
+    }
+    
+    .notes-section {
+        padding: var(--space-3) var(--space-3);
+    }
+    
     .modal {
         padding: var(--space-4);
+    }
+    
+    .header {
+        padding: var(--space-2) var(--space-3);
+        gap: var(--space-2);
+    }
+    
+    .header-controls {
+        gap: var(--space-2);
+    }
+    
+    .buttons-grid {
+        gap: var(--space-2);
+    }
+    
+    .buttons-grid-large {
+        gap: var(--space-3);
+    }
+    
+    .note-button {
+        min-height: 90px;
+        padding: var(--space-6) var(--space-3);
+        font-size: var(--font-base);
+    }
+    
+    .buttons-grid-large .note-button {
+        min-height: 110px;
+        padding: var(--space-8) var(--space-4);
+        font-size: var(--font-lg);
     }
 }
 
