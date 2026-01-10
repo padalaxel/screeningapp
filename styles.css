@@ -328,6 +328,8 @@ body {
     text-align: center;
     padding: var(--space-1) var(--space-4) var(--space-1);
     margin: 0 0 var(--space-2) 0;
+    position: relative;
+    z-index: 1;
 }
 
 .timer-controls {
@@ -336,6 +338,8 @@ body {
     align-items: center;
     justify-content: center;
     gap: var(--space-1);
+    position: relative;
+    z-index: 1;
 }
 
 .timer-display {
