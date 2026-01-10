@@ -50,10 +50,10 @@
         <!-- Timer Section - Hero Element -->
         <div class="timer-section">
             <div class="timer-controls">
+                <button id="startPauseBtn" class="btn-primary btn-play" aria-label="Start or pause timer">Start</button>
                 <div class="timer-display">
                     <div id="timecode" class="timecode" role="timer" aria-live="polite" aria-label="Current timecode">00:00:00</div>
                 </div>
-                <button id="startPauseBtn" class="btn-primary btn-play" aria-label="Start or pause timer">Start</button>
             </div>
         </div>
         
@@ -62,8 +62,8 @@
         </div>
         
         <div class="action-buttons">
-            <button id="exportBtn" class="btn-small" aria-label="Export notes">Export</button>
             <button id="undoBtn" class="btn-small" aria-label="Undo last note">Undo</button>
+            <button id="exportBtn" class="btn-small" aria-label="Export notes">Export</button>
         </div>
     </main>
 
@@ -179,19 +179,13 @@
 
     <!-- Other Note Modal -->
     <div id="otherNoteModal" class="modal" role="dialog" aria-labelledby="other-note-title" aria-modal="true" aria-hidden="true" tabindex="-1">
-        <div class="modal-content modal-small">
-            <div class="modal-header">
-                <h2 id="other-note-title">Other Note</h2>
-                <button id="closeOtherNote" class="btn-close" aria-label="Close other note modal">&times;</button>
-            </div>
+        <div class="modal-content modal-edit-note">
             <div class="modal-body">
-                <label for="otherNoteInput" class="setting-group label">
-                    <span style="display: block; margin-bottom: var(--space-3); color: var(--text-tertiary); font-size: var(--font-sm);">Add a custom note or click "Log Note" to record without text:</span>
-                </label>
-                <input type="text" id="otherNoteInput" class="input-text" placeholder="Enter note (optional)" aria-label="Custom note text" />
+                <input type="text" id="otherNoteInput" class="input-text input-edit-note" placeholder="Add note..." aria-label="Custom note text" />
             </div>
-            <div class="modal-footer">
-                <button id="logOtherNoteBtn" class="btn-primary" aria-label="Log note with optional text">Log Note</button>
+            <div class="modal-footer modal-footer-minimal">
+                <button id="cancelOtherNoteBtn" class="btn-minimal" aria-label="Cancel adding note">Cancel</button>
+                <button id="logOtherNoteBtn" class="btn-minimal" aria-label="Log note">Save</button>
             </div>
         </div>
     </div>

@@ -1450,13 +1450,54 @@ function showOtherNoteModal() {
     const modal = $('otherNoteModal');
     const input = $('otherNoteInput');
     if (modal) {
-        // Ensure dim overlay stays at current level (don't reset it)
-        // The dim overlay z-index is 9999, modal is 10001, so modal appears above
-        modal.classList.add('active');
+        // Clear input first
         if (input) {
             input.value = '';
-            input.focus();
         }
+        
+        // Show modal using standard showModal function for consistency
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        currentOpenModal = 'otherNoteModal';
+        
+        // Add outside click handler
+        const handleOutsideClick = (e) => {
+            if (e.target === modal) {
+                closeModal('otherNoteModal');
+                modal.removeEventListener('click', handleOutsideClick, true);
+            }
+        };
+        modal._outsideClickHandler = handleOutsideClick;
+        modal.addEventListener('click', handleOutsideClick, true);
+        
+        // Auto-focus input with multiple attempts for mobile keyboard
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                if (input) {
+                    input.style.display = 'block';
+                    input.style.visibility = 'visible';
+                    input.style.opacity = '1';
+                    
+                    input.focus();
+                    input.click();
+                    input.blur();
+                    setTimeout(() => {
+                        input.focus();
+                        input.click();
+                    }, 100);
+                    setTimeout(() => {
+                        input.focus();
+                        input.click();
+                    }, 250);
+                    setTimeout(() => {
+                        input.focus();
+                        input.click();
+                    }, 500);
+                }
+            });
+        });
     }
 }
 
@@ -1465,11 +1506,11 @@ function logOtherNote() {
     const input = $('otherNoteInput');
     const customText = input ? input.value.trim() : '';
     
-    // Close modal first
-    closeModal('otherNoteModal');
-    
     // Add note (with or without custom text)
     addNote('other', customText || null);
+    
+    // Close modal after adding note
+    closeModal('otherNoteModal');
 }
 
 // Setup event listeners
@@ -1541,11 +1582,13 @@ function setupEventListeners() {
         startScreeningBtn.addEventListener('click', startScreening);
     }
     
-    // Other note modal
-    const closeOtherNote = $('closeOtherNote');
-    if (closeOtherNote) {
-        closeOtherNote.addEventListener('click', () => closeModal('otherNoteModal'));
-        closeOtherNote.addEventListener('keydown', (e) => {
+    // Other note modal - use same pattern as edit note modal
+    const cancelOtherNoteBtn = $('cancelOtherNoteBtn');
+    if (cancelOtherNoteBtn) {
+        cancelOtherNoteBtn.addEventListener('click', () => {
+            closeModal('otherNoteModal');
+        });
+        cancelOtherNoteBtn.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
                 closeModal('otherNoteModal');
@@ -1570,7 +1613,8 @@ function setupEventListeners() {
         otherNoteInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                logOtherNote();
+                const saveBtn = $('logOtherNoteBtn');
+                if (saveBtn) saveBtn.click();
             } else if (e.key === 'Escape') {
                 e.preventDefault();
                 closeModal('otherNoteModal');
