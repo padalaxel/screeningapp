@@ -519,6 +519,8 @@ button:disabled {
 .main-content {
     padding: var(--space-6) var(--space-5) var(--space-10);
     min-height: 50vh;
+    position: relative;
+    z-index: 1;
 }
 
 .buttons-grid {
@@ -561,6 +563,8 @@ button:disabled {
     position: relative;
     visibility: visible !important;
     opacity: 1 !important;
+    width: 100%;
+    height: auto;
 }
 
 .buttons-grid-large .note-button {

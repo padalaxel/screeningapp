@@ -65,11 +65,19 @@ function init() {
         allModals.forEach(modal => {
             modal.classList.remove('active');
             modal.setAttribute('aria-hidden', 'true');
-            if (modal.id !== 'setupModal') {
-                modal.style.display = 'none';
-            }
+            modal.style.display = 'none';
         });
         document.body.style.overflow = '';
+        
+        // Ensure buttonLabels are set from genre if missing
+        if (!state.buttonLabels || state.buttonLabels.length === 0) {
+            if (state.genre && GENRE_BUTTONS[state.genre]) {
+                state.buttonLabels = GENRE_BUTTONS[state.genre];
+            } else {
+                state.buttonLabels = GENRE_BUTTONS.default;
+            }
+            saveState();
+        }
         
         renderButtons();
         renderNotes();
@@ -521,7 +529,21 @@ function capitalizeLabel(label) {
 // Render buttons
 function renderButtons() {
     const grid = $('buttonsGrid');
-    if (!grid) return;
+    if (!grid) {
+        console.error('buttonsGrid element not found!');
+        return;
+    }
+    
+    // Ensure buttonLabels exist
+    if (!state.buttonLabels || state.buttonLabels.length === 0) {
+        console.warn('No button labels found, using defaults');
+        // Fallback to default genre buttons if none exist
+        if (state.genre && GENRE_BUTTONS[state.genre]) {
+            state.buttonLabels = GENRE_BUTTONS[state.genre];
+        } else {
+            state.buttonLabels = GENRE_BUTTONS.default;
+        }
+    }
     
     grid.innerHTML = '';
     
@@ -531,6 +553,11 @@ function renderButtons() {
     if (buttonCount === 2 || buttonCount === 4 || buttonCount === 6) {
         grid.classList.add('buttons-grid-large');
     }
+    
+    // Ensure grid is visible
+    grid.style.display = 'grid';
+    grid.style.visibility = 'visible';
+    grid.style.opacity = '1';
     
     state.buttonLabels.forEach((label, index) => {
         const button = document.createElement('button');
