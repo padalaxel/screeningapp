@@ -579,8 +579,8 @@ button:disabled {
     background-color: var(--bg-card);
     color: var(--text-primary);
     border: none;
-    padding: calc(var(--space-6) * 1.1) calc(var(--space-4) * 1.1);
-    font-size: calc(var(--font-lg) * 1.1);
+    padding: calc(var(--space-6) * 1.5) calc(var(--space-4) * 1.5);
+    font-size: calc(var(--font-lg) * 1.5);
     font-weight: var(--font-weight-medium);
     line-height: var(--line-height-relaxed);
     letter-spacing: var(--letter-spacing-normal);
@@ -589,7 +589,7 @@ button:disabled {
     transition: all var(--transition-base);
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
-    min-height: 99px;
+    min-height: 135px;
     display: flex !important;
     align-items: center;
     justify-content: center;
@@ -604,9 +604,9 @@ button:disabled {
 }
 
 .buttons-grid-large .note-button {
-    padding: calc(var(--space-8) * 1.1) calc(var(--space-5) * 1.1);
-    font-size: calc(var(--font-xl) * 1.1);
-    min-height: 121px;
+    padding: calc(var(--space-8) * 1.5) calc(var(--space-5) * 1.5);
+    font-size: calc(var(--font-xl) * 1.5);
+    min-height: 165px;
 }
 
 .note-button:hover:not(:disabled) {
@@ -1475,15 +1475,15 @@ button:disabled {
     }
     
     .note-button {
-        min-height: 99px;
-        padding: calc(var(--space-6) * 1.1) calc(var(--space-3) * 1.1);
-        font-size: calc(var(--font-base) * 1.1);
+        min-height: 135px;
+        padding: calc(var(--space-6) * 1.5) calc(var(--space-3) * 1.5);
+        font-size: calc(var(--font-base) * 1.5);
     }
     
     .buttons-grid-large .note-button {
-        min-height: 121px;
-        padding: calc(var(--space-8) * 1.1) calc(var(--space-4) * 1.1);
-        font-size: calc(var(--font-lg) * 1.1);
+        min-height: 165px;
+        padding: calc(var(--space-8) * 1.5) calc(var(--space-4) * 1.5);
+        font-size: calc(var(--font-lg) * 1.5);
     }
 }
 

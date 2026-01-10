@@ -459,27 +459,59 @@ function editNote(index) {
         editInput.value = context;
     }
     
-    showModal('editNoteModal');
+    // Show modal
+    const modal = $('editNoteModal');
+    if (modal) {
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        currentOpenModal = 'editNoteModal';
+    }
     
-    // Auto-focus input and bring up keyboard - multiple attempts for mobile compatibility
-    const focusInput = () => {
-        const input = $('editNoteInput');
-        if (input) {
-            input.focus();
-            input.click(); // Trigger click for iOS/mobile keyboards
-            // Select all text if there's existing context for easy replacement
-            if (context && input.value.length > 0) {
+    // Force input to be visible and focusable - use requestAnimationFrame for proper timing
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            const input = $('editNoteInput');
+            if (input) {
+                // Ensure input is visible
+                input.style.display = 'block';
+                input.style.visibility = 'visible';
+                input.style.opacity = '1';
+                
+                // Multiple focus strategies for maximum compatibility
+                input.focus();
+                input.click();
+                
+                // For iOS/Safari, sometimes need to blur first then focus
+                input.blur();
                 setTimeout(() => {
-                    input.setSelectionRange(0, input.value.length);
-                }, 50);
+                    input.focus();
+                    input.click();
+                    
+                    // Select all text if there's existing context
+                    if (context && input.value.length > 0) {
+                        try {
+                            input.setSelectionRange(0, input.value.length);
+                        } catch (e) {
+                            // Some browsers don't support setSelectionRange
+                        }
+                    }
+                }, 100);
+                
+                // Additional attempts for stubborn mobile keyboards
+                setTimeout(() => {
+                    input.focus();
+                    input.click();
+                }, 250);
+                
+                setTimeout(() => {
+                    input.focus();
+                    input.click();
+                }, 500);
             }
-        }
-    };
-    
-    // Try multiple times with increasing delays for mobile keyboard compatibility
-    setTimeout(focusInput, 50);
-    setTimeout(focusInput, 150);
-    setTimeout(focusInput, 300);
+        });
+    });
 }
 
 // Save edited note
@@ -1125,17 +1157,11 @@ function showModal(modalId) {
             renderSessionsList();
         }
         
-        // Focus management - for edit note modal, focus the input; otherwise focus first focusable
-        setTimeout(() => {
-            if (modalId === 'editNoteModal') {
-                // For edit note modal, always focus the input to bring up keyboard
-                const editInput = modal.querySelector('#editNoteInput');
-                if (editInput) {
-                    editInput.focus();
-                    editInput.click(); // Trigger click for iOS/mobile keyboards
-                }
-            } else {
-                // For other modals, try close button first (if exists)
+        // Focus management - for edit note modal, focus is handled in editNote() function
+        // For other modals, focus first focusable element
+        if (modalId !== 'editNoteModal') {
+            setTimeout(() => {
+                // Try close button first (if exists)
                 const closeButton = modal.querySelector('.btn-close');
                 if (closeButton && !closeButton.disabled) {
                     closeButton.focus();
@@ -1146,8 +1172,8 @@ function showModal(modalId) {
                         firstFocusable.focus();
                     }
                 }
-            }
-        }, 100);
+            }, 100);
+        }
     }
 }
 
