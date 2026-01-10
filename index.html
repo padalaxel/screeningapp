@@ -102,12 +102,18 @@
             </div>
             <div class="modal-body">
                 <div class="export-actions" role="group" aria-labelledby="export-title">
-                    <button id="shareCsvBtn" class="btn-primary" aria-label="Share CSV file">Share CSV</button>
-                    <button id="shareTextBtn" class="btn-primary" aria-label="Share text file">Share Text</button>
-                    <button id="shareEmailBtn" class="btn-primary" aria-label="Share via email">Share to Email</button>
-                    <button id="exportNotesBtn" class="btn-primary" aria-label="Export to Notes app">Export to Notes</button>
-                    <button id="copyCsvBtn" class="btn-primary" aria-label="Copy CSV to clipboard">Copy CSV</button>
-                    <button id="copyTextBtn" class="btn-primary" aria-label="Copy text to clipboard">Copy Text</button>
+                    <div class="export-group">
+                        <div class="export-group-label">Share</div>
+                        <button id="shareCsvBtn" class="btn-primary" aria-label="Share CSV file">Share CSV</button>
+                        <button id="shareTextBtn" class="btn-primary" aria-label="Share text file">Share Text</button>
+                        <button id="shareEmailBtn" class="btn-primary" aria-label="Share via email">Share to Email</button>
+                        <button id="exportNotesBtn" class="btn-primary" aria-label="Export to Notes app">Export to Notes</button>
+                    </div>
+                    <div class="export-group">
+                        <div class="export-group-label">Copy</div>
+                        <button id="copyCsvBtn" class="btn-primary" aria-label="Copy CSV to clipboard">Copy CSV</button>
+                        <button id="copyTextBtn" class="btn-primary" aria-label="Copy text to clipboard">Copy Text</button>
+                    </div>
                 </div>
             </div>
         </div>

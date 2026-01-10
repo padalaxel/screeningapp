@@ -573,7 +573,14 @@ function renderNotes() {
     if (!list) return;
     
     if (!state.session || !state.session.notes || state.session.notes.length === 0) {
-        list.innerHTML = '<div style="color: #666; text-align: center; padding: 20px;">No notes yet</div>';
+        const emptyState = document.createElement('div');
+        emptyState.className = 'empty-state';
+        emptyState.innerHTML = `
+            <div class="empty-state-icon">📝</div>
+            <div class="empty-state-text">No notes yet</div>
+            <div class="empty-state-hint">Tap a button above to log your first note</div>
+        `;
+        list.appendChild(emptyState);
         // Hide arrow when no notes
         if (arrow) arrow.style.display = 'none';
         return;
@@ -722,7 +729,14 @@ function renderSessionsList() {
     }
     
     if (allSessions.length === 0) {
-        list.innerHTML = '<div style="color: #666; text-align: center; padding: 20px;">No saved sessions</div>';
+        const emptyState = document.createElement('div');
+        emptyState.className = 'empty-state';
+        emptyState.innerHTML = `
+            <div class="empty-state-icon">📚</div>
+            <div class="empty-state-text">No saved sessions</div>
+            <div class="empty-state-hint">Your session history will appear here</div>
+        `;
+        list.appendChild(emptyState);
         return;
     }
     
