@@ -329,34 +329,36 @@ function applyToastDimming(toastEl) {
         const textColor = `rgb(${r}, ${g}, ${b})`;
         
         // Dim background color - interpolate from card color to darker
-        const bgR = Math.round(26 - 26 * dimPercent);
-        const bgG = Math.round(26 - 26 * dimPercent);
-        const bgB = Math.round(26 - 26 * dimPercent);
+        // var(--bg-surface-2) is #151515 (21, 21, 21), dim to darker
+        const bgR = Math.round(21 - 21 * dimPercent);
+        const bgG = Math.round(21 - 21 * dimPercent);
+        const bgB = Math.round(21 - 21 * dimPercent);
         const bgColor = `rgb(${bgR}, ${bgG}, ${bgB})`;
         
-        toastEl.style.color = textColor;
-        toastEl.style.backgroundColor = bgColor;
+        // Use !important to override CSS
+        toastEl.style.setProperty('color', textColor, 'important');
+        toastEl.style.setProperty('background-color', bgColor, 'important');
         
-        // Also dim child elements (timecode and label)
+        // Also dim child elements (timecode and label) with !important
         const timecodeEl = toastEl.querySelector('.toast-timecode');
         const labelEl = toastEl.querySelector('.toast-label');
         if (timecodeEl) {
-            timecodeEl.style.color = textColor;
+            timecodeEl.style.setProperty('color', textColor, 'important');
         }
         if (labelEl) {
-            labelEl.style.color = textColor;
+            labelEl.style.setProperty('color', textColor, 'important');
         }
     } else {
         // Reset to default if no dimming
-        toastEl.style.color = '';
-        toastEl.style.backgroundColor = '';
+        toastEl.style.removeProperty('color');
+        toastEl.style.removeProperty('background-color');
         const timecodeEl = toastEl.querySelector('.toast-timecode');
         const labelEl = toastEl.querySelector('.toast-label');
         if (timecodeEl) {
-            timecodeEl.style.color = '';
+            timecodeEl.style.removeProperty('color');
         }
         if (labelEl) {
-            labelEl.style.color = '';
+            labelEl.style.removeProperty('color');
         }
     }
 }
