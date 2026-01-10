@@ -1415,7 +1415,6 @@ function setupEventListeners() {
     }
     
     // Settings
-    // Settings
     const settingsBtn = $('settingsBtn');
     if (settingsBtn) {
         settingsBtn.setAttribute('data-opens-modal', 'settingsModal');
@@ -1503,14 +1502,7 @@ function setupEventListeners() {
         });
     }
     
-    // Settings
-    const settingsBtn = $('settingsBtn');
-    if (settingsBtn) {
-        settingsBtn.addEventListener('click', () => {
-            renderSettings();
-            showModal('settingsModal');
-        });
-    }
+    // Duplicate settingsBtn declaration removed - already declared above
     
     // Undo
     const undoBtn = $('undoBtn');
