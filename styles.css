@@ -327,7 +327,7 @@ body {
 .timer-section {
     text-align: center;
     padding: var(--space-10) var(--space-5) var(--space-8);
-    margin: 0;
+    margin: 0 0 var(--space-8) 0;
 }
 
 .timer-controls {
