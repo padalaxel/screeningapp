@@ -164,21 +164,14 @@
 
     <!-- Edit Note Modal -->
     <div id="editNoteModal" class="modal" role="dialog" aria-labelledby="edit-note-title" aria-modal="true" aria-hidden="true" tabindex="-1">
-        <div class="modal-content modal-small">
-            <div class="modal-header">
-                <h2 id="edit-note-title">Edit Note</h2>
-                <button id="closeEditNote" class="btn-close" aria-label="Close edit note modal">&times;</button>
-            </div>
+        <div class="modal-content modal-edit-note">
             <div class="modal-body">
-                <label for="editNoteInput" class="setting-group label">
-                    <span style="display: block; margin-bottom: var(--space-3); color: var(--text-tertiary); font-size: var(--font-sm);">Add context or additional details:</span>
-                </label>
-                <input type="text" id="editNoteInput" class="input-text" placeholder="Enter context (optional)" aria-label="Note context" />
+                <input type="text" id="editNoteInput" class="input-text input-edit-note" placeholder="Add context..." aria-label="Note context" autofocus />
                 <input type="hidden" id="editNoteIndex" />
             </div>
-            <div class="modal-footer">
-                <button id="deleteNoteBtn" class="btn-primary btn-danger" aria-label="Delete this note">Delete</button>
-                <button id="saveEditNoteBtn" class="btn-primary" aria-label="Save note changes">Save</button>
+            <div class="modal-footer modal-footer-minimal">
+                <button id="deleteNoteBtn" class="btn-minimal btn-danger" aria-label="Delete this note">Delete</button>
+                <button id="saveEditNoteBtn" class="btn-minimal" aria-label="Save note changes">Done</button>
             </div>
         </div>
     </div>

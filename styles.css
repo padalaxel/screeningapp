@@ -579,8 +579,8 @@ button:disabled {
     background-color: var(--bg-card);
     color: var(--text-primary);
     border: none;
-    padding: var(--space-6) var(--space-4);
-    font-size: var(--font-lg);
+    padding: calc(var(--space-6) * 1.1) calc(var(--space-4) * 1.1);
+    font-size: calc(var(--font-lg) * 1.1);
     font-weight: var(--font-weight-medium);
     line-height: var(--line-height-relaxed);
     letter-spacing: var(--letter-spacing-normal);
@@ -589,7 +589,7 @@ button:disabled {
     transition: all var(--transition-base);
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
-    min-height: 90px;
+    min-height: 99px;
     display: flex !important;
     align-items: center;
     justify-content: center;
@@ -604,9 +604,9 @@ button:disabled {
 }
 
 .buttons-grid-large .note-button {
-    padding: var(--space-8) var(--space-5);
-    font-size: var(--font-xl);
-    min-height: 110px;
+    padding: calc(var(--space-8) * 1.1) calc(var(--space-5) * 1.1);
+    font-size: calc(var(--font-xl) * 1.1);
+    min-height: 121px;
 }
 
 .note-button:hover:not(:disabled) {
@@ -806,6 +806,67 @@ button:disabled {
 
 .modal-small {
     max-width: 300px;
+}
+
+.modal-edit-note {
+    max-width: 90%;
+    padding: 0;
+}
+
+.modal-edit-note .modal-body {
+    padding: var(--space-6) var(--space-5);
+}
+
+.modal-edit-note .input-edit-note {
+    width: 100%;
+    font-size: var(--font-lg);
+    padding: var(--space-4) var(--space-5);
+    border-radius: var(--radius-md);
+    background-color: var(--bg-surface);
+    border: none;
+    color: var(--text-primary);
+    box-shadow: var(--shadow-card);
+    text-align: left;
+}
+
+.modal-edit-note .input-edit-note:focus {
+    outline: var(--focus-ring);
+    outline-offset: 2px;
+    background-color: var(--bg-surface-2);
+}
+
+.modal-footer-minimal {
+    padding: var(--space-3) var(--space-5);
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-3);
+    border-top: 1px solid var(--border-divider);
+}
+
+.btn-minimal {
+    background-color: transparent;
+    color: var(--text-tertiary);
+    border: none;
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--font-sm);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    transition: color var(--transition-fast);
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    min-height: 44px;
+}
+
+.btn-minimal:hover {
+    color: var(--text-primary);
+}
+
+.btn-minimal.btn-danger {
+    color: var(--accent-danger);
+}
+
+.btn-minimal.btn-danger:hover {
+    color: var(--accent-danger-hover);
 }
 
 .modal-header {
@@ -1403,15 +1464,15 @@ button:disabled {
     }
     
     .note-button {
-        min-height: 90px;
-        padding: var(--space-6) var(--space-3);
-        font-size: var(--font-base);
+        min-height: 99px;
+        padding: calc(var(--space-6) * 1.1) calc(var(--space-3) * 1.1);
+        font-size: calc(var(--font-base) * 1.1);
     }
     
     .buttons-grid-large .note-button {
-        min-height: 110px;
-        padding: var(--space-8) var(--space-4);
-        font-size: var(--font-lg);
+        min-height: 121px;
+        padding: calc(var(--space-8) * 1.1) calc(var(--space-4) * 1.1);
+        font-size: calc(var(--font-lg) * 1.1);
     }
 }
 

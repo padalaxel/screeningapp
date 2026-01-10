@@ -444,12 +444,6 @@ function editNote(index) {
     const baseLabel = note.baseLabel || (note.label.includes(':') ? note.label.split(':')[0].trim() : note.label);
     const context = note.context || (note.label.includes(':') ? note.label.split(':').slice(1).join(':').trim() : '');
     
-    // Show edit modal
-    const editInput = $('editNoteInput');
-    if (editInput) {
-        editInput.value = context;
-    }
-    
     // Store the index being edited
     const editIndexEl = $('editNoteIndex');
     if (editIndexEl) {
@@ -457,6 +451,23 @@ function editNote(index) {
     }
     
     showModal('editNoteModal');
+    
+    // Auto-focus input and bring up keyboard - use setTimeout to ensure modal is visible first
+    setTimeout(() => {
+        const editInput = $('editNoteInput');
+        if (editInput) {
+            editInput.value = context;
+            editInput.focus();
+            // For iOS, trigger focus after a short delay
+            setTimeout(() => {
+                editInput.focus();
+                // Select all text if there's existing context
+                if (context) {
+                    editInput.setSelectionRange(0, editInput.value.length);
+                }
+            }, 100);
+        }
+    }, 50);
 }
 
 // Save edited note
