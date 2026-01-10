@@ -269,11 +269,11 @@ function updateTimer() {
         
         statusEl.textContent = 'RUNNING';
         statusEl.className = 'status running';
-        startPauseBtn.textContent = 'Pause';
+        startPauseBtnEl.textContent = 'Pause';
     } else {
         statusEl.textContent = state.elapsedSeconds > 0 ? 'PAUSED' : 'STOPPED';
         statusEl.className = state.elapsedSeconds > 0 ? 'status paused' : 'status';
-        startPauseBtn.textContent = state.elapsedSeconds > 0 ? 'Resume' : 'Start';
+        startPauseBtnEl.textContent = state.elapsedSeconds > 0 ? 'Resume' : 'Start';
     }
     
     const formatted = formatTimecode(state.elapsedSeconds, state.fps);
