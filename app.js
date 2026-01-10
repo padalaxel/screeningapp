@@ -1647,7 +1647,7 @@ function setupEventListeners() {
     if (newBtn) {
         newBtn.setAttribute('data-opens-modal', 'confirmModal');
         newBtn.addEventListener('click', () => {
-            showConfirm('Start a new session? This will reset the timer and clear all notes.', () => {
+            showConfirm('Start new session? Your current session will be saved under "History."', () => {
                 state.isRunning = false;
                 state.elapsedSeconds = 0;
                 state.pausedTime = 0;
