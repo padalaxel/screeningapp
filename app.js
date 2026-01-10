@@ -1251,6 +1251,17 @@ function showModal(modalId) {
 function closeModal(modalId) {
     const modal = $(modalId);
     if (modal) {
+        // First, blur any focused elements inside the modal to avoid aria-hidden violation
+        const focusedElement = modal.querySelector(':focus');
+        if (focusedElement) {
+            focusedElement.blur();
+        }
+        
+        // Also blur the active element if it's inside the modal
+        if (document.activeElement && modal.contains(document.activeElement)) {
+            document.activeElement.blur();
+        }
+        
         modal.classList.remove('active');
         modal.setAttribute('aria-hidden', 'true');
         modal.style.display = 'none';
@@ -1270,6 +1281,9 @@ function closeModal(modalId) {
         const triggerButton = document.querySelector(`[data-opens-modal="${modalId}"]`);
         if (triggerButton) {
             setTimeout(() => triggerButton.focus(), 100);
+        } else {
+            // If no trigger button, focus body to remove focus from any element
+            document.body.focus();
         }
     }
 }
