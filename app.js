@@ -1482,6 +1482,12 @@ function setupEventListeners() {
     const undoBtn = $('undoBtn');
     if (undoBtn) {
         undoBtn.addEventListener('click', undoLastNote);
+        undoBtn.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                undoLastNote();
+            }
+        });
     }
     
     // Sessions
@@ -1498,20 +1504,6 @@ function setupEventListeners() {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
                 closeModal('sessionsModal');
-            }
-        });
-    }
-    
-    // Duplicate settingsBtn declaration removed - already declared above
-    
-    // Undo
-    const undoBtn = $('undoBtn');
-    if (undoBtn) {
-        undoBtn.addEventListener('click', undoLastNote);
-        undoBtn.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                undoLastNote();
             }
         });
     }
