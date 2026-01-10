@@ -928,15 +928,16 @@ button:disabled {
     flex: 1;
     overflow-y: auto;
     min-height: 0;
-    max-height: calc(90vh - 200px);
+    padding-bottom: var(--space-8);
 }
 
 #setupModal .modal-body {
     padding: var(--space-4) !important;
+    padding-bottom: var(--space-4) !important;
 }
 
 #settingsModal .modal-body {
-    padding-bottom: var(--space-6) !important;
+    padding-bottom: calc(var(--space-8) + var(--space-4)) !important;
 }
 
 .modal-footer {
@@ -958,11 +959,11 @@ button:disabled {
     bottom: 0;
     background-color: var(--bg-surface-2);
     border-top: 1px solid var(--border-divider);
-    margin-top: var(--space-4);
+    margin-top: auto;
     padding: var(--space-4) var(--space-6);
     justify-content: center;
     z-index: 10;
-    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.15);
 }
 
 #setupModal .modal-footer-sticky {
@@ -975,9 +976,17 @@ button:disabled {
 
 #settingsModal .modal-footer-sticky {
     background-color: var(--bg-surface-2) !important;
-    padding: var(--space-4) var(--space-6) !important;
+    padding: var(--space-5) var(--space-6) !important;
     border-top: 1px solid var(--border-divider) !important;
-    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.2) !important;
+    margin-top: 0 !important;
+}
+
+#settingsModal .modal-footer-sticky .btn-primary {
+    width: 100%;
+    max-width: 300px;
+    padding: var(--space-3) var(--space-5);
+    font-size: var(--font-base);
 }
 
 /* ============================================
