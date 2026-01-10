@@ -1308,11 +1308,14 @@ textarea {
     text-decoration: none;
     transition: top var(--transition-fast);
     box-shadow: var(--shadow-md);
+    line-height: var(--line-height-normal);
 }
 
 .skip-link:focus {
     top: var(--space-4);
     outline: none;
+    background: var(--bg-surface-3);
+    border-color: var(--accent-primary-hover);
 }
 
 /* High contrast mode support */

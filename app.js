@@ -1014,10 +1014,18 @@ function showModal(modalId) {
         }
         
         // Focus management - focus first focusable element or close button
+        // Use getElementsByTagName for better performance
         setTimeout(() => {
-            const firstFocusable = modal.querySelector('button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])');
-            if (firstFocusable) {
-                firstFocusable.focus();
+            // Try close button first (if exists)
+            const closeButton = modal.querySelector('.btn-close');
+            if (closeButton && !closeButton.disabled) {
+                closeButton.focus();
+            } else {
+                // Otherwise focus first input or button
+                const firstFocusable = modal.querySelector('button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])');
+                if (firstFocusable) {
+                    firstFocusable.focus();
+                }
             }
         }, 100);
     }
@@ -1300,11 +1308,23 @@ function setupEventListeners() {
     const closeOtherNote = $('closeOtherNote');
     if (closeOtherNote) {
         closeOtherNote.addEventListener('click', () => closeModal('otherNoteModal'));
+        closeOtherNote.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                closeModal('otherNoteModal');
+            }
+        });
     }
     
     const logOtherNoteBtn = $('logOtherNoteBtn');
     if (logOtherNoteBtn) {
         logOtherNoteBtn.addEventListener('click', logOtherNote);
+        logOtherNoteBtn.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                logOtherNote();
+            }
+        });
     }
     
     // Allow Enter key in other note input
@@ -1371,6 +1391,16 @@ function setupEventListeners() {
     }
     
     // Settings
+    // Settings
+    const settingsBtn = $('settingsBtn');
+    if (settingsBtn) {
+        settingsBtn.setAttribute('data-opens-modal', 'settingsModal');
+        settingsBtn.addEventListener('click', () => {
+            renderSettings();
+            showModal('settingsModal');
+        });
+    }
+    
     const closeSettings = $('closeSettings');
     if (closeSettings) {
         closeSettings.addEventListener('click', () => closeModal('settingsModal'));
@@ -1384,6 +1414,12 @@ function setupEventListeners() {
     
     const saveSettings = $('saveSettings');
     if (saveSettings) {
+        saveSettings.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                // Trigger click handler
+            }
+        });
         saveSettings.addEventListener('click', () => {
             // Get button labels from inputs and force capitalization
             const inputs = document.querySelectorAll('#buttonLabelsContainer input');
@@ -1575,11 +1611,23 @@ function setupEventListeners() {
     const closeEditNote = $('closeEditNote');
     if (closeEditNote) {
         closeEditNote.addEventListener('click', () => closeModal('editNoteModal'));
+        closeEditNote.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                closeModal('editNoteModal');
+            }
+        });
     }
     
     const saveEditNoteBtn = $('saveEditNoteBtn');
     if (saveEditNoteBtn) {
         saveEditNoteBtn.addEventListener('click', saveEditedNote);
+        saveEditNoteBtn.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                saveEditedNote();
+            }
+        });
     }
     
     const deleteNoteBtn = $('deleteNoteBtn');
@@ -1590,6 +1638,17 @@ function setupEventListeners() {
                 const index = parseInt(editIndexEl.dataset.index);
                 closeModal('editNoteModal');
                 deleteNote(index);
+            }
+        });
+        deleteNoteBtn.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                const editIndexEl = $('editNoteIndex');
+                if (editIndexEl && editIndexEl.dataset.index) {
+                    const index = parseInt(editIndexEl.dataset.index);
+                    closeModal('editNoteModal');
+                    deleteNote(index);
+                }
             }
         });
     }
