@@ -439,14 +439,6 @@ button:disabled {
     background-color: var(--bg-surface-4);
 }
 
-#setupModal .btn-primary:hover:not(:disabled) {
-    background-color: var(--bg-surface-3);
-}
-
-#setupModal .btn-primary:active:not(:disabled) {
-    background-color: var(--bg-surface-4);
-}
-
 .btn-primary.btn-play {
     background-color: rgba(76, 175, 80, 0.15);
     color: rgba(129, 199, 132, 1);
@@ -817,12 +809,9 @@ button:disabled {
 }
 
 #setupModal .modal-content {
-    border-radius: var(--radius-md) !important;
-}
-
-#setupModal .modal-content {
     max-width: 400px !important;
     margin-top: 0 !important;
+    border-radius: var(--radius-md) !important;
     box-shadow: none !important;
     background-color: var(--bg-surface) !important;
 }
