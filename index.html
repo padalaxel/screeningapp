@@ -35,6 +35,8 @@
             <button id="newBtn" class="btn-small" aria-label="Start new screening session">New</button>
             <button id="sessionsBtn" class="btn-small" aria-label="View session history">History</button>
             <button id="settingsBtn" class="btn-small" aria-label="Customize button labels">Customize</button>
+            <button id="exportBtn" class="btn-small" aria-label="Export notes">Export</button>
+            <button id="undoBtn" class="btn-small" aria-label="Undo last note">Undo</button>
             <button id="dimToggleBtn" class="btn-small" aria-label="Toggle dim overlay">Dim</button>
         </div>
         <div id="dimSliderContainer" class="dim-slider-container" style="display: none;" role="group" aria-labelledby="dim-label-text">
@@ -43,8 +45,10 @@
         </div>
         <div class="timer-section">
             <div class="timer-controls">
-                <div id="status" class="status" role="status" aria-live="polite">STOPPED</div>
-                <div id="timecode" class="timecode" role="timer" aria-live="polite" aria-label="Current timecode">00:00:00</div>
+                <div class="timer-display">
+                    <div id="timecode" class="timecode" role="timer" aria-live="polite" aria-label="Current timecode">00:00:00</div>
+                    <div id="status" class="status" role="status" aria-live="polite">STOPPED</div>
+                </div>
                 <button id="startPauseBtn" class="btn-primary" aria-label="Start or pause timer">Start</button>
             </div>
         </div>
@@ -59,17 +63,6 @@
 
     <!-- Notes List -->
     <section class="notes-section">
-        <div class="notes-header">
-            <div class="notes-title-container">
-                <h2>Notes</h2>
-                <span id="notesArrow" class="notes-arrow" style="display: none;">▼</span>
-            </div>
-            <div class="notes-actions">
-                <button id="undoBtn" class="btn-small">Undo</button>
-                <button id="exportBtn" class="btn-small">Export</button>
-                <button id="clearBtn" class="btn-small btn-danger">Clear</button>
-            </div>
-        </div>
         <div id="notesList" class="notes-list">
             <!-- Notes will be dynamically generated -->
         </div>

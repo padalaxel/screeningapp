@@ -569,8 +569,9 @@ function renderButtons() {
 // Render notes list
 function renderNotes() {
     const list = $('notesList');
-    const arrow = $('notesArrow');
     if (!list) return;
+    
+    list.innerHTML = '';
     
     if (!state.session || !state.session.notes || state.session.notes.length === 0) {
         const emptyState = document.createElement('div');
@@ -578,18 +579,12 @@ function renderNotes() {
         emptyState.innerHTML = `
             <div class="empty-state-icon">📝</div>
             <div class="empty-state-text">No notes yet</div>
-            <div class="empty-state-hint">Tap a button above to log your first note</div>
+            <div class="empty-state-hint">Tap a card above to log your first note</div>
         `;
         list.appendChild(emptyState);
-        // Hide arrow when no notes
-        if (arrow) arrow.style.display = 'none';
         return;
     }
     
-    // Show arrow when there are notes
-    if (arrow) arrow.style.display = 'inline-block';
-    
-    list.innerHTML = '';
     state.session.notes.forEach((note, index) => {
         const item = document.createElement('div');
         item.className = 'note-item';
@@ -1488,11 +1483,29 @@ function setupEventListeners() {
         });
     }
     
+    // Undo
+    const undoBtn = $('undoBtn');
+    if (undoBtn) {
+        undoBtn.addEventListener('click', undoLastNote);
+        undoBtn.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                undoLastNote();
+            }
+        });
+    }
+    
     // Export
     const exportBtn = $('exportBtn');
     if (exportBtn) {
         exportBtn.setAttribute('data-opens-modal', 'exportModal');
         exportBtn.addEventListener('click', () => showModal('exportModal'));
+        exportBtn.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                showModal('exportModal');
+            }
+        });
     }
     
     const closeExport = $('closeExport');
