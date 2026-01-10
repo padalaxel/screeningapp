@@ -521,33 +521,24 @@ function editNote(index) {
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
         currentOpenModal = 'editNoteModal';
-    }
-    
-    // Focus management - wait for modal to render, then focus
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-            const input = $('editNoteInput');
-            if (input && modal && modal.classList.contains('active') && modal.getAttribute('aria-hidden') === 'false') {
-                input.focus();
-                // Select all text if there's existing context
-                if (context && input.value.length > 0) {
-                    setTimeout(() => {
-                        try {
-                            input.setSelectionRange(0, input.value.length);
-                        } catch (e) {
-                            // Some browsers don't support setSelectionRange
-                        }
-                    }, 100);
-                }
-                // Additional attempt for mobile
+        
+        // CRITICAL: Focus immediately in the same user gesture (synchronously)
+        // This is required for mobile keyboards to open
+        const input = $('editNoteInput');
+        if (input) {
+            input.focus();
+            // Select all text if there's existing context (can be async)
+            if (context && input.value.length > 0) {
                 setTimeout(() => {
-                    if (input && document.activeElement !== input && modal.classList.contains('active')) {
-                        input.focus();
+                    try {
+                        input.setSelectionRange(0, input.value.length);
+                    } catch (e) {
+                        // Some browsers don't support setSelectionRange
                     }
-                }, 300);
+                }, 0);
             }
-        });
-    });
+        }
+    }
 }
 
 // Save edited note
@@ -1474,20 +1465,11 @@ function showOtherNoteModal() {
     modal._outsideClickHandler = handleOutsideClick;
     modal.addEventListener('click', handleOutsideClick, true);
     
-    // Focus management - wait for modal to render, then focus
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-            if (input && modal.classList.contains('active') && modal.getAttribute('aria-hidden') === 'false') {
-                input.focus();
-                // Additional attempt for mobile
-                setTimeout(() => {
-                    if (input && document.activeElement !== input && modal.classList.contains('active')) {
-                        input.focus();
-                    }
-                }, 300);
-            }
-        });
-    });
+    // CRITICAL: Focus immediately in the same user gesture (synchronously)
+    // This is required for mobile keyboards to open - no async delays!
+    if (input) {
+        input.focus();
+    }
 }
 
 // Log other note
@@ -1655,12 +1637,11 @@ function setupEventListeners() {
                     clearInterval(timerInterval);
                     timerInterval = null;
                 }
-                // Close confirmation modal first, then show setup modal with a slight delay for proper focus
+                // Close confirmation modal first
                 closeModal('confirmModal');
-                // Use a slight delay to ensure confirmation modal is fully closed before opening setup
-                setTimeout(() => {
-                    showSetupModal();
-                }, 100);
+                // Show setup modal immediately (synchronously) to preserve user gesture
+                // Focus will happen inside showSetupModal() synchronously
+                showSetupModal();
             });
         });
     }
