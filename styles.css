@@ -827,12 +827,23 @@ button:disabled {
     color: var(--text-primary);
     box-shadow: var(--shadow-card);
     text-align: left;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    -webkit-user-select: text;
+    user-select: text;
+    -webkit-appearance: none;
+    appearance: none;
+    position: relative;
+    z-index: 1;
 }
 
 .modal-edit-note .input-edit-note:focus {
     outline: var(--focus-ring);
     outline-offset: 2px;
     background-color: var(--bg-surface-2);
+    -webkit-user-select: text;
+    user-select: text;
 }
 
 .modal-footer-minimal {
@@ -867,17 +878,6 @@ button:disabled {
 
 .btn-minimal.btn-danger:hover {
     color: var(--accent-danger-hover);
-}
-
-/* Ensure input is visible and focusable for keyboard */
-.modal-edit-note .input-edit-note {
-    -webkit-user-select: text;
-    user-select: text;
-}
-
-.modal-edit-note .input-edit-note:focus {
-    -webkit-user-select: text;
-    user-select: text;
 }
 
 .modal-header {
