@@ -268,7 +268,9 @@ function updateTimer() {
         startPauseBtn.textContent = state.elapsedSeconds > 0 ? 'Resume' : 'Start';
     }
     
-    timecodeEl.textContent = formatTimecode(state.elapsedSeconds, state.fps);
+    const formatted = formatTimecode(state.elapsedSeconds, state.fps);
+    timecodeEl.textContent = formatted;
+    timecodeEl.setAttribute('aria-label', `Current timecode: ${formatted}`);
 }
 
 // Start/Pause timer
@@ -1615,10 +1617,8 @@ function setupEventListeners() {
     }
     
     // Clear
-    const clearBtn = $('clearBtn');
-    if (clearBtn) {
-        clearBtn.addEventListener('click', clearNotes);
-    }
+    // Clear button removed from UI - moved to menu or hidden for cleaner design
+    // Clear functionality still available via confirm modal if needed
     
     // Edit Note Modal
     const closeEditNote = $('closeEditNote');
