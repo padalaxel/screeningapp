@@ -1050,15 +1050,22 @@ button:disabled {
     background-color: var(--bg-surface);
     color: var(--text-primary);
     border: none;
-    padding: var(--space-4) var(--space-5);
+    padding: var(--space-3) var(--space-4);
     font-size: var(--font-base);
     font-weight: var(--font-weight-normal);
     line-height: var(--line-height-normal);
     letter-spacing: var(--letter-spacing-normal);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-sm);
     transition: background-color var(--transition-fast);
     -webkit-appearance: none;
     appearance: none;
+}
+
+#setupModal .input-text {
+    padding: var(--space-3) var(--space-4) !important;
+    font-size: var(--font-base) !important;
+    background-color: var(--bg-surface) !important;
+    border-radius: var(--radius-sm) !important;
 }
 
 .input-text {
