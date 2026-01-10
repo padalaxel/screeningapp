@@ -542,7 +542,7 @@ function saveEditedNote() {
     const context = editInput ? editInput.value.trim() : '';
     
     const note = state.session.notes[index];
-    const baseLabel = note.baseLabel || (note.label.includes(':') ? note.label.split(':')[0].trim() : note.label);
+    const baseLabel = note.baseLabel || (note.label && note.label.includes(':') ? note.label.split(':')[0].trim() : note.label || 'Note');
     
     // Update note
     note.baseLabel = baseLabel;
@@ -1165,12 +1165,26 @@ function showModal(modalId) {
     if (modal) {
         modal.classList.add('active');
         modal.setAttribute('aria-hidden', 'false');
+        modal.style.display = 'flex';
         document.body.style.overflow = 'hidden'; // Prevent body scroll
         currentOpenModal = modalId;
         
         // Special handling for sessions modal - render list
         if (modalId === 'sessionsModal') {
             renderSessionsList();
+        }
+        
+        // Add click-outside-to-close handler (except for setup modal)
+        if (modalId !== 'setupModal') {
+            const handleOutsideClick = (e) => {
+                // Only close if clicking directly on the modal backdrop (not on modal content)
+                if (e.target === modal) {
+                    closeModal(modalId);
+                    modal.removeEventListener('click', handleOutsideClick);
+                }
+            };
+            // Use capture phase to catch clicks on the modal backdrop
+            modal.addEventListener('click', handleOutsideClick, true);
         }
         
         // Focus management - for edit note modal, focus is handled in editNote() function
