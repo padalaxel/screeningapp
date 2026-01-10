@@ -256,23 +256,18 @@ function formatTimecode(seconds, fps) {
 
 // Update timer display
 function updateTimer() {
-    const statusEl = $('status');
     const timecodeEl = $('timecode');
     const startPauseBtnEl = $('startPauseBtn');
     
-    if (!statusEl || !timecodeEl || !startPauseBtnEl) return;
+    if (!timecodeEl || !startPauseBtnEl) return;
     
     if (state.isRunning) {
         const now = Date.now();
         const elapsed = (now - state.startTime) / 1000 + state.pausedTime;
         state.elapsedSeconds = elapsed;
         
-        statusEl.textContent = 'RUNNING';
-        statusEl.className = 'status running';
         startPauseBtnEl.textContent = 'Pause';
     } else {
-        statusEl.textContent = state.elapsedSeconds > 0 ? 'PAUSED' : 'STOPPED';
-        statusEl.className = state.elapsedSeconds > 0 ? 'status paused' : 'status';
         startPauseBtnEl.textContent = state.elapsedSeconds > 0 ? 'Resume' : 'Start';
     }
     
@@ -1818,8 +1813,8 @@ function updateDimOverlay(level) {
         dimButton.style.color = ''; // Reset to default
     }
     
-    // Update timecode and status (lighter text)
-    const lightTextElements = document.querySelectorAll('.timecode, .status, .note-item-timecode, .summary-count, .btn-close');
+    // Update timecode (lighter text)
+    const lightTextElements = document.querySelectorAll('.timecode, .note-item-timecode, .summary-count, .btn-close');
     const lightR = Math.round(170 - (170 - 51) * dimPercent);
     const lightG = Math.round(170 - (170 - 51) * dimPercent);
     const lightB = Math.round(170 - (170 - 51) * dimPercent);
