@@ -869,6 +869,17 @@ button:disabled {
     color: var(--accent-danger-hover);
 }
 
+/* Ensure input is visible and focusable for keyboard */
+.modal-edit-note .input-edit-note {
+    -webkit-user-select: text;
+    user-select: text;
+}
+
+.modal-edit-note .input-edit-note:focus {
+    -webkit-user-select: text;
+    user-select: text;
+}
+
 .modal-header {
     display: flex;
     justify-content: space-between;

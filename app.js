@@ -444,8 +444,8 @@ function editNote(index) {
     if (!state.session || !state.session.notes[index]) return;
     
     const note = state.session.notes[index];
-    const baseLabel = note.baseLabel || (note.label.includes(':') ? note.label.split(':')[0].trim() : note.label);
-    const context = note.context || (note.label.includes(':') ? note.label.split(':').slice(1).join(':').trim() : '');
+    const baseLabel = note.baseLabel || (note.label && note.label.includes(':') ? note.label.split(':')[0].trim() : note.label || 'Note');
+    const context = note.context || (note.label && note.label.includes(':') ? note.label.split(':').slice(1).join(':').trim() : '');
     
     // Store the index being edited
     const editIndexEl = $('editNoteIndex');
@@ -453,24 +453,33 @@ function editNote(index) {
         editIndexEl.dataset.index = index;
     }
     
+    // Set the input value first, before showing modal
+    const editInput = $('editNoteInput');
+    if (editInput) {
+        editInput.value = context;
+    }
+    
     showModal('editNoteModal');
     
-    // Auto-focus input and bring up keyboard - use setTimeout to ensure modal is visible first
-    setTimeout(() => {
-        const editInput = $('editNoteInput');
-        if (editInput) {
-            editInput.value = context;
-            editInput.focus();
-            // For iOS, trigger focus after a short delay
-            setTimeout(() => {
-                editInput.focus();
-                // Select all text if there's existing context
-                if (context) {
-                    editInput.setSelectionRange(0, editInput.value.length);
-                }
-            }, 100);
+    // Auto-focus input and bring up keyboard - multiple attempts for mobile compatibility
+    const focusInput = () => {
+        const input = $('editNoteInput');
+        if (input) {
+            input.focus();
+            input.click(); // Trigger click for iOS/mobile keyboards
+            // Select all text if there's existing context for easy replacement
+            if (context && input.value.length > 0) {
+                setTimeout(() => {
+                    input.setSelectionRange(0, input.value.length);
+                }, 50);
+            }
         }
-    }, 50);
+    };
+    
+    // Try multiple times with increasing delays for mobile keyboard compatibility
+    setTimeout(focusInput, 50);
+    setTimeout(focusInput, 150);
+    setTimeout(focusInput, 300);
 }
 
 // Save edited note
@@ -1116,18 +1125,26 @@ function showModal(modalId) {
             renderSessionsList();
         }
         
-        // Focus management - focus first focusable element or close button
-        // Use getElementsByTagName for better performance
+        // Focus management - for edit note modal, focus the input; otherwise focus first focusable
         setTimeout(() => {
-            // Try close button first (if exists)
-            const closeButton = modal.querySelector('.btn-close');
-            if (closeButton && !closeButton.disabled) {
-                closeButton.focus();
+            if (modalId === 'editNoteModal') {
+                // For edit note modal, always focus the input to bring up keyboard
+                const editInput = modal.querySelector('#editNoteInput');
+                if (editInput) {
+                    editInput.focus();
+                    editInput.click(); // Trigger click for iOS/mobile keyboards
+                }
             } else {
-                // Otherwise focus first input or button
-                const firstFocusable = modal.querySelector('button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])');
-                if (firstFocusable) {
-                    firstFocusable.focus();
+                // For other modals, try close button first (if exists)
+                const closeButton = modal.querySelector('.btn-close');
+                if (closeButton && !closeButton.disabled) {
+                    closeButton.focus();
+                } else {
+                    // Otherwise focus first input or button
+                    const firstFocusable = modal.querySelector('button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])');
+                    if (firstFocusable) {
+                        firstFocusable.focus();
+                    }
                 }
             }
         }, 100);
@@ -1733,25 +1750,16 @@ function setupEventListeners() {
         });
     }
     
-    const deleteNoteBtn = $('deleteNoteBtn');
-    if (deleteNoteBtn) {
-        deleteNoteBtn.addEventListener('click', () => {
-            const editIndexEl = $('editNoteIndex');
-            if (editIndexEl && editIndexEl.dataset.index) {
-                const index = parseInt(editIndexEl.dataset.index);
-                closeModal('editNoteModal');
-                deleteNote(index);
-            }
+    const cancelEditNoteBtn = $('cancelEditNoteBtn');
+    if (cancelEditNoteBtn) {
+        cancelEditNoteBtn.addEventListener('click', () => {
+            // Just close the modal without saving changes
+            closeModal('editNoteModal');
         });
-        deleteNoteBtn.addEventListener('keydown', (e) => {
+        cancelEditNoteBtn.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                const editIndexEl = $('editNoteIndex');
-                if (editIndexEl && editIndexEl.dataset.index) {
-                    const index = parseInt(editIndexEl.dataset.index);
-                    closeModal('editNoteModal');
-                    deleteNote(index);
-                }
+                closeModal('editNoteModal');
             }
         });
     }
