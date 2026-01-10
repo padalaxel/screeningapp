@@ -362,6 +362,22 @@ function showToast(message, timecode, noteIndex = null) {
         
         toastEl.classList.add('show');
         
+        // Apply dimmer setting to toast
+        if (state.dimLevel && state.dimLevel > 0) {
+            const dimPercent = Math.min(state.dimLevel / 85, 1);
+            // Apply dimming similar to other text elements
+            const dimR = Math.round(255 - (255 - 51) * dimPercent);
+            const dimG = Math.round(255 - (255 - 51) * dimPercent);
+            const dimB = Math.round(255 - (255 - 51) * dimPercent);
+            const dimColor = `rgb(${dimR}, ${dimG}, ${dimB})`;
+            toastEl.style.color = dimColor;
+            toastEl.style.backgroundColor = `rgba(${Math.round(26 - 26 * dimPercent)}, ${Math.round(26 - 26 * dimPercent)}, ${Math.round(26 - 26 * dimPercent)}, 1)`;
+        } else {
+            // Reset to default if no dimming
+            toastEl.style.color = '';
+            toastEl.style.backgroundColor = '';
+        }
+        
         setTimeout(() => {
             toastEl.classList.remove('show');
             // Clear the noteIndex and role after toast hides
