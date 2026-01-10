@@ -2149,11 +2149,11 @@ function renderSettings() {
         
         div.appendChild(reorderContainer);
         
-        // Create label for the input
-        const label = document.createElement('label');
-        label.className = 'sr-only';
-        label.setAttribute('for', `button-label-${index}`);
-        label.textContent = `Button ${index + 1} label`;
+        // Create label element for the input
+        const labelEl = document.createElement('label');
+        labelEl.className = 'sr-only';
+        labelEl.setAttribute('for', `button-label-${index}`);
+        labelEl.textContent = `Button ${index + 1} label`;
         
         const input = document.createElement('input');
         input.type = 'text';
@@ -2165,7 +2165,7 @@ function renderSettings() {
         input.setAttribute('aria-label', `Button ${index + 1} label`);
         
         // Add label before input
-        div.appendChild(label);
+        div.appendChild(labelEl);
         
         // Add remove button (red X) - show if more than minimum (3 buttons)
         // Always allow deletion as long as we have more than 3
