@@ -866,31 +866,33 @@ button:disabled {
 .genre-btn {
     flex: 1;
     min-width: 0;
-    background-color: var(--bg-surface-3);
+    background-color: var(--bg-surface-2);
     color: var(--text-secondary);
-    border: 1px solid var(--border-default);
-    padding: var(--space-2) var(--space-3);
+    border: none;
+    padding: var(--space-3) var(--space-4);
     font-size: var(--font-base);
     font-weight: var(--font-weight-medium);
-    line-height: var(--line-height-tight);
-    letter-spacing: var(--letter-spacing-tight);
-    border-radius: var(--radius-sm);
+    line-height: var(--line-height-normal);
+    letter-spacing: var(--letter-spacing-normal);
+    border-radius: var(--radius-md);
     cursor: pointer;
-    transition: all var(--transition-fast);
+    transition: all var(--transition-base);
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
     white-space: nowrap;
-    min-height: 40px;
+    min-height: 44px;
+    box-shadow: var(--shadow-card);
 }
 
 #setupModal .genre-btn {
-    padding: var(--space-2) var(--space-3) !important;
+    padding: var(--space-3) var(--space-3) !important;
     font-size: var(--font-sm) !important;
 }
 
 .genre-btn:hover:not(:disabled) {
-    background-color: var(--bg-surface-4);
-    border-color: var(--border-strong);
+    background-color: var(--bg-card-hover);
+    box-shadow: var(--shadow-card-hover);
+    transform: translateY(-1px);
 }
 
 .genre-btn:focus-visible {
@@ -899,13 +901,14 @@ button:disabled {
 }
 
 .genre-btn.selected {
-    background-color: rgba(74, 158, 255, 0.15);
-    border-color: var(--accent-primary);
+    background-color: rgba(74, 158, 255, 0.12);
+    box-shadow: var(--shadow-card-hover), 0 0 0 2px rgba(74, 158, 255, 0.3);
     color: var(--text-primary);
 }
 
 .genre-btn.selected:focus-visible {
-    outline: 0 0 0 2px var(--accent-primary);
+    outline: var(--focus-ring);
+    outline-offset: 2px;
 }
 
 /* Input Fields */
