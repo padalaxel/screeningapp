@@ -439,6 +439,22 @@ button:disabled {
     background-color: var(--bg-surface-4);
 }
 
+#setupModal .btn-primary {
+    width: 100%;
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--font-base);
+    background-color: var(--bg-surface-2);
+    color: var(--text-primary);
+}
+
+#setupModal .btn-primary:hover:not(:disabled) {
+    background-color: var(--bg-surface-3);
+}
+
+#setupModal .btn-primary:active:not(:disabled) {
+    background-color: var(--bg-surface-4);
+}
+
 .btn-primary.btn-play {
     background-color: rgba(76, 175, 80, 0.15);
     color: rgba(129, 199, 132, 1);

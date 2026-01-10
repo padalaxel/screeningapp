@@ -1227,9 +1227,9 @@ function showModal(modalId) {
             modal.addEventListener('click', handleOutsideClick, true);
         }
         
-        // Focus management - for edit note modal, focus is handled in editNote() function
+        // Focus management - for edit note and other note modals, focus is handled in their specific functions
         // For other modals, focus first focusable element
-        if (modalId !== 'editNoteModal') {
+        if (modalId !== 'editNoteModal' && modalId !== 'otherNoteModal') {
             setTimeout(() => {
                 // Try close button first (if exists)
                 const closeButton = modal.querySelector('.btn-close');
