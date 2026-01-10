@@ -1291,8 +1291,10 @@ function showSetupModal() {
     const modal = $('setupModal');
     if (!modal) return;
     
-    // Clear inputs first, before showing modal
+    // Get input reference first
     const nameInput = $('screeningNameInput');
+    
+    // Clear input value
     if (nameInput) {
         nameInput.value = '';
     }
@@ -1316,7 +1318,14 @@ function showSetupModal() {
     document.body.style.overflow = 'hidden';
     currentOpenModal = 'setupModal';
     
-    // Auto-select "Default" genre
+    // CRITICAL: Focus immediately in the same user gesture (synchronously)
+    // This MUST happen immediately after showing modal to preserve gesture chain
+    // Do this BEFORE any other operations that might cause reflows
+    if (nameInput) {
+        nameInput.focus();
+    }
+    
+    // Auto-select "Default" genre (can happen after focus)
     document.querySelectorAll('.genre-btn').forEach(btn => {
         btn.classList.remove('selected');
         btn.setAttribute('aria-checked', 'false');
@@ -1332,12 +1341,6 @@ function showSetupModal() {
     if (startBtn) {
         startBtn.disabled = false;
         startBtn.setAttribute('aria-disabled', 'false');
-    }
-    
-    // CRITICAL: Focus immediately in the same user gesture (synchronously)
-    // This is required for mobile keyboards to open - no async delays!
-    if (nameInput) {
-        nameInput.focus();
     }
 }
 
@@ -1895,16 +1898,24 @@ function setupEventListeners() {
             if (pendingConfirm) {
                 const callback = pendingConfirm;
                 pendingConfirm = null;
-                // Close confirm modal first (without blurring to preserve gesture chain)
+                // Close confirm modal synchronously (without blurring) BEFORE executing callback
+                // This preserves the user gesture chain for the setup modal
                 const confirmModal = $('confirmModal');
                 if (confirmModal) {
+                    // Remove handlers first to prevent interference
+                    if (confirmModal._outsideClickHandler) {
+                        confirmModal.removeEventListener('click', confirmModal._outsideClickHandler, true);
+                        delete confirmModal._outsideClickHandler;
+                    }
+                    // Close without blurring (blur would break gesture chain)
                     confirmModal.classList.remove('active');
                     confirmModal.setAttribute('aria-hidden', 'true');
                     confirmModal.style.display = 'none';
-                    document.body.style.overflow = '';
                     currentOpenModal = null;
+                    // Keep body overflow hidden if we're opening another modal
                 }
                 // Execute callback immediately (synchronously) to preserve user gesture
+                // This will open setup modal and focus input in the same gesture chain
                 callback();
             }
         });
