@@ -532,36 +532,61 @@ function editNote(index) {
                 input.style.visibility = 'visible';
                 input.style.opacity = '1';
                 
-                // Multiple focus strategies for maximum compatibility
+                // Focus and click to trigger keyboard - NO blur() to keep keyboard open
                 input.focus();
                 input.click();
                 
-                // For iOS/Safari, sometimes need to blur first then focus
-                input.blur();
-                setTimeout(() => {
-                    input.focus();
-                    input.click();
-                    
-                    // Select all text if there's existing context
-                    if (context && input.value.length > 0) {
+                // Select all text if there's existing context
+                if (context && input.value.length > 0) {
+                    setTimeout(() => {
                         try {
                             input.setSelectionRange(0, input.value.length);
                         } catch (e) {
                             // Some browsers don't support setSelectionRange
                         }
+                    }, 50);
+                }
+                
+                // Multiple persistent focus attempts WITHOUT blur - keep keyboard open
+                setTimeout(() => {
+                    if (document.activeElement !== input) {
+                        input.focus();
+                        input.click();
                     }
                 }, 100);
                 
-                // Additional attempts for stubborn mobile keyboards
                 setTimeout(() => {
-                    input.focus();
-                    input.click();
-                }, 250);
+                    if (document.activeElement !== input) {
+                        input.focus();
+                        input.click();
+                        // Re-select text after refocus
+                        if (context && input.value.length > 0) {
+                            try {
+                                input.setSelectionRange(0, input.value.length);
+                            } catch (e) {}
+                        }
+                    }
+                }, 300);
                 
                 setTimeout(() => {
-                    input.focus();
-                    input.click();
-                }, 500);
+                    if (document.activeElement !== input) {
+                        input.focus();
+                        input.click();
+                    }
+                }, 600);
+                
+                // Keep trying if focus is lost (but not if user clicked elsewhere)
+                const checkFocus = setInterval(() => {
+                    if (modal.classList.contains('active') && document.activeElement !== input && !document.activeElement?.matches('button')) {
+                        input.focus();
+                        input.click();
+                    } else if (!modal.classList.contains('active')) {
+                        clearInterval(checkFocus);
+                    }
+                }, 200);
+                
+                // Clear interval after 3 seconds
+                setTimeout(() => clearInterval(checkFocus), 3000);
             }
         });
     });
@@ -1315,36 +1340,29 @@ function showConfirm(message, callback) {
 // Show setup modal
 function showSetupModal() {
     const modal = $('setupModal');
-    if (modal) {
-        // Force show the modal
-        modal.style.display = 'flex';
-        modal.classList.add('active');
-        modal.setAttribute('aria-hidden', 'false');
-        // Ensure it's on top
-        modal.style.zIndex = '10001';
-        // Force top positioning
-        modal.style.alignItems = 'flex-start';
-        modal.style.justifyContent = 'center';
-        modal.style.paddingTop = '10px';
-        modal.style.paddingBottom = '10px';
-        modal.style.paddingLeft = '10px';
-        modal.style.paddingRight = '10px';
-        document.body.style.overflow = 'hidden';
-        
-        // Focus name input after a short delay
-        setTimeout(() => {
-            const nameInput = $('screeningNameInput');
-            if (nameInput) {
-                nameInput.focus();
-            }
-        }, 150);
-    }
-    // Clear inputs
+    if (!modal) return;
+    
+    // Clear inputs first, before showing modal
     const nameInput = $('screeningNameInput');
     if (nameInput) {
         nameInput.value = '';
-        nameInput.focus();
     }
+    
+    // Force show the modal
+    modal.style.display = 'flex';
+    modal.classList.add('active');
+    modal.setAttribute('aria-hidden', 'false');
+    // Ensure it's on top
+    modal.style.zIndex = '10001';
+    // Force top positioning
+    modal.style.alignItems = 'flex-start';
+    modal.style.justifyContent = 'center';
+    modal.style.paddingTop = '10px';
+    modal.style.paddingBottom = '10px';
+    modal.style.paddingLeft = '10px';
+    modal.style.paddingRight = '10px';
+    document.body.style.overflow = 'hidden';
+    currentOpenModal = 'setupModal';
     
     // Auto-select "Default" genre
     document.querySelectorAll('.genre-btn').forEach(btn => {
@@ -1363,6 +1381,57 @@ function showSetupModal() {
         startBtn.disabled = false;
         startBtn.setAttribute('aria-disabled', 'false');
     }
+    
+    // Aggressive focus management for keyboard to appear and stay - NO blur()
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            if (nameInput) {
+                // Ensure input is visible and focusable
+                nameInput.style.display = 'block';
+                nameInput.style.visibility = 'visible';
+                nameInput.style.opacity = '1';
+                
+                // Focus and click to trigger keyboard - NO blur()
+                nameInput.focus();
+                nameInput.click();
+                
+                // Multiple persistent focus attempts without blur
+                setTimeout(() => {
+                    if (document.activeElement !== nameInput) {
+                        nameInput.focus();
+                        nameInput.click();
+                    }
+                }, 100);
+                
+                setTimeout(() => {
+                    if (document.activeElement !== nameInput) {
+                        nameInput.focus();
+                        nameInput.click();
+                    }
+                }, 300);
+                
+                setTimeout(() => {
+                    if (document.activeElement !== nameInput) {
+                        nameInput.focus();
+                        nameInput.click();
+                    }
+                }, 600);
+                
+                // Keep trying if focus is lost (but not if user clicked elsewhere)
+                const checkFocus = setInterval(() => {
+                    if (modal.classList.contains('active') && document.activeElement !== nameInput && !document.activeElement?.matches('button')) {
+                        nameInput.focus();
+                        nameInput.click();
+                    } else if (!modal.classList.contains('active')) {
+                        clearInterval(checkFocus);
+                    }
+                }, 200);
+                
+                // Clear interval after 3 seconds
+                setTimeout(() => clearInterval(checkFocus), 3000);
+            }
+        });
+    });
 }
 
 // Start screening from setup
@@ -1479,7 +1548,7 @@ function showOtherNoteModal() {
     modal._outsideClickHandler = handleOutsideClick;
     modal.addEventListener('click', handleOutsideClick, true);
     
-    // Auto-focus input with multiple attempts for mobile keyboard
+    // Auto-focus input with multiple attempts for mobile keyboard - NO blur() to keep keyboard open
     requestAnimationFrame(() => {
         requestAnimationFrame(() => {
             if (input) {
@@ -1487,21 +1556,44 @@ function showOtherNoteModal() {
                 input.style.visibility = 'visible';
                 input.style.opacity = '1';
                 
+                // Focus and click to trigger keyboard - NO blur() to keep it open
                 input.focus();
                 input.click();
-                input.blur();
+                
+                // Multiple persistent focus attempts WITHOUT blur
                 setTimeout(() => {
-                    input.focus();
-                    input.click();
+                    if (document.activeElement !== input) {
+                        input.focus();
+                        input.click();
+                    }
                 }, 100);
+                
                 setTimeout(() => {
-                    input.focus();
-                    input.click();
-                }, 250);
+                    if (document.activeElement !== input) {
+                        input.focus();
+                        input.click();
+                    }
+                }, 300);
+                
                 setTimeout(() => {
-                    input.focus();
-                    input.click();
-                }, 500);
+                    if (document.activeElement !== input) {
+                        input.focus();
+                        input.click();
+                    }
+                }, 600);
+                
+                // Keep trying if focus is lost (but not if user clicked elsewhere)
+                const checkFocus = setInterval(() => {
+                    if (modal.classList.contains('active') && document.activeElement !== input && !document.activeElement?.matches('button')) {
+                        input.focus();
+                        input.click();
+                    } else if (!modal.classList.contains('active')) {
+                        clearInterval(checkFocus);
+                    }
+                }, 200);
+                
+                // Clear interval after 3 seconds
+                setTimeout(() => clearInterval(checkFocus), 3000);
             }
         });
     });
@@ -1672,7 +1764,12 @@ function setupEventListeners() {
                     clearInterval(timerInterval);
                     timerInterval = null;
                 }
-                showSetupModal();
+                // Close confirmation modal first, then show setup modal with a slight delay for proper focus
+                closeModal('confirmModal');
+                // Use a slight delay to ensure confirmation modal is fully closed before opening setup
+                setTimeout(() => {
+                    showSetupModal();
+                }, 100);
             });
         });
     }
