@@ -2111,6 +2111,56 @@ function renderSettings() {
     state.buttonLabels.forEach((label, index) => {
         const div = document.createElement('div');
         div.className = 'button-label-input';
+        div.dataset.index = index;
+        
+        // Add reorder buttons (up/down arrows)
+        const reorderContainer = document.createElement('div');
+        reorderContainer.className = 'button-reorder-controls';
+        
+        // Up arrow button
+        const upBtn = document.createElement('button');
+        upBtn.type = 'button';
+        upBtn.className = 'btn-reorder btn-reorder-up';
+        upBtn.innerHTML = '▲';
+        upBtn.setAttribute('aria-label', `Move button ${index + 1} up`);
+        upBtn.title = 'Move up';
+        upBtn.disabled = index === 0;
+        upBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (index > 0) {
+                // Swap with previous item
+                [state.buttonLabels[index - 1], state.buttonLabels[index]] = 
+                    [state.buttonLabels[index], state.buttonLabels[index - 1]];
+                saveState();
+                renderSettings();
+            }
+        });
+        reorderContainer.appendChild(upBtn);
+        
+        // Down arrow button
+        const downBtn = document.createElement('button');
+        downBtn.type = 'button';
+        downBtn.className = 'btn-reorder btn-reorder-down';
+        downBtn.innerHTML = '▼';
+        downBtn.setAttribute('aria-label', `Move button ${index + 1} down`);
+        downBtn.title = 'Move down';
+        downBtn.disabled = index === state.buttonLabels.length - 1;
+        downBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (index < state.buttonLabels.length - 1) {
+                // Swap with next item
+                [state.buttonLabels[index], state.buttonLabels[index + 1]] = 
+                    [state.buttonLabels[index + 1], state.buttonLabels[index]];
+                saveState();
+                renderSettings();
+            }
+        });
+        reorderContainer.appendChild(downBtn);
+        
+        div.appendChild(reorderContainer);
+        
         const input = document.createElement('input');
         input.type = 'text';
         input.className = 'input-text';
