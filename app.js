@@ -1648,6 +1648,35 @@ function setupEventListeners() {
         newBtn.setAttribute('data-opens-modal', 'confirmModal');
         newBtn.addEventListener('click', () => {
             showConfirm('Start new session? Your current session will be saved under "History."', () => {
+                // Save current session to history before starting new one
+                if (state.session && state.session.notes && state.session.notes.length > 0) {
+                    // Save elapsed time with session
+                    state.session.elapsedSeconds = state.elapsedSeconds;
+                    state.session.isRunning = state.isRunning;
+                    
+                    // Check if session already exists in history (by ID)
+                    const existingIndex = state.sessionHistory.findIndex(s => s.id === state.session.id);
+                    if (existingIndex >= 0) {
+                        // Update existing session in history
+                        state.sessionHistory[existingIndex] = { 
+                            ...state.session,
+                            buttonLabels: state.buttonLabels
+                        };
+                    } else {
+                        // Add new session to history
+                        state.sessionHistory.push({ 
+                            ...state.session,
+                            buttonLabels: state.buttonLabels
+                        });
+                    }
+                    // Keep only last 50 sessions to avoid storage issues
+                    if (state.sessionHistory.length > 50) {
+                        state.sessionHistory = state.sessionHistory.slice(-50);
+                    }
+                    saveState();
+                }
+                
+                // Reset state for new session
                 state.isRunning = false;
                 state.elapsedSeconds = 0;
                 state.pausedTime = 0;
