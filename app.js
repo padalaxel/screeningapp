@@ -1447,58 +1447,64 @@ function startScreening() {
 
 // Show other note modal
 function showOtherNoteModal() {
+    // First ensure modal is closed and cleaned up
+    closeModal('otherNoteModal');
+    
     const modal = $('otherNoteModal');
     const input = $('otherNoteInput');
-    if (modal) {
-        // Clear input first
-        if (input) {
-            input.value = '';
+    if (!modal) return;
+    
+    // Clear input first
+    if (input) {
+        input.value = '';
+    }
+    
+    // Show modal using standard showModal function for consistency
+    modal.classList.add('active');
+    modal.setAttribute('aria-hidden', 'false');
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    currentOpenModal = 'otherNoteModal';
+    
+    // Add outside click handler
+    const handleOutsideClick = (e) => {
+        if (e.target === modal) {
+            closeModal('otherNoteModal');
         }
-        
-        // Show modal using standard showModal function for consistency
-        modal.classList.add('active');
-        modal.setAttribute('aria-hidden', 'false');
-        modal.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-        currentOpenModal = 'otherNoteModal';
-        
-        // Add outside click handler
-        const handleOutsideClick = (e) => {
-            if (e.target === modal) {
-                closeModal('otherNoteModal');
-                modal.removeEventListener('click', handleOutsideClick, true);
-            }
-        };
-        modal._outsideClickHandler = handleOutsideClick;
-        modal.addEventListener('click', handleOutsideClick, true);
-        
-        // Auto-focus input with multiple attempts for mobile keyboard
+    };
+    // Remove any existing handler first
+    if (modal._outsideClickHandler) {
+        modal.removeEventListener('click', modal._outsideClickHandler, true);
+    }
+    modal._outsideClickHandler = handleOutsideClick;
+    modal.addEventListener('click', handleOutsideClick, true);
+    
+    // Auto-focus input with multiple attempts for mobile keyboard
+    requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                if (input) {
-                    input.style.display = 'block';
-                    input.style.visibility = 'visible';
-                    input.style.opacity = '1';
-                    
+            if (input) {
+                input.style.display = 'block';
+                input.style.visibility = 'visible';
+                input.style.opacity = '1';
+                
+                input.focus();
+                input.click();
+                input.blur();
+                setTimeout(() => {
                     input.focus();
                     input.click();
-                    input.blur();
-                    setTimeout(() => {
-                        input.focus();
-                        input.click();
-                    }, 100);
-                    setTimeout(() => {
-                        input.focus();
-                        input.click();
-                    }, 250);
-                    setTimeout(() => {
-                        input.focus();
-                        input.click();
-                    }, 500);
-                }
-            });
+                }, 100);
+                setTimeout(() => {
+                    input.focus();
+                    input.click();
+                }, 250);
+                setTimeout(() => {
+                    input.focus();
+                    input.click();
+                }, 500);
+            }
         });
-    }
+    });
 }
 
 // Log other note
