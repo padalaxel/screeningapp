@@ -1934,6 +1934,22 @@ function updateDimOverlay(level) {
         }
     });
     
+    // Update toast notification dimming
+    const toast = $('toast');
+    if (toast && toast.classList.contains('show')) {
+        if (clampedLevel > 0) {
+            toast.style.color = textColor;
+            // Dim background color too
+            const bgR = Math.round(26 - 26 * dimPercent);
+            const bgG = Math.round(26 - 26 * dimPercent);
+            const bgB = Math.round(26 - 26 * dimPercent);
+            toast.style.backgroundColor = `rgba(${bgR}, ${bgG}, ${bgB}, 1)`;
+        } else {
+            toast.style.color = '';
+            toast.style.backgroundColor = '';
+        }
+    }
+    
     // Dim button gets special treatment - only dims to 50% max so it stays visible
     const dimButton = $('dimToggleBtn');
     if (dimButton && clampedLevel > 0) {
