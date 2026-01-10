@@ -1627,10 +1627,8 @@ function setupEventListeners() {
                     clearInterval(timerInterval);
                     timerInterval = null;
                 }
-                // Close confirmation modal first
-                closeModal('confirmModal');
                 // Show setup modal immediately (synchronously) to preserve user gesture
-                // Focus will happen inside showSetupModal() synchronously
+                // The confirm modal is already closed by the confirmOk click handler
                 showSetupModal();
             });
         });
@@ -1895,10 +1893,20 @@ function setupEventListeners() {
     if (confirmOk) {
         confirmOk.addEventListener('click', () => {
             if (pendingConfirm) {
-                pendingConfirm();
+                const callback = pendingConfirm;
                 pendingConfirm = null;
+                // Close confirm modal first (without blurring to preserve gesture chain)
+                const confirmModal = $('confirmModal');
+                if (confirmModal) {
+                    confirmModal.classList.remove('active');
+                    confirmModal.setAttribute('aria-hidden', 'true');
+                    confirmModal.style.display = 'none';
+                    document.body.style.overflow = '';
+                    currentOpenModal = null;
+                }
+                // Execute callback immediately (synchronously) to preserve user gesture
+                callback();
             }
-            closeModal('confirmModal');
         });
     }
     
