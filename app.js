@@ -318,10 +318,13 @@ function showToast(message, timecode, noteIndex = null) {
     const toast = $('toast');
     if (!toast) return;
     
-    // Remove any existing click handlers
-    const newToast = toast.cloneNode(true);
-    toast.parentNode.replaceChild(newToast, toast);
-    const toastEl = $('toast');
+    // Clear any existing content and handlers by removing and recreating
+    const parent = toast.parentNode;
+    const newToast = document.createElement('div');
+    newToast.id = 'toast';
+    newToast.className = 'toast';
+    parent.replaceChild(newToast, toast);
+    const toastEl = newToast;
     
     if (timecode) {
         toastEl.innerHTML = `<span class="toast-timecode">${escapeHtml(timecode)}</span><span class="toast-label">${escapeHtml(message)}</span>`;
@@ -341,7 +344,7 @@ function showToast(message, timecode, noteIndex = null) {
             e.preventDefault();
             e.stopPropagation();
             const index = parseInt(toastEl.dataset.noteIndex);
-            if (!isNaN(index) && state.session && state.session.notes[index]) {
+            if (!isNaN(index) && state.session && state.session.notes && state.session.notes[index]) {
                 editNote(index);
                 toastEl.classList.remove('show');
             }
@@ -360,9 +363,15 @@ function showToast(message, timecode, noteIndex = null) {
     
     setTimeout(() => {
         toastEl.classList.remove('show');
-        // Clear the noteIndex after toast hides
+        // Clear the noteIndex and role after toast hides
         if (toastEl.dataset.noteIndex) {
             delete toastEl.dataset.noteIndex;
+        }
+        if (toastEl.getAttribute('role') === 'button') {
+            toastEl.removeAttribute('role');
+            toastEl.removeAttribute('aria-label');
+            toastEl.removeAttribute('tabindex');
+            toastEl.style.cursor = '';
         }
     }, 2000);
 }
