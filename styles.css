@@ -810,11 +810,11 @@ button:disabled {
 
 .modal-edit-note {
     max-width: 90%;
-    padding: 0;
 }
 
 .modal-edit-note .modal-body {
     padding: var(--space-6) var(--space-5);
+    padding-bottom: var(--space-4);
 }
 
 .modal-edit-note .input-edit-note {

@@ -318,62 +318,64 @@ function showToast(message, timecode, noteIndex = null) {
     const toast = $('toast');
     if (!toast) return;
     
-    // Clear any existing content and handlers by removing and recreating
+    // Clear existing event listeners by cloning and replacing
     const parent = toast.parentNode;
-    const newToast = document.createElement('div');
-    newToast.id = 'toast';
-    newToast.className = 'toast';
-    parent.replaceChild(newToast, toast);
-    const toastEl = newToast;
-    
-    if (timecode) {
-        toastEl.innerHTML = `<span class="toast-timecode">${escapeHtml(timecode)}</span><span class="toast-label">${escapeHtml(message)}</span>`;
-    } else {
-        toastEl.innerHTML = `<span class="toast-label">${escapeHtml(message)}</span>`;
-    }
-    
-    // If noteIndex is provided, make toast clickable to edit that note
-    if (noteIndex !== null && noteIndex !== undefined) {
-        toastEl.style.cursor = 'pointer';
-        toastEl.setAttribute('role', 'button');
-        toastEl.setAttribute('aria-label', 'Click to edit this note');
-        toastEl.setAttribute('tabindex', '0');
-        toastEl.dataset.noteIndex = noteIndex;
+    if (parent) {
+        const newToast = toast.cloneNode(false);
+        newToast.id = 'toast';
+        newToast.className = 'toast';
+        parent.replaceChild(newToast, toast);
+        const toastEl = newToast;
         
-        const clickHandler = (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            const index = parseInt(toastEl.dataset.noteIndex);
-            if (!isNaN(index) && state.session && state.session.notes && state.session.notes[index]) {
-                editNote(index);
-                toastEl.classList.remove('show');
-            }
-        };
+        if (timecode) {
+            toastEl.innerHTML = `<span class="toast-timecode">${escapeHtml(timecode)}</span><span class="toast-label">${escapeHtml(message)}</span>`;
+        } else {
+            toastEl.innerHTML = `<span class="toast-label">${escapeHtml(message)}</span>`;
+        }
         
-        toastEl.addEventListener('click', clickHandler);
-        toastEl.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
+        // If noteIndex is provided, make toast clickable to edit that note
+        if (noteIndex !== null && noteIndex !== undefined) {
+            toastEl.style.cursor = 'pointer';
+            toastEl.setAttribute('role', 'button');
+            toastEl.setAttribute('aria-label', 'Click to edit this note');
+            toastEl.setAttribute('tabindex', '0');
+            toastEl.dataset.noteIndex = noteIndex;
+            
+            const clickHandler = (e) => {
                 e.preventDefault();
-                clickHandler(e);
+                e.stopPropagation();
+                const index = parseInt(toastEl.dataset.noteIndex);
+                if (!isNaN(index) && state.session && state.session.notes && state.session.notes[index]) {
+                    editNote(index);
+                    toastEl.classList.remove('show');
+                }
+            };
+            
+            toastEl.addEventListener('click', clickHandler);
+            toastEl.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    clickHandler(e);
+                }
+            });
+        }
+        
+        toastEl.classList.add('show');
+        
+        setTimeout(() => {
+            toastEl.classList.remove('show');
+            // Clear the noteIndex and role after toast hides
+            if (toastEl.dataset.noteIndex) {
+                delete toastEl.dataset.noteIndex;
             }
-        });
+            if (toastEl.getAttribute('role') === 'button') {
+                toastEl.removeAttribute('role');
+                toastEl.removeAttribute('aria-label');
+                toastEl.removeAttribute('tabindex');
+                toastEl.style.cursor = '';
+            }
+        }, 2000);
     }
-    
-    toastEl.classList.add('show');
-    
-    setTimeout(() => {
-        toastEl.classList.remove('show');
-        // Clear the noteIndex and role after toast hides
-        if (toastEl.dataset.noteIndex) {
-            delete toastEl.dataset.noteIndex;
-        }
-        if (toastEl.getAttribute('role') === 'button') {
-            toastEl.removeAttribute('role');
-            toastEl.removeAttribute('aria-label');
-            toastEl.removeAttribute('tabindex');
-            toastEl.style.cursor = '';
-        }
-    }, 2000);
 }
 
 // Add visual feedback to button
@@ -433,7 +435,8 @@ function addNote(label, customText = null) {
     
     // Show toast notification with click handler
     const displayLabel = context ? `${baseLabel}: ${context}` : baseLabel;
-    showToast(displayLabel, note.timecode, state.lastAddedNoteIndex);
+    const timecode = note.timecode || formatTimecode(state.elapsedSeconds, state.fps);
+    showToast(displayLabel, timecode, state.lastAddedNoteIndex);
 }
 
 // Edit note
@@ -677,19 +680,22 @@ function renderNotes() {
         item.className = 'note-item';
         
         // Get base label and context (handle backward compatibility)
-        const baseLabel = note.baseLabel || (note.label.includes(':') ? note.label.split(':')[0].trim() : note.label);
-        const context = note.context || (note.label.includes(':') ? note.label.split(':').slice(1).join(':').trim() : '');
+        const baseLabel = note.baseLabel || (note.label && note.label.includes(':') ? note.label.split(':')[0].trim() : note.label || 'Note');
+        const context = note.context || (note.label && note.label.includes(':') ? note.label.split(':').slice(1).join(':').trim() : '');
         const displayLabel = context ? `${baseLabel}: ${context}` : baseLabel;
+        
+        // Get timecode - handle both timecode and elapsedHMS formats
+        const timecode = note.timecode || note.elapsedHMS || formatTimecode(note.elapsedSeconds || 0, state.fps);
         
         item.innerHTML = `
             <div class="note-item-content">
                 <span class="note-item-label">${escapeHtml(displayLabel)}</span>
                 ${context ? '<span class="note-item-context-indicator" aria-label="Has additional context">✎</span>' : ''}
             </div>
-            <span class="note-item-timecode" aria-label="Timecode: ${escapeHtml(note.timecode)}">${escapeHtml(note.timecode)}</span>
+            <span class="note-item-timecode" aria-label="Timecode: ${escapeHtml(timecode)}">${escapeHtml(timecode)}</span>
         `;
         item.setAttribute('role', 'button');
-        item.setAttribute('aria-label', `Edit note: ${escapeHtml(displayLabel)} at ${escapeHtml(note.timecode)}`);
+        item.setAttribute('aria-label', `Edit note: ${escapeHtml(displayLabel)} at ${escapeHtml(timecode)}`);
         item.setAttribute('tabindex', '0');
         
         // Store index as data attribute for debugging/verification
@@ -700,7 +706,7 @@ function renderNotes() {
             e.preventDefault();
             e.stopPropagation();
             const noteIndex = parseInt(item.dataset.noteIndex);
-            if (!isNaN(noteIndex) && state.session && state.session.notes[noteIndex]) {
+            if (!isNaN(noteIndex) && state.session && state.session.notes && state.session.notes[noteIndex]) {
                 editNote(noteIndex);
             }
         };
