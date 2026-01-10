@@ -515,36 +515,39 @@ function editNote(index) {
     // Show modal
     const modal = $('editNoteModal');
     if (modal) {
-        modal.classList.add('active');
+        // CRITICAL: Set aria-hidden to false FIRST, before showing modal
         modal.setAttribute('aria-hidden', 'false');
+        modal.classList.add('active');
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
         currentOpenModal = 'editNoteModal';
     }
     
-    // Simple focus management - wait for modal to render, then focus
-    setTimeout(() => {
-        const input = $('editNoteInput');
-        if (input && modal.classList.contains('active')) {
-            input.focus();
-            // Select all text if there's existing context
-            if (context && input.value.length > 0) {
-                setTimeout(() => {
-                    try {
-                        input.setSelectionRange(0, input.value.length);
-                    } catch (e) {
-                        // Some browsers don't support setSelectionRange
-                    }
-                }, 100);
-            }
-            // Additional attempt for mobile
-            setTimeout(() => {
-                if (input && document.activeElement !== input) {
-                    input.focus();
+    // Focus management - wait for modal to render, then focus
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            const input = $('editNoteInput');
+            if (input && modal && modal.classList.contains('active') && modal.getAttribute('aria-hidden') === 'false') {
+                input.focus();
+                // Select all text if there's existing context
+                if (context && input.value.length > 0) {
+                    setTimeout(() => {
+                        try {
+                            input.setSelectionRange(0, input.value.length);
+                        } catch (e) {
+                            // Some browsers don't support setSelectionRange
+                        }
+                    }, 100);
                 }
-            }, 300);
-        }
-    }, 300);
+                // Additional attempt for mobile
+                setTimeout(() => {
+                    if (input && document.activeElement !== input && modal.classList.contains('active')) {
+                        input.focus();
+                    }
+                }, 300);
+            }
+        });
+    });
 }
 
 // Save edited note
@@ -1207,9 +1210,9 @@ function showModal(modalId) {
             modal.addEventListener('click', handleOutsideClick, true);
         }
         
-        // Focus management - for edit note and other note modals, focus is handled in their specific functions
+        // Focus management - for edit note, other note, and setup modals, focus is handled in their specific functions
         // For other modals, focus first focusable element
-        if (modalId !== 'editNoteModal' && modalId !== 'otherNoteModal') {
+        if (modalId !== 'editNoteModal' && modalId !== 'otherNoteModal' && modalId !== 'setupModal') {
             setTimeout(() => {
                 // Try close button first (if exists)
                 const closeButton = modal.querySelector('.btn-close');
@@ -1303,10 +1306,13 @@ function showSetupModal() {
         nameInput.value = '';
     }
     
+    // CRITICAL: Set aria-hidden to false FIRST, before showing modal
+    // This prevents the accessibility violation that blocks keyboard
+    modal.setAttribute('aria-hidden', 'false');
+    
     // Force show the modal
     modal.style.display = 'flex';
     modal.classList.add('active');
-    modal.setAttribute('aria-hidden', 'false');
     // Ensure it's on top
     modal.style.zIndex = '10001';
     // Force top positioning
@@ -1337,18 +1343,21 @@ function showSetupModal() {
         startBtn.setAttribute('aria-disabled', 'false');
     }
     
-    // Simple focus management - wait for modal to render, then focus
-    setTimeout(() => {
-        if (nameInput && modal.classList.contains('active')) {
-            nameInput.focus();
-            // Additional attempt for mobile
-            setTimeout(() => {
-                if (nameInput && document.activeElement !== nameInput) {
-                    nameInput.focus();
-                }
-            }, 200);
-        }
-    }, 300);
+    // Focus management - wait for modal to fully render, then focus input
+    // Use requestAnimationFrame to ensure DOM is ready
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            if (nameInput && modal.classList.contains('active') && modal.getAttribute('aria-hidden') === 'false') {
+                nameInput.focus();
+                // Additional attempt for mobile after a short delay
+                setTimeout(() => {
+                    if (nameInput && document.activeElement !== nameInput && modal.classList.contains('active')) {
+                        nameInput.focus();
+                    }
+                }, 200);
+            }
+        });
+    });
 }
 
 // Start screening from setup
@@ -1445,9 +1454,9 @@ function showOtherNoteModal() {
         input.value = '';
     }
     
-    // Show modal using standard showModal function for consistency
-    modal.classList.add('active');
+    // Show modal - CRITICAL: Set aria-hidden to false FIRST
     modal.setAttribute('aria-hidden', 'false');
+    modal.classList.add('active');
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
     currentOpenModal = 'otherNoteModal';
@@ -1465,18 +1474,20 @@ function showOtherNoteModal() {
     modal._outsideClickHandler = handleOutsideClick;
     modal.addEventListener('click', handleOutsideClick, true);
     
-    // Simple focus management - wait for modal to render, then focus
-    setTimeout(() => {
-        if (input && modal.classList.contains('active')) {
-            input.focus();
-            // Additional attempt for mobile
-            setTimeout(() => {
-                if (input && document.activeElement !== input) {
-                    input.focus();
-                }
-            }, 300);
-        }
-    }, 300);
+    // Focus management - wait for modal to render, then focus
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            if (input && modal.classList.contains('active') && modal.getAttribute('aria-hidden') === 'false') {
+                input.focus();
+                // Additional attempt for mobile
+                setTimeout(() => {
+                    if (input && document.activeElement !== input && modal.classList.contains('active')) {
+                        input.focus();
+                    }
+                }, 300);
+            }
+        });
+    });
 }
 
 // Log other note
@@ -2138,6 +2149,12 @@ function renderSettings() {
         
         div.appendChild(reorderContainer);
         
+        // Create label for the input
+        const label = document.createElement('label');
+        label.className = 'sr-only';
+        label.setAttribute('for', `button-label-${index}`);
+        label.textContent = `Button ${index + 1} label`;
+        
         const input = document.createElement('input');
         input.type = 'text';
         input.className = 'input-text';
@@ -2146,6 +2163,9 @@ function renderSettings() {
         input.value = capitalizeLabel(label);
         input.placeholder = `Button ${index + 1}`;
         input.setAttribute('aria-label', `Button ${index + 1} label`);
+        
+        // Add label before input
+        div.appendChild(label);
         
         // Add remove button (red X) - show if more than minimum (3 buttons)
         // Always allow deletion as long as we have more than 3
