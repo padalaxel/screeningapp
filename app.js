@@ -522,11 +522,20 @@ function editNote(index) {
         document.body.style.overflow = 'hidden';
         currentOpenModal = 'editNoteModal';
         
+        // Force synchronous layout/reflow to ensure modal is rendered
+        void modal.offsetHeight;
+        
         // CRITICAL: Focus immediately in the same user gesture (synchronously)
         // This is required for mobile keyboards to open
         const input = $('editNoteInput');
         if (input) {
+            // Ensure input is visible and accessible
+            input.style.display = 'block';
+            input.style.visibility = 'visible';
+            input.style.opacity = '1';
             input.focus();
+            // Also trigger click event to ensure mobile keyboard opens
+            input.click();
             // Select all text if there's existing context (can be async)
             if (context && input.value.length > 0) {
                 setTimeout(() => {
@@ -1297,6 +1306,10 @@ function showSetupModal() {
     // Clear input value
     if (nameInput) {
         nameInput.value = '';
+        // Ensure input is visible and accessible
+        nameInput.style.display = 'block';
+        nameInput.style.visibility = 'visible';
+        nameInput.style.opacity = '1';
     }
     
     // CRITICAL: Set aria-hidden to false FIRST, before showing modal
@@ -1306,8 +1319,8 @@ function showSetupModal() {
     // Force show the modal
     modal.style.display = 'flex';
     modal.classList.add('active');
-    // Ensure it's on top
-    modal.style.zIndex = '10001';
+    // Ensure it's on top - use higher z-index than other modals
+    modal.style.zIndex = '10002';
     // Force top positioning
     modal.style.alignItems = 'flex-start';
     modal.style.justifyContent = 'center';
@@ -1318,11 +1331,16 @@ function showSetupModal() {
     document.body.style.overflow = 'hidden';
     currentOpenModal = 'setupModal';
     
+    // Force synchronous layout/reflow to ensure modal is rendered
+    // This helps mobile browsers recognize the element is ready for focus
+    void modal.offsetHeight;
+    
     // CRITICAL: Focus immediately in the same user gesture (synchronously)
     // This MUST happen immediately after showing modal to preserve gesture chain
-    // Do this BEFORE any other operations that might cause reflows
     if (nameInput) {
         nameInput.focus();
+        // Also trigger click event to ensure mobile keyboard opens
+        nameInput.click();
     }
     
     // Auto-select "Default" genre (can happen after focus)
@@ -1445,6 +1463,9 @@ function showOtherNoteModal() {
     document.body.style.overflow = 'hidden';
     currentOpenModal = 'otherNoteModal';
     
+    // Force synchronous layout/reflow to ensure modal is rendered
+    void modal.offsetHeight;
+    
     // Add outside click handler
     const handleOutsideClick = (e) => {
         if (e.target === modal) {
@@ -1461,7 +1482,13 @@ function showOtherNoteModal() {
     // CRITICAL: Focus immediately in the same user gesture (synchronously)
     // This is required for mobile keyboards to open - no async delays!
     if (input) {
+        // Ensure input is visible and accessible
+        input.style.display = 'block';
+        input.style.visibility = 'visible';
+        input.style.opacity = '1';
         input.focus();
+        // Also trigger click event to ensure mobile keyboard opens
+        input.click();
     }
 }
 
