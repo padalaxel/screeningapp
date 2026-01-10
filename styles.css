@@ -11,9 +11,9 @@
   --bg-surface-3: #1a1a1a;          /* Active/interactive surface */
   --bg-surface-4: #1f1f1f;          /* Pressed state */
   --bg-surface-5: #252525;          /* Hover state */
-  --bg-card: #111111;               /* Default card background */
-  --bg-card-hover: #151515;         /* Card hover state */
-  --bg-card-active: #1a1a1a;        /* Card active/pressed */
+  --bg-card: #151515;               /* Default card background - more visible */
+  --bg-card-hover: #1a1a1a;         /* Card hover state */
+  --bg-card-active: #1f1f1f;        /* Card active/pressed */
   
   /* Colors - Text (lightest to darkest) */
   --text-primary: #ffffff;
@@ -83,9 +83,9 @@
   --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
   --shadow-xl: 0 12px 32px rgba(0, 0, 0, 0.6);
-  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.4);        /* Default card elevation */
-  --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.5);   /* Card hover lift */
-  --shadow-card-active: 0 2px 8px rgba(0, 0, 0, 0.3);   /* Card pressed */
+  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.6);        /* Default card elevation - stronger */
+  --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.7);   /* Card hover lift */
+  --shadow-card-active: 0 2px 8px rgba(0, 0, 0, 0.5);   /* Card pressed */
   
   /* Transitions */
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -522,11 +522,13 @@ button:disabled {
 }
 
 .buttons-grid {
-    display: grid;
+    display: grid !important;
     grid-template-columns: repeat(3, 1fr);
     gap: var(--space-6);
     max-width: 800px;
     margin: 0 auto;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 .buttons-grid-large {
@@ -550,13 +552,15 @@ button:disabled {
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
     min-height: 110px;
-    display: flex;
+    display: flex !important;
     align-items: center;
     justify-content: center;
     text-align: center;
     word-break: break-word;
     box-shadow: var(--shadow-card);
     position: relative;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 .buttons-grid-large .note-button {
