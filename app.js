@@ -1894,12 +1894,17 @@ function setupEventListeners() {
     // Confirmation
     const confirmOk = $('confirmOk');
     if (confirmOk) {
-        confirmOk.addEventListener('click', () => {
+        confirmOk.addEventListener('click', (e) => {
             if (pendingConfirm) {
                 const callback = pendingConfirm;
                 pendingConfirm = null;
-                // Close confirm modal synchronously (without blurring) BEFORE executing callback
-                // This preserves the user gesture chain for the setup modal
+                
+                // Execute callback FIRST (synchronously) while still in user gesture
+                // This opens setup modal and focuses input in the same gesture chain
+                callback();
+                
+                // THEN close confirm modal after setup modal is shown
+                // The setup modal has z-index 10001, so it appears on top
                 const confirmModal = $('confirmModal');
                 if (confirmModal) {
                     // Remove handlers first to prevent interference
@@ -1907,16 +1912,15 @@ function setupEventListeners() {
                         confirmModal.removeEventListener('click', confirmModal._outsideClickHandler, true);
                         delete confirmModal._outsideClickHandler;
                     }
-                    // Close without blurring (blur would break gesture chain)
+                    // Close without blurring (to avoid breaking gesture chain)
                     confirmModal.classList.remove('active');
                     confirmModal.setAttribute('aria-hidden', 'true');
                     confirmModal.style.display = 'none';
-                    currentOpenModal = null;
-                    // Keep body overflow hidden if we're opening another modal
+                    if (currentOpenModal === 'confirmModal') {
+                        currentOpenModal = null;
+                    }
+                    // Don't restore body overflow - setup modal will handle it
                 }
-                // Execute callback immediately (synchronously) to preserve user gesture
-                // This will open setup modal and focus input in the same gesture chain
-                callback();
             }
         });
     }
