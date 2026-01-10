@@ -29,20 +29,20 @@
     <header class="header">
         <div id="screeningName" class="screening-name"></div>
         <div class="header-controls">
-            <button id="newBtn" class="btn-small">New</button>
-            <button id="sessionsBtn" class="btn-small">History</button>
-            <button id="settingsBtn" class="btn-small">Customize</button>
-            <button id="dimToggleBtn" class="btn-small">Dim</button>
+            <button id="newBtn" class="btn-small" aria-label="Start new screening session">New</button>
+            <button id="sessionsBtn" class="btn-small" aria-label="View session history">History</button>
+            <button id="settingsBtn" class="btn-small" aria-label="Customize button labels">Customize</button>
+            <button id="dimToggleBtn" class="btn-small" aria-label="Toggle dim overlay">Dim</button>
         </div>
-        <div id="dimSliderContainer" class="dim-slider-container" style="display: none;">
-            <label for="dimSlider" class="dim-label">Dim</label>
-            <input type="range" id="dimSlider" class="dim-slider" min="0" max="85" value="0" />
+        <div id="dimSliderContainer" class="dim-slider-container" style="display: none;" role="group" aria-labelledby="dim-label-text">
+            <label for="dimSlider" class="dim-label" id="dim-label-text">Dim</label>
+            <input type="range" id="dimSlider" class="dim-slider" min="0" max="85" value="0" aria-label="Dim level" aria-valuemin="0" aria-valuemax="85" aria-valuenow="0" />
         </div>
         <div class="timer-section">
             <div class="timer-controls">
-                <div id="status" class="status">STOPPED</div>
-                <div id="timecode" class="timecode">00:00:00:00</div>
-                <button id="startPauseBtn" class="btn-primary">Start</button>
+                <div id="status" class="status" role="status" aria-live="polite">STOPPED</div>
+                <div id="timecode" class="timecode" aria-label="Current timecode">00:00:00</div>
+                <button id="startPauseBtn" class="btn-primary" aria-label="Start or pause timer">Start</button>
             </div>
         </div>
     </header>
@@ -73,78 +73,79 @@
     </section>
 
     <!-- Settings Modal -->
-    <div id="settingsModal" class="modal">
+    <div id="settingsModal" class="modal" role="dialog" aria-labelledby="settings-title" aria-modal="true" aria-hidden="true" tabindex="-1">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Customize Buttons</h2>
-                <button id="closeSettings" class="btn-close">&times;</button>
+                <h2 id="settings-title">Customize Buttons</h2>
+                <button id="closeSettings" class="btn-close" aria-label="Close customize buttons modal">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="setting-group">
-                    <label>Button Labels (tap to edit):</label>
-                    <div id="buttonLabelsContainer" class="button-labels-container">
+                    <label for="buttonLabelsContainer">Button Labels (tap to edit):</label>
+                    <div id="buttonLabelsContainer" class="button-labels-container" role="group" aria-labelledby="button-labels-label">
                         <!-- Dynamically generated -->
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button id="saveSettings" class="btn-primary">Save</button>
+                <button id="saveSettings" class="btn-primary" aria-label="Save button label changes">Save</button>
             </div>
         </div>
     </div>
 
     <!-- Export Modal -->
-    <div id="exportModal" class="modal">
+    <div id="exportModal" class="modal" role="dialog" aria-labelledby="export-title" aria-modal="true" aria-hidden="true" tabindex="-1">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Export</h2>
-                <button id="closeExport" class="btn-close">&times;</button>
+                <h2 id="export-title">Export</h2>
+                <button id="closeExport" class="btn-close" aria-label="Close export modal">&times;</button>
             </div>
             <div class="modal-body">
-                <div class="export-actions">
-                    <button id="shareCsvBtn" class="btn-primary">Share CSV</button>
-                    <button id="shareTextBtn" class="btn-primary">Share Text</button>
-                    <button id="shareEmailBtn" class="btn-primary">Share to Email</button>
-                    <button id="exportNotesBtn" class="btn-primary">Export to Notes</button>
-                    <button id="copyCsvBtn" class="btn-primary">Copy CSV</button>
-                    <button id="copyTextBtn" class="btn-primary">Copy Text</button>
+                <div class="export-actions" role="group" aria-labelledby="export-title">
+                    <button id="shareCsvBtn" class="btn-primary" aria-label="Share CSV file">Share CSV</button>
+                    <button id="shareTextBtn" class="btn-primary" aria-label="Share text file">Share Text</button>
+                    <button id="shareEmailBtn" class="btn-primary" aria-label="Share via email">Share to Email</button>
+                    <button id="exportNotesBtn" class="btn-primary" aria-label="Export to Notes app">Export to Notes</button>
+                    <button id="copyCsvBtn" class="btn-primary" aria-label="Copy CSV to clipboard">Copy CSV</button>
+                    <button id="copyTextBtn" class="btn-primary" aria-label="Copy text to clipboard">Copy Text</button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Setup Modal (Opening Screen) -->
-    <div id="setupModal" class="modal">
+    <div id="setupModal" class="modal" role="dialog" aria-labelledby="setup-title" aria-modal="true" aria-hidden="true" tabindex="-1">
         <div class="modal-content modal-setup">
             <div class="modal-header">
-                <h2>New Screening</h2>
+                <h2 id="setup-title">New Screening</h2>
             </div>
             <div class="modal-body">
                 <div class="setting-group">
-                    <input type="text" id="screeningNameInput" class="input-text" placeholder="Enter screening name" />
+                    <label for="screeningNameInput" class="sr-only">Screening Name</label>
+                    <input type="text" id="screeningNameInput" class="input-text" placeholder="Enter screening name" aria-label="Screening name" />
                 </div>
                 <div class="setting-group">
-                    <label>Genre:</label>
-                    <div class="genre-buttons">
-                        <button class="genre-btn" data-genre="default">Default</button>
-                        <button class="genre-btn" data-genre="comedy">Comedy</button>
-                        <button class="genre-btn" data-genre="action">Action</button>
-                        <button class="genre-btn" data-genre="documentary">Doc</button>
+                    <label for="genre-select" id="genre-label">Genre:</label>
+                    <div class="genre-buttons" role="radiogroup" aria-labelledby="genre-label">
+                        <button class="genre-btn" data-genre="default" role="radio" aria-checked="false" aria-label="Default genre">Default</button>
+                        <button class="genre-btn" data-genre="comedy" role="radio" aria-checked="false" aria-label="Comedy genre">Comedy</button>
+                        <button class="genre-btn" data-genre="action" role="radio" aria-checked="false" aria-label="Action genre">Action</button>
+                        <button class="genre-btn" data-genre="documentary" role="radio" aria-checked="false" aria-label="Documentary genre">Doc</button>
                     </div>
                 </div>
             </div>
             <div class="modal-footer modal-footer-sticky">
-                <button id="startScreeningBtn" class="btn-primary" disabled>Start Screening</button>
+                <button id="startScreeningBtn" class="btn-primary" disabled aria-label="Start screening session">Start Screening</button>
             </div>
         </div>
     </div>
 
     <!-- Sessions Modal -->
-    <div id="sessionsModal" class="modal">
+    <div id="sessionsModal" class="modal" role="dialog" aria-labelledby="history-title" aria-modal="true" aria-hidden="true" tabindex="-1">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>History</h2>
-                <button id="closeSessions" class="btn-close">&times;</button>
+                <h2 id="history-title">History</h2>
+                <button id="closeSessions" class="btn-close" aria-label="Close history modal">&times;</button>
             </div>
             <div class="modal-body">
                 <div id="sessionsList" class="sessions-list">
@@ -155,50 +156,54 @@
     </div>
 
     <!-- Edit Note Modal -->
-    <div id="editNoteModal" class="modal">
+    <div id="editNoteModal" class="modal" role="dialog" aria-labelledby="edit-note-title" aria-modal="true" aria-hidden="true" tabindex="-1">
         <div class="modal-content modal-small">
             <div class="modal-header">
-                <h2>Edit Note</h2>
-                <button id="closeEditNote" class="btn-close">&times;</button>
+                <h2 id="edit-note-title">Edit Note</h2>
+                <button id="closeEditNote" class="btn-close" aria-label="Close edit note modal">&times;</button>
             </div>
             <div class="modal-body">
-                <p style="margin-bottom: 12px; color: #aaaaaa; font-size: 14px;">Add context or additional details:</p>
-                <input type="text" id="editNoteInput" class="input-text" placeholder="Enter context (optional)" />
+                <label for="editNoteInput" class="setting-group label">
+                    <span style="display: block; margin-bottom: var(--space-3); color: var(--text-tertiary); font-size: var(--font-sm);">Add context or additional details:</span>
+                </label>
+                <input type="text" id="editNoteInput" class="input-text" placeholder="Enter context (optional)" aria-label="Note context" />
                 <input type="hidden" id="editNoteIndex" />
             </div>
             <div class="modal-footer">
-                <button id="deleteNoteBtn" class="btn-primary btn-danger">Delete</button>
-                <button id="saveEditNoteBtn" class="btn-primary">Save</button>
+                <button id="deleteNoteBtn" class="btn-primary btn-danger" aria-label="Delete this note">Delete</button>
+                <button id="saveEditNoteBtn" class="btn-primary" aria-label="Save note changes">Save</button>
             </div>
         </div>
     </div>
 
     <!-- Other Note Modal -->
-    <div id="otherNoteModal" class="modal">
+    <div id="otherNoteModal" class="modal" role="dialog" aria-labelledby="other-note-title" aria-modal="true" aria-hidden="true" tabindex="-1">
         <div class="modal-content modal-small">
             <div class="modal-header">
-                <h2>Other Note</h2>
-                <button id="closeOtherNote" class="btn-close">&times;</button>
+                <h2 id="other-note-title">Other Note</h2>
+                <button id="closeOtherNote" class="btn-close" aria-label="Close other note modal">&times;</button>
             </div>
             <div class="modal-body">
-                <p style="margin-bottom: 12px; color: #aaaaaa; font-size: 14px;">Add a custom note or click "Log Note" to record without text:</p>
-                <input type="text" id="otherNoteInput" class="input-text" placeholder="Enter note (optional)" />
+                <label for="otherNoteInput" class="setting-group label">
+                    <span style="display: block; margin-bottom: var(--space-3); color: var(--text-tertiary); font-size: var(--font-sm);">Add a custom note or click "Log Note" to record without text:</span>
+                </label>
+                <input type="text" id="otherNoteInput" class="input-text" placeholder="Enter note (optional)" aria-label="Custom note text" />
             </div>
             <div class="modal-footer">
-                <button id="logOtherNoteBtn" class="btn-primary">Log Note</button>
+                <button id="logOtherNoteBtn" class="btn-primary" aria-label="Log note with optional text">Log Note</button>
             </div>
         </div>
     </div>
 
     <!-- Confirmation Modal -->
-    <div id="confirmModal" class="modal">
+    <div id="confirmModal" class="modal" role="alertdialog" aria-labelledby="confirm-message" aria-modal="true" aria-hidden="true" tabindex="-1">
         <div class="modal-content modal-small">
             <div class="modal-body">
-                <p id="confirmMessage"></p>
+                <p id="confirmMessage" role="alert"></p>
             </div>
             <div class="modal-footer">
-                <button id="confirmCancel" class="btn-small">Cancel</button>
-                <button id="confirmOk" class="btn-small btn-danger">OK</button>
+                <button id="confirmCancel" class="btn-small" aria-label="Cancel action">Cancel</button>
+                <button id="confirmOk" class="btn-small btn-danger" aria-label="Confirm action">OK</button>
             </div>
         </div>
     </div>

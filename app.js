@@ -60,7 +60,17 @@ function init() {
         // Don't close setup modal - show it
         showSetupModal();
     } else {
-        closeAllModals();
+        // Ensure all modals are closed
+        const allModals = document.querySelectorAll('.modal');
+        allModals.forEach(modal => {
+            modal.classList.remove('active');
+            modal.setAttribute('aria-hidden', 'true');
+            if (modal.id !== 'setupModal') {
+                modal.style.display = 'none';
+            }
+        });
+        document.body.style.overflow = '';
+        
         renderButtons();
         renderNotes();
         updateTimer();
@@ -523,6 +533,7 @@ function renderButtons() {
     state.buttonLabels.forEach((label, index) => {
         const button = document.createElement('button');
         button.className = 'note-button';
+        button.setAttribute('aria-label', `${capitalizeLabel(label)} - log note`);
         const displayLabel = capitalizeLabel(label);
         button.textContent = displayLabel;
         button.addEventListener('click', () => {
@@ -584,11 +595,20 @@ function renderNotes() {
         item.innerHTML = `
             <div class="note-item-content">
                 <span class="note-item-label">${escapeHtml(displayLabel)}</span>
-                ${context ? '<span class="note-item-context-indicator">✎</span>' : ''}
+                ${context ? '<span class="note-item-context-indicator" aria-label="Has additional context">✎</span>' : ''}
             </div>
-            <span class="note-item-timecode">${escapeHtml(note.timecode)}</span>
+            <span class="note-item-timecode" aria-label="Timecode: ${escapeHtml(note.timecode)}">${escapeHtml(note.timecode)}</span>
         `;
+        item.setAttribute('role', 'button');
+        item.setAttribute('aria-label', `Edit note: ${escapeHtml(displayLabel)} at ${escapeHtml(note.timecode)}`);
+        item.setAttribute('tabindex', '0');
         item.addEventListener('click', () => editNote(index));
+        item.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                editNote(index);
+            }
+        });
         list.appendChild(item);
     });
 }
@@ -728,9 +748,9 @@ function renderSessionsList() {
                 <div class="session-meta">${dateStr} ${timeStr} • ${noteCount} note${noteCount !== 1 ? 's' : ''}</div>
             </div>
             <div class="session-actions">
-                <button class="btn-small session-load-btn" data-session-id="${session.id}">Load</button>
-                <button class="btn-small session-rename-btn" data-session-id="${session.id}">Rename</button>
-                <button class="btn-small btn-danger session-delete-btn" data-session-id="${session.id}">Delete</button>
+                <button class="btn-small session-load-btn" data-session-id="${session.id}" aria-label="Load session: ${escapeHtml(session.name)}">Load</button>
+                <button class="btn-small session-rename-btn" data-session-id="${session.id}" aria-label="Rename session: ${escapeHtml(session.name)}">Rename</button>
+                <button class="btn-small btn-danger session-delete-btn" data-session-id="${session.id}" aria-label="Delete session: ${escapeHtml(session.name)}">Delete</button>
             </div>
         `;
         
@@ -967,10 +987,21 @@ function showModal(modalId) {
     const modal = $(modalId);
     if (modal) {
         modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden'; // Prevent body scroll
+        
         // Special handling for sessions modal - render list
         if (modalId === 'sessionsModal') {
             renderSessionsList();
         }
+        
+        // Focus management - focus first focusable element or close button
+        setTimeout(() => {
+            const firstFocusable = modal.querySelector('button, input, [tabindex]:not([tabindex="-1"])');
+            if (firstFocusable) {
+                firstFocusable.focus();
+            }
+        }, 100);
     }
 }
 
@@ -979,15 +1010,28 @@ function closeModal(modalId) {
     const modal = $(modalId);
     if (modal) {
         modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = ''; // Restore body scroll
+        
+        // Return focus to the element that opened the modal
+        const lastActiveElement = document.activeElement;
+        if (lastActiveElement && lastActiveElement !== document.body) {
+            // Focus will naturally return, but we can help it
+        }
     }
 }
 
 // Close all modals (except setup modal)
 function closeAllModals() {
-    closeModal('settingsModal');
-    closeModal('exportModal');
-    closeModal('confirmModal');
-    closeModal('otherNoteModal');
+    const modals = ['settingsModal', 'exportModal', 'confirmModal', 'otherNoteModal', 'sessionsModal', 'editNoteModal'];
+    modals.forEach(id => {
+        const modal = $(id);
+        if (modal) {
+            modal.classList.remove('active');
+            modal.setAttribute('aria-hidden', 'true');
+        }
+    });
+    document.body.style.overflow = '';
 }
 
 // Show confirmation
@@ -1007,6 +1051,7 @@ function showSetupModal() {
         // Force show the modal
         modal.style.display = 'flex';
         modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
         // Ensure it's on top
         modal.style.zIndex = '10001';
         // Force top positioning
@@ -1016,6 +1061,15 @@ function showSetupModal() {
         modal.style.paddingBottom = '10px';
         modal.style.paddingLeft = '10px';
         modal.style.paddingRight = '10px';
+        document.body.style.overflow = 'hidden';
+        
+        // Focus name input after a short delay
+        setTimeout(() => {
+            const nameInput = $('screeningNameInput');
+            if (nameInput) {
+                nameInput.focus();
+            }
+        }, 150);
     }
     // Clear inputs
     const nameInput = $('screeningNameInput');
@@ -1027,15 +1081,20 @@ function showSetupModal() {
     // Auto-select "Default" genre
     document.querySelectorAll('.genre-btn').forEach(btn => {
         btn.classList.remove('selected');
+        btn.setAttribute('aria-checked', 'false');
         if (btn.dataset.genre === 'default') {
             btn.classList.add('selected');
+            btn.setAttribute('aria-checked', 'true');
             state.genre = 'default';
         }
     });
     
     // Enable start button since genre is selected
     const startBtn = $('startScreeningBtn');
-    if (startBtn) startBtn.disabled = false;
+    if (startBtn) {
+        startBtn.disabled = false;
+        startBtn.setAttribute('aria-disabled', 'false');
+    }
 }
 
 // Start screening from setup
@@ -1081,7 +1140,9 @@ function startScreening() {
     const setupModal = $('setupModal');
     if (setupModal) {
         setupModal.classList.remove('active');
+        setupModal.setAttribute('aria-hidden', 'true');
         setupModal.style.display = 'none';
+        document.body.style.overflow = '';
     }
     
     // Force scroll to top immediately after closing modal
@@ -1155,15 +1216,20 @@ function setupEventListeners() {
     document.querySelectorAll('.genre-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             // Remove selection from all
-            document.querySelectorAll('.genre-btn').forEach(b => b.classList.remove('selected'));
+            document.querySelectorAll('.genre-btn').forEach(b => {
+                b.classList.remove('selected');
+                b.setAttribute('aria-checked', 'false');
+            });
             // Add to clicked
             btn.classList.add('selected');
+            btn.setAttribute('aria-checked', 'true');
             state.genre = btn.dataset.genre;
             
             // Enable start button (name is optional, defaults to "Untitled Screening")
             const startBtn = $('startScreeningBtn');
             if (startBtn) {
                 startBtn.disabled = false;
+                startBtn.setAttribute('aria-disabled', 'false');
             }
         });
     });
@@ -1176,6 +1242,7 @@ function setupEventListeners() {
             const startBtn = $('startScreeningBtn');
             if (startBtn) {
                 startBtn.disabled = !state.genre;
+                startBtn.setAttribute('aria-disabled', (!state.genre).toString());
             }
         });
     }
@@ -1607,9 +1674,11 @@ function renderSettings() {
         const input = document.createElement('input');
         input.type = 'text';
         input.className = 'input-text';
+        input.id = `button-label-${index}`;
         // Show capitalized version in input, but store original
         input.value = capitalizeLabel(label);
         input.placeholder = `Button ${index + 1}`;
+        input.setAttribute('aria-label', `Button ${index + 1} label`);
         
         // Add remove button (red X) - show if more than minimum (3 buttons)
         // Always allow deletion as long as we have more than 3
@@ -1617,6 +1686,7 @@ function renderSettings() {
             const removeBtn = document.createElement('button');
             removeBtn.className = 'btn-remove';
             removeBtn.innerHTML = '&times;';
+            removeBtn.setAttribute('aria-label', `Remove button ${index + 1}`);
             removeBtn.title = 'Remove button';
             removeBtn.addEventListener('click', () => {
                 if (state.buttonLabels.length > 3) {
@@ -1649,32 +1719,34 @@ function renderSettings() {
     // Add button with plus sign (up to 10 buttons) - always show at bottom
     const addButtonDiv = document.createElement('div');
     addButtonDiv.className = 'add-button-container';
-    const addBtn = document.createElement('button');
-    addBtn.className = 'btn-add-button';
-    addBtn.innerHTML = '<span class="add-button-plus">+</span> Add Button';
-    
-    if (state.buttonLabels.length >= 10) {
-        addBtn.disabled = true;
-        addBtn.style.opacity = '0.5';
-        addBtn.style.cursor = 'not-allowed';
-        addBtn.title = 'Maximum 10 buttons reached';
-    } else {
-        addBtn.addEventListener('click', () => {
-            if (state.buttonLabels.length < 10) {
-                // Add new button label
-                state.buttonLabels.push(`button ${state.buttonLabels.length + 1}`);
-                renderSettings();
-                // Focus the new input
-                setTimeout(() => {
-                    const inputs = container.querySelectorAll('input');
-                    if (inputs.length > 0) {
-                        inputs[inputs.length - 1].focus();
-                        inputs[inputs.length - 1].select();
-                    }
-                }, 100);
-            }
-        });
-    }
+        const addBtn = document.createElement('button');
+        addBtn.className = 'btn-add-button';
+        addBtn.innerHTML = '<span class="add-button-plus" aria-hidden="true">+</span> Add Button';
+        addBtn.setAttribute('aria-label', 'Add new button');
+        
+        if (state.buttonLabels.length >= 10) {
+            addBtn.disabled = true;
+            addBtn.setAttribute('aria-disabled', 'true');
+            addBtn.setAttribute('aria-label', 'Maximum 10 buttons reached');
+            addBtn.title = 'Maximum 10 buttons reached';
+        } else {
+            addBtn.addEventListener('click', () => {
+                if (state.buttonLabels.length < 10) {
+                    // Add new button label
+                    state.buttonLabels.push(`button ${state.buttonLabels.length + 1}`);
+                    renderSettings();
+                    // Focus the new input
+                    setTimeout(() => {
+                        const inputs = container.querySelectorAll('input');
+                        if (inputs.length > 0) {
+                            const lastInput = inputs[inputs.length - 1];
+                            lastInput.focus();
+                            lastInput.select();
+                        }
+                    }, 100);
+                }
+            });
+        }
     
     addButtonDiv.appendChild(addBtn);
     container.appendChild(addButtonDiv);
