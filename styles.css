@@ -326,8 +326,8 @@ body {
 
 .timer-section {
     text-align: center;
-    padding: var(--space-2) var(--space-4) var(--space-2);
-    margin: 0 0 var(--space-3) 0;
+    padding: var(--space-1) var(--space-4) var(--space-1);
+    margin: 0 0 var(--space-2) 0;
 }
 
 .timer-controls {
@@ -335,23 +335,23 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: var(--space-2);
+    gap: var(--space-1);
 }
 
 .timer-display {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--space-1);
-    margin-bottom: var(--space-2);
+    gap: 0;
+    margin-bottom: var(--space-1);
 }
 
 .timecode {
-    font-size: 36px;
+    font-size: 18px;
     font-weight: var(--font-weight-medium);
     color: var(--text-primary);
     font-variant-numeric: tabular-nums;
-    letter-spacing: -1px;
+    letter-spacing: -0.5px;
     line-height: 1.1;
 }
 
@@ -1298,7 +1298,7 @@ button:disabled {
     }
     
     .timecode {
-        font-size: 32px;
+        font-size: 16px;
     }
     
     .timer-controls {
@@ -1306,8 +1306,8 @@ button:disabled {
     }
     
     .timer-section {
-        padding: var(--space-2) var(--space-3) var(--space-1);
-        margin-bottom: var(--space-2);
+        padding: var(--space-1) var(--space-3) var(--space-1);
+        margin-bottom: var(--space-1);
     }
     
     .timer-display {
@@ -1369,13 +1369,13 @@ button:disabled {
     }
     
     .timecode {
-        font-size: 42px;
+        font-size: 21px;
     }
 }
 
 @media (min-width: 1024px) {
     .timecode {
-        font-size: 48px;
+        font-size: 24px;
     }
 }
 
