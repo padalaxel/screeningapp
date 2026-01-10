@@ -326,8 +326,8 @@ body {
 
 .timer-section {
     text-align: center;
-    padding: var(--space-4) var(--space-4) var(--space-3);
-    margin: 0 0 var(--space-4) 0;
+    padding: var(--space-2) var(--space-4) var(--space-2);
+    margin: 0 0 var(--space-3) 0;
 }
 
 .timer-controls {
@@ -335,7 +335,7 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: var(--space-3);
+    gap: var(--space-2);
 }
 
 .timer-display {
@@ -343,11 +343,11 @@ body {
     flex-direction: column;
     align-items: center;
     gap: var(--space-1);
-    margin-bottom: var(--space-3);
+    margin-bottom: var(--space-2);
 }
 
 .timecode {
-    font-size: 48px;
+    font-size: 36px;
     font-weight: var(--font-weight-medium);
     color: var(--text-primary);
     font-variant-numeric: tabular-nums;
@@ -521,6 +521,14 @@ button:disabled {
     min-height: 50vh;
     position: relative;
     z-index: 1;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
 }
 
 .buttons-grid {
@@ -1290,21 +1298,27 @@ button:disabled {
     }
     
     .timecode {
-        font-size: 40px;
+        font-size: 32px;
     }
     
     .timer-controls {
-        gap: var(--space-2);
+        gap: var(--space-1);
     }
     
     .timer-section {
-        padding: var(--space-3) var(--space-3) var(--space-2);
-        margin-bottom: var(--space-3);
+        padding: var(--space-2) var(--space-3) var(--space-1);
+        margin-bottom: var(--space-2);
     }
     
     .timer-display {
-        margin-bottom: var(--space-2);
-        gap: var(--space-1);
+        margin-bottom: var(--space-1);
+        gap: 0;
+    }
+    
+    .action-buttons {
+        margin-top: var(--space-3);
+        padding-top: var(--space-3);
+        gap: var(--space-2);
     }
     
     .main-content {
@@ -1352,6 +1366,16 @@ button:disabled {
 @media (min-width: 768px) {
     .buttons-grid {
         grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .timecode {
+        font-size: 42px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .timecode {
+        font-size: 48px;
     }
 }
 
