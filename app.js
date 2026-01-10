@@ -267,8 +267,12 @@ function updateTimer() {
         state.elapsedSeconds = elapsed;
         
         startPauseBtnEl.textContent = 'Pause';
+        startPauseBtnEl.classList.remove('btn-play');
+        startPauseBtnEl.classList.add('btn-pause');
     } else {
         startPauseBtnEl.textContent = state.elapsedSeconds > 0 ? 'Resume' : 'Start';
+        startPauseBtnEl.classList.remove('btn-pause');
+        startPauseBtnEl.classList.add('btn-play');
     }
     
     const formatted = formatTimecode(state.elapsedSeconds, state.fps);

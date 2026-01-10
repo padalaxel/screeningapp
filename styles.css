@@ -423,14 +423,35 @@ button:disabled {
     touch-action: manipulation;
 }
 
-.btn-primary:hover:not(:disabled) {
+.btn-primary.btn-play {
+    background-color: rgba(76, 175, 80, 0.15);
+    color: rgba(129, 199, 132, 1);
+}
+
+.btn-primary.btn-play:hover:not(:disabled) {
+    background-color: rgba(76, 175, 80, 0.25);
+    box-shadow: var(--shadow-card-hover);
+    transform: translateY(-1px);
+}
+
+.btn-primary.btn-pause {
+    background-color: rgba(244, 67, 54, 0.15);
+    color: rgba(239, 154, 154, 1);
+}
+
+.btn-primary.btn-pause:hover:not(:disabled) {
+    background-color: rgba(244, 67, 54, 0.25);
+    box-shadow: var(--shadow-card-hover);
+    transform: translateY(-1px);
+}
+
+.btn-primary:hover:not(:disabled):not(.btn-play):not(.btn-pause) {
     background-color: var(--bg-surface-3);
     box-shadow: var(--shadow-card-hover);
     transform: translateY(-1px);
 }
 
 .btn-primary:active:not(:disabled) {
-    background-color: var(--bg-surface-4);
     box-shadow: var(--shadow-card-active);
     transform: translateY(0);
 }
