@@ -11,9 +11,9 @@
   --bg-surface-3: #1a1a1a;          /* Active/interactive surface */
   --bg-surface-4: #1f1f1f;          /* Pressed state */
   --bg-surface-5: #252525;          /* Hover state */
-  --bg-card: #151515;               /* Default card background - more visible */
-  --bg-card-hover: #1a1a1a;         /* Card hover state */
-  --bg-card-active: #1f1f1f;        /* Card active/pressed */
+  --bg-card: #1a1a1a;               /* Default card background - clearly visible */
+  --bg-card-hover: #1f1f1f;         /* Card hover state */
+  --bg-card-active: #252525;        /* Card active/pressed */
   
   /* Colors - Text (lightest to darkest) */
   --text-primary: #ffffff;
