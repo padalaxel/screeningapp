@@ -27,7 +27,8 @@ let state = {
     genre: null,
     screeningName: '',
     setupComplete: false,
-    sessionHistory: [] // Array of past sessions
+    sessionHistory: [], // Array of past sessions
+    lastAddedNoteIndex: null // Track most recently added note for toast click
 };
 
 let timerInterval = null;
@@ -313,20 +314,56 @@ function toggleTimer() {
 }
 
 // Show toast notification
-function showToast(message, timecode) {
+function showToast(message, timecode, noteIndex = null) {
     const toast = $('toast');
     if (!toast) return;
     
+    // Remove any existing click handlers
+    const newToast = toast.cloneNode(true);
+    toast.parentNode.replaceChild(newToast, toast);
+    const toastEl = $('toast');
+    
     if (timecode) {
-        toast.innerHTML = `<span class="toast-timecode">${escapeHtml(timecode)}</span><span class="toast-label">${escapeHtml(message)}</span>`;
+        toastEl.innerHTML = `<span class="toast-timecode">${escapeHtml(timecode)}</span><span class="toast-label">${escapeHtml(message)}</span>`;
     } else {
-        toast.innerHTML = `<span class="toast-label">${escapeHtml(message)}</span>`;
+        toastEl.innerHTML = `<span class="toast-label">${escapeHtml(message)}</span>`;
     }
     
-    toast.classList.add('show');
+    // If noteIndex is provided, make toast clickable to edit that note
+    if (noteIndex !== null && noteIndex !== undefined) {
+        toastEl.style.cursor = 'pointer';
+        toastEl.setAttribute('role', 'button');
+        toastEl.setAttribute('aria-label', 'Click to edit this note');
+        toastEl.setAttribute('tabindex', '0');
+        toastEl.dataset.noteIndex = noteIndex;
+        
+        const clickHandler = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const index = parseInt(toastEl.dataset.noteIndex);
+            if (!isNaN(index) && state.session && state.session.notes[index]) {
+                editNote(index);
+                toastEl.classList.remove('show');
+            }
+        };
+        
+        toastEl.addEventListener('click', clickHandler);
+        toastEl.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                clickHandler(e);
+            }
+        });
+    }
+    
+    toastEl.classList.add('show');
     
     setTimeout(() => {
-        toast.classList.remove('show');
+        toastEl.classList.remove('show');
+        // Clear the noteIndex after toast hides
+        if (toastEl.dataset.noteIndex) {
+            delete toastEl.dataset.noteIndex;
+        }
     }, 2000);
 }
 
@@ -371,6 +408,8 @@ function addNote(label, customText = null) {
     };
     
     state.session.notes.push(note);
+    // Store the index of the most recently added note (it's the last item in the array)
+    state.lastAddedNoteIndex = state.session.notes.length - 1;
     saveState();
     renderNotes();
     
@@ -383,9 +422,9 @@ function addNote(label, customText = null) {
         }
     });
     
-    // Show toast notification
+    // Show toast notification with click handler
     const displayLabel = context ? `${baseLabel}: ${context}` : baseLabel;
-    showToast(displayLabel, note.timecode);
+    showToast(displayLabel, note.timecode, state.lastAddedNoteIndex);
 }
 
 // Edit note
@@ -632,13 +671,28 @@ function renderNotes() {
         item.setAttribute('role', 'button');
         item.setAttribute('aria-label', `Edit note: ${escapeHtml(displayLabel)} at ${escapeHtml(note.timecode)}`);
         item.setAttribute('tabindex', '0');
-        item.addEventListener('click', () => editNote(index));
+        
+        // Store index as data attribute for debugging/verification
+        item.dataset.noteIndex = index;
+        
+        // Click handler - use a closure to capture the correct index
+        const clickHandler = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const noteIndex = parseInt(item.dataset.noteIndex);
+            if (!isNaN(noteIndex) && state.session && state.session.notes[noteIndex]) {
+                editNote(noteIndex);
+            }
+        };
+        
+        item.addEventListener('click', clickHandler, { passive: false });
         item.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                editNote(index);
+                clickHandler(e);
             }
         });
+        
         list.appendChild(item);
     });
 }

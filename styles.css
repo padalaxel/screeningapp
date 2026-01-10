@@ -1299,6 +1299,30 @@ button:disabled {
     pointer-events: auto;
 }
 
+.toast[role="button"] {
+    cursor: pointer;
+    user-select: none;
+}
+
+.toast[role="button"]:hover {
+    background-color: var(--bg-card-hover);
+    box-shadow: var(--shadow-xl);
+    transform: translateX(-50%) translateY(-2px);
+}
+
+.toast[role="button"]:active {
+    background-color: var(--bg-card-active);
+    transform: translateX(-50%) translateY(0);
+}
+
+.toast[role="button"].show {
+    transform: translateX(-50%) translateY(0);
+}
+
+.toast[role="button"].show:hover {
+    transform: translateX(-50%) translateY(-2px);
+}
+
 .toast .toast-timecode {
     color: var(--accent-primary);
     font-weight: var(--font-weight-semibold);
