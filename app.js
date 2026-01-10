@@ -522,74 +522,29 @@ function editNote(index) {
         currentOpenModal = 'editNoteModal';
     }
     
-    // Force input to be visible and focusable - use requestAnimationFrame for proper timing
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-            const input = $('editNoteInput');
-            if (input) {
-                // Ensure input is visible
-                input.style.display = 'block';
-                input.style.visibility = 'visible';
-                input.style.opacity = '1';
-                
-                // Focus and click to trigger keyboard - NO blur() to keep keyboard open
-                input.focus();
-                input.click();
-                
-                // Select all text if there's existing context
-                if (context && input.value.length > 0) {
-                    setTimeout(() => {
-                        try {
-                            input.setSelectionRange(0, input.value.length);
-                        } catch (e) {
-                            // Some browsers don't support setSelectionRange
-                        }
-                    }, 50);
-                }
-                
-                // Multiple persistent focus attempts WITHOUT blur - keep keyboard open
+    // Simple focus management - wait for modal to render, then focus
+    setTimeout(() => {
+        const input = $('editNoteInput');
+        if (input && modal.classList.contains('active')) {
+            input.focus();
+            // Select all text if there's existing context
+            if (context && input.value.length > 0) {
                 setTimeout(() => {
-                    if (document.activeElement !== input) {
-                        input.focus();
-                        input.click();
+                    try {
+                        input.setSelectionRange(0, input.value.length);
+                    } catch (e) {
+                        // Some browsers don't support setSelectionRange
                     }
                 }, 100);
-                
-                setTimeout(() => {
-                    if (document.activeElement !== input) {
-                        input.focus();
-                        input.click();
-                        // Re-select text after refocus
-                        if (context && input.value.length > 0) {
-                            try {
-                                input.setSelectionRange(0, input.value.length);
-                            } catch (e) {}
-                        }
-                    }
-                }, 300);
-                
-                setTimeout(() => {
-                    if (document.activeElement !== input) {
-                        input.focus();
-                        input.click();
-                    }
-                }, 600);
-                
-                // Keep trying if focus is lost (but not if user clicked elsewhere)
-                const checkFocus = setInterval(() => {
-                    if (modal.classList.contains('active') && document.activeElement !== input && !document.activeElement?.matches('button')) {
-                        input.focus();
-                        input.click();
-                    } else if (!modal.classList.contains('active')) {
-                        clearInterval(checkFocus);
-                    }
-                }, 200);
-                
-                // Clear interval after 3 seconds
-                setTimeout(() => clearInterval(checkFocus), 3000);
             }
-        });
-    });
+            // Additional attempt for mobile
+            setTimeout(() => {
+                if (input && document.activeElement !== input) {
+                    input.focus();
+                }
+            }, 300);
+        }
+    }, 300);
 }
 
 // Save edited note
@@ -1382,56 +1337,18 @@ function showSetupModal() {
         startBtn.setAttribute('aria-disabled', 'false');
     }
     
-    // Aggressive focus management for keyboard to appear and stay - NO blur()
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-            if (nameInput) {
-                // Ensure input is visible and focusable
-                nameInput.style.display = 'block';
-                nameInput.style.visibility = 'visible';
-                nameInput.style.opacity = '1';
-                
-                // Focus and click to trigger keyboard - NO blur()
-                nameInput.focus();
-                nameInput.click();
-                
-                // Multiple persistent focus attempts without blur
-                setTimeout(() => {
-                    if (document.activeElement !== nameInput) {
-                        nameInput.focus();
-                        nameInput.click();
-                    }
-                }, 100);
-                
-                setTimeout(() => {
-                    if (document.activeElement !== nameInput) {
-                        nameInput.focus();
-                        nameInput.click();
-                    }
-                }, 300);
-                
-                setTimeout(() => {
-                    if (document.activeElement !== nameInput) {
-                        nameInput.focus();
-                        nameInput.click();
-                    }
-                }, 600);
-                
-                // Keep trying if focus is lost (but not if user clicked elsewhere)
-                const checkFocus = setInterval(() => {
-                    if (modal.classList.contains('active') && document.activeElement !== nameInput && !document.activeElement?.matches('button')) {
-                        nameInput.focus();
-                        nameInput.click();
-                    } else if (!modal.classList.contains('active')) {
-                        clearInterval(checkFocus);
-                    }
-                }, 200);
-                
-                // Clear interval after 3 seconds
-                setTimeout(() => clearInterval(checkFocus), 3000);
-            }
-        });
-    });
+    // Simple focus management - wait for modal to render, then focus
+    setTimeout(() => {
+        if (nameInput && modal.classList.contains('active')) {
+            nameInput.focus();
+            // Additional attempt for mobile
+            setTimeout(() => {
+                if (nameInput && document.activeElement !== nameInput) {
+                    nameInput.focus();
+                }
+            }, 200);
+        }
+    }, 300);
 }
 
 // Start screening from setup
@@ -1548,55 +1465,18 @@ function showOtherNoteModal() {
     modal._outsideClickHandler = handleOutsideClick;
     modal.addEventListener('click', handleOutsideClick, true);
     
-    // Auto-focus input with multiple attempts for mobile keyboard - NO blur() to keep keyboard open
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-            if (input) {
-                input.style.display = 'block';
-                input.style.visibility = 'visible';
-                input.style.opacity = '1';
-                
-                // Focus and click to trigger keyboard - NO blur() to keep it open
-                input.focus();
-                input.click();
-                
-                // Multiple persistent focus attempts WITHOUT blur
-                setTimeout(() => {
-                    if (document.activeElement !== input) {
-                        input.focus();
-                        input.click();
-                    }
-                }, 100);
-                
-                setTimeout(() => {
-                    if (document.activeElement !== input) {
-                        input.focus();
-                        input.click();
-                    }
-                }, 300);
-                
-                setTimeout(() => {
-                    if (document.activeElement !== input) {
-                        input.focus();
-                        input.click();
-                    }
-                }, 600);
-                
-                // Keep trying if focus is lost (but not if user clicked elsewhere)
-                const checkFocus = setInterval(() => {
-                    if (modal.classList.contains('active') && document.activeElement !== input && !document.activeElement?.matches('button')) {
-                        input.focus();
-                        input.click();
-                    } else if (!modal.classList.contains('active')) {
-                        clearInterval(checkFocus);
-                    }
-                }, 200);
-                
-                // Clear interval after 3 seconds
-                setTimeout(() => clearInterval(checkFocus), 3000);
-            }
-        });
-    });
+    // Simple focus management - wait for modal to render, then focus
+    setTimeout(() => {
+        if (input && modal.classList.contains('active')) {
+            input.focus();
+            // Additional attempt for mobile
+            setTimeout(() => {
+                if (input && document.activeElement !== input) {
+                    input.focus();
+                }
+            }, 300);
+        }
+    }, 300);
 }
 
 // Log other note
