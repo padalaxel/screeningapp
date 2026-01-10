@@ -1216,10 +1216,17 @@ function closeModal(modalId) {
     if (modal) {
         modal.classList.remove('active');
         modal.setAttribute('aria-hidden', 'true');
+        modal.style.display = 'none';
         document.body.style.overflow = ''; // Restore body scroll
         
         if (currentOpenModal === modalId) {
             currentOpenModal = null;
+        }
+        
+        // Remove outside click handler if it exists
+        if (modal._outsideClickHandler) {
+            modal.removeEventListener('click', modal._outsideClickHandler, true);
+            delete modal._outsideClickHandler;
         }
         
         // Return focus to the element that opened the modal (if available)
