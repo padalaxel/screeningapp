@@ -402,13 +402,13 @@ button:disabled {
     background-color: var(--bg-surface-2);
     color: var(--text-primary);
     border: none;
-    padding: var(--space-4) var(--space-8);
-    font-size: var(--font-md);
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--font-sm);
     font-weight: var(--font-weight-medium);
     line-height: var(--line-height-normal);
     letter-spacing: var(--letter-spacing-normal);
-    border-radius: var(--radius-lg);
-    min-height: 52px;
+    border-radius: var(--radius-md);
+    min-height: 32px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
