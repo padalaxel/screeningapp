@@ -1334,21 +1334,11 @@ function showSetupModal() {
         startBtn.setAttribute('aria-disabled', 'false');
     }
     
-    // Focus management - wait for modal to fully render, then focus input
-    // Use requestAnimationFrame to ensure DOM is ready
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-            if (nameInput && modal.classList.contains('active') && modal.getAttribute('aria-hidden') === 'false') {
-                nameInput.focus();
-                // Additional attempt for mobile after a short delay
-                setTimeout(() => {
-                    if (nameInput && document.activeElement !== nameInput && modal.classList.contains('active')) {
-                        nameInput.focus();
-                    }
-                }, 200);
-            }
-        });
-    });
+    // CRITICAL: Focus immediately in the same user gesture (synchronously)
+    // This is required for mobile keyboards to open - no async delays!
+    if (nameInput) {
+        nameInput.focus();
+    }
 }
 
 // Start screening from setup
