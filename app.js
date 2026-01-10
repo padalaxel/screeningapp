@@ -258,9 +258,9 @@ function formatTimecode(seconds, fps) {
 function updateTimer() {
     const statusEl = $('status');
     const timecodeEl = $('timecode');
-    const startPauseBtn = $('startPauseBtn');
+    const startPauseBtnEl = $('startPauseBtn');
     
-    if (!statusEl || !timecodeEl || !startPauseBtn) return;
+    if (!statusEl || !timecodeEl || !startPauseBtnEl) return;
     
     if (state.isRunning) {
         const now = Date.now();
