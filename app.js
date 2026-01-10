@@ -313,6 +313,54 @@ function toggleTimer() {
     updateTimer();
 }
 
+// Apply dimming to toast notification
+function applyToastDimming(toastEl) {
+    if (!toastEl) return;
+    
+    const dimLevel = state.dimLevel || 0;
+    const clampedLevel = Math.min(dimLevel, 85);
+    const dimPercent = clampedLevel / 100;
+    
+    if (clampedLevel > 0) {
+        // Dim text color - interpolate from white to dark grey
+        const r = Math.round(255 - (255 - 51) * dimPercent);
+        const g = Math.round(255 - (255 - 51) * dimPercent);
+        const b = Math.round(255 - (255 - 51) * dimPercent);
+        const textColor = `rgb(${r}, ${g}, ${b})`;
+        
+        // Dim background color - interpolate from card color to darker
+        const bgR = Math.round(26 - 26 * dimPercent);
+        const bgG = Math.round(26 - 26 * dimPercent);
+        const bgB = Math.round(26 - 26 * dimPercent);
+        const bgColor = `rgb(${bgR}, ${bgG}, ${bgB})`;
+        
+        toastEl.style.color = textColor;
+        toastEl.style.backgroundColor = bgColor;
+        
+        // Also dim child elements (timecode and label)
+        const timecodeEl = toastEl.querySelector('.toast-timecode');
+        const labelEl = toastEl.querySelector('.toast-label');
+        if (timecodeEl) {
+            timecodeEl.style.color = textColor;
+        }
+        if (labelEl) {
+            labelEl.style.color = textColor;
+        }
+    } else {
+        // Reset to default if no dimming
+        toastEl.style.color = '';
+        toastEl.style.backgroundColor = '';
+        const timecodeEl = toastEl.querySelector('.toast-timecode');
+        const labelEl = toastEl.querySelector('.toast-label');
+        if (timecodeEl) {
+            timecodeEl.style.color = '';
+        }
+        if (labelEl) {
+            labelEl.style.color = '';
+        }
+    }
+}
+
 // Show toast notification
 function showToast(message, timecode, noteIndex = null) {
     const toast = $('toast');
@@ -362,21 +410,8 @@ function showToast(message, timecode, noteIndex = null) {
         
         toastEl.classList.add('show');
         
-        // Apply dimmer setting to toast
-        if (state.dimLevel && state.dimLevel > 0) {
-            const dimPercent = Math.min(state.dimLevel / 85, 1);
-            // Apply dimming similar to other text elements
-            const dimR = Math.round(255 - (255 - 51) * dimPercent);
-            const dimG = Math.round(255 - (255 - 51) * dimPercent);
-            const dimB = Math.round(255 - (255 - 51) * dimPercent);
-            const dimColor = `rgb(${dimR}, ${dimG}, ${dimB})`;
-            toastEl.style.color = dimColor;
-            toastEl.style.backgroundColor = `rgba(${Math.round(26 - 26 * dimPercent)}, ${Math.round(26 - 26 * dimPercent)}, ${Math.round(26 - 26 * dimPercent)}, 1)`;
-        } else {
-            // Reset to default if no dimming
-            toastEl.style.color = '';
-            toastEl.style.backgroundColor = '';
-        }
+        // Apply dimmer setting to toast immediately
+        applyToastDimming(toastEl);
         
         setTimeout(() => {
             toastEl.classList.remove('show');
@@ -1961,17 +1996,7 @@ function updateDimOverlay(level) {
     // Update toast notification dimming
     const toast = $('toast');
     if (toast && toast.classList.contains('show')) {
-        if (clampedLevel > 0) {
-            toast.style.color = textColor;
-            // Dim background color too
-            const bgR = Math.round(26 - 26 * dimPercent);
-            const bgG = Math.round(26 - 26 * dimPercent);
-            const bgB = Math.round(26 - 26 * dimPercent);
-            toast.style.backgroundColor = `rgba(${bgR}, ${bgG}, ${bgB}, 1)`;
-        } else {
-            toast.style.color = '';
-            toast.style.backgroundColor = '';
-        }
+        applyToastDimming(toast);
     }
     
     // Dim button gets special treatment - only dims to 50% max so it stays visible
