@@ -421,7 +421,7 @@ button:disabled {
     line-height: var(--line-height-tight);
     letter-spacing: var(--letter-spacing-tight);
     border-radius: var(--radius-sm);
-    min-height: 36px;
+    min-height: 44px; /* WCAG AA minimum touch target */
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -460,8 +460,10 @@ button:disabled {
     font-size: 28px;
     line-height: 1;
     padding: 0;
-    width: 40px;
-    height: 40px;
+    width: 44px; /* WCAG AA minimum touch target */
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1012,9 +1014,9 @@ button:disabled {
     font-size: 20px;
     line-height: 1;
     cursor: pointer;
-    padding: 0;
-    width: 32px;
-    height: 32px;
+    padding: var(--space-2); /* Extra padding for touch target */
+    width: 44px; /* WCAG AA minimum touch target */
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1293,17 +1295,24 @@ textarea {
 /* Skip link for keyboard navigation */
 .skip-link {
     position: absolute;
-    top: -40px;
-    left: 0;
+    top: -100px;
+    left: var(--space-4);
     background: var(--bg-surface-2);
     color: var(--text-primary);
-    padding: var(--space-2) var(--space-4);
+    padding: var(--space-3) var(--space-4);
     z-index: 10003;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
+    border: 2px solid var(--accent-primary);
+    font-size: var(--font-sm);
+    font-weight: var(--font-weight-medium);
+    text-decoration: none;
+    transition: top var(--transition-fast);
+    box-shadow: var(--shadow-md);
 }
 
 .skip-link:focus {
-    top: var(--space-2);
+    top: var(--space-4);
+    outline: none;
 }
 
 /* High contrast mode support */

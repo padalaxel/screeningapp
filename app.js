@@ -996,6 +996,9 @@ async function copyToClipboard(text) {
     }
 }
 
+// Track which modal is currently open for Escape key handling
+let currentOpenModal = null;
+
 // Show modal
 function showModal(modalId) {
     const modal = $(modalId);
@@ -1003,6 +1006,7 @@ function showModal(modalId) {
         modal.classList.add('active');
         modal.setAttribute('aria-hidden', 'false');
         document.body.style.overflow = 'hidden'; // Prevent body scroll
+        currentOpenModal = modalId;
         
         // Special handling for sessions modal - render list
         if (modalId === 'sessionsModal') {
@@ -1011,7 +1015,7 @@ function showModal(modalId) {
         
         // Focus management - focus first focusable element or close button
         setTimeout(() => {
-            const firstFocusable = modal.querySelector('button, input, [tabindex]:not([tabindex="-1"])');
+            const firstFocusable = modal.querySelector('button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])');
             if (firstFocusable) {
                 firstFocusable.focus();
             }
@@ -1027,10 +1031,14 @@ function closeModal(modalId) {
         modal.setAttribute('aria-hidden', 'true');
         document.body.style.overflow = ''; // Restore body scroll
         
-        // Return focus to the element that opened the modal
-        const lastActiveElement = document.activeElement;
-        if (lastActiveElement && lastActiveElement !== document.body) {
-            // Focus will naturally return, but we can help it
+        if (currentOpenModal === modalId) {
+            currentOpenModal = null;
+        }
+        
+        // Return focus to the element that opened the modal (if available)
+        const triggerButton = document.querySelector(`[data-opens-modal="${modalId}"]`);
+        if (triggerButton) {
+            setTimeout(() => triggerButton.focus(), 100);
         }
     }
 }
@@ -1045,6 +1053,7 @@ function closeAllModals() {
             modal.setAttribute('aria-hidden', 'true');
         }
     });
+    currentOpenModal = null;
     document.body.style.overflow = '';
 }
 
@@ -1220,10 +1229,30 @@ function logOtherNote() {
 
 // Setup event listeners
 function setupEventListeners() {
+    // Global keyboard handlers
+    document.addEventListener('keydown', (e) => {
+        // Escape key - close current modal
+        if (e.key === 'Escape' && currentOpenModal) {
+            // Don't close setup modal with Escape (user must use Start button)
+            if (currentOpenModal !== 'setupModal') {
+                closeModal(currentOpenModal);
+                e.preventDefault();
+            }
+        }
+    });
+    
     // Start/Pause button
     const startPauseBtn = $('startPauseBtn');
     if (startPauseBtn) {
         startPauseBtn.addEventListener('click', toggleTimer);
+        
+        // Allow Space/Enter to toggle timer
+        startPauseBtn.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                toggleTimer();
+            }
+        });
     }
     
     // Setup modal - genre selection
@@ -1281,9 +1310,42 @@ function setupEventListeners() {
     // Allow Enter key in other note input
     const otherNoteInput = $('otherNoteInput');
     if (otherNoteInput) {
-        otherNoteInput.addEventListener('keypress', (e) => {
+        otherNoteInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
+                e.preventDefault();
                 logOtherNote();
+            } else if (e.key === 'Escape') {
+                e.preventDefault();
+                closeModal('otherNoteModal');
+            }
+        });
+    }
+    
+    // Allow Enter key in edit note input
+    const editNoteInput = $('editNoteInput');
+    if (editNoteInput) {
+        editNoteInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const saveBtn = $('saveEditNoteBtn');
+                if (saveBtn) saveBtn.click();
+            } else if (e.key === 'Escape') {
+                e.preventDefault();
+                closeModal('editNoteModal');
+            }
+        });
+    }
+    
+    // Allow Enter key in screening name input
+    const screeningNameInput = $('screeningNameInput');
+    if (screeningNameInput) {
+        screeningNameInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const startBtn = $('startScreeningBtn');
+                if (startBtn && !startBtn.disabled) {
+                    startBtn.click();
+                }
             }
         });
     }
@@ -1291,6 +1353,7 @@ function setupEventListeners() {
     // New session
     const newBtn = $('newBtn');
     if (newBtn) {
+        newBtn.setAttribute('data-opens-modal', 'confirmModal');
         newBtn.addEventListener('click', () => {
             showConfirm('Start a new session? This will reset the timer and clear all notes.', () => {
                 state.isRunning = false;
@@ -1311,6 +1374,12 @@ function setupEventListeners() {
     const closeSettings = $('closeSettings');
     if (closeSettings) {
         closeSettings.addEventListener('click', () => closeModal('settingsModal'));
+        closeSettings.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                closeModal('settingsModal');
+            }
+        });
     }
     
     const saveSettings = $('saveSettings');
@@ -1359,12 +1428,19 @@ function setupEventListeners() {
     // Sessions
     const sessionsBtn = $('sessionsBtn');
     if (sessionsBtn) {
+        sessionsBtn.setAttribute('data-opens-modal', 'sessionsModal');
         sessionsBtn.addEventListener('click', () => showModal('sessionsModal'));
     }
     
     const closeSessions = $('closeSessions');
     if (closeSessions) {
         closeSessions.addEventListener('click', () => closeModal('sessionsModal'));
+        closeSessions.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                closeModal('sessionsModal');
+            }
+        });
     }
     
     // Settings
@@ -1379,12 +1455,19 @@ function setupEventListeners() {
     // Export
     const exportBtn = $('exportBtn');
     if (exportBtn) {
+        exportBtn.setAttribute('data-opens-modal', 'exportModal');
         exportBtn.addEventListener('click', () => showModal('exportModal'));
     }
     
     const closeExport = $('closeExport');
     if (closeExport) {
         closeExport.addEventListener('click', () => closeModal('exportModal'));
+        closeExport.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                closeModal('exportModal');
+            }
+        });
     }
     
     const shareCsvBtn = $('shareCsvBtn');

@@ -22,6 +22,9 @@
     </script>
 </head>
 <body>
+    <!-- Skip to main content link (for keyboard navigation) -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
     <!-- Dim overlay toggle -->
     <div id="dimOverlay" class="dim-overlay"></div>
     
@@ -48,7 +51,7 @@
     </header>
 
     <!-- Buttons Grid -->
-    <main class="main-content">
+    <main id="main-content" class="main-content" tabindex="-1">
         <div id="buttonsGrid" class="buttons-grid">
             <!-- Buttons will be dynamically generated -->
         </div>
