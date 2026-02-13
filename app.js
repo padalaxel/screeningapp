@@ -33,6 +33,61 @@ let state = {
 
 let timerInterval = null;
 let pendingConfirm = null;
+let wakeLockSentinel = null;
+
+// Screen Wake Lock - keep screen on while app is open (e.g. during screenings on iPhone)
+async function requestWakeLock() {
+    if (!('wakeLock' in navigator)) return;
+    try {
+        if (wakeLockSentinel) return;
+        wakeLockSentinel = await navigator.wakeLock.request('screen');
+        wakeLockSentinel.addEventListener('release', () => {
+            wakeLockSentinel = null;
+        });
+    } catch (e) {
+        console.warn('Wake Lock request failed:', e.message);
+    }
+}
+
+function releaseWakeLock() {
+    if (wakeLockSentinel) {
+        try {
+            wakeLockSentinel.release();
+            wakeLockSentinel = null;
+        } catch (e) {
+            wakeLockSentinel = null;
+        }
+    }
+}
+
+function setupWakeLock() {
+    if (!('wakeLock' in navigator)) return;
+    // Request when page is visible
+    if (document.visibilityState === 'visible') {
+        requestWakeLock();
+    }
+    // Re-request when user returns to the tab; release when they leave
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+            requestWakeLock();
+        } else {
+            releaseWakeLock();
+            // When user switches away, persist timer and session so we survive tab kill
+            if (state.isRunning) {
+                const now = Date.now();
+                state.elapsedSeconds = (now - state.startTime) / 1000 + state.pausedTime;
+                state.pausedTime = state.elapsedSeconds;
+                state.isRunning = false;
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                }
+                updateTimer(); // Update display to show paused time and "Resume"
+            }
+            saveState();
+        }
+    });
+}
 
 // Initialize
 function init() {
@@ -55,6 +110,7 @@ function init() {
     
     loadState();
     setupEventListeners();
+    setupWakeLock();
     
     // Check if setup is needed
     if (!state.setupComplete || !state.genre || !state.screeningName) {
@@ -156,6 +212,18 @@ function loadState() {
             if (parsed.sessionHistory && Array.isArray(parsed.sessionHistory)) {
                 state.sessionHistory = parsed.sessionHistory;
             }
+            // Restore timer state so "Resume" and elapsed time persist after tab kill/refresh
+            if (typeof parsed.elapsedSeconds === 'number' && parsed.elapsedSeconds >= 0) {
+                state.elapsedSeconds = parsed.elapsedSeconds;
+            }
+            if (typeof parsed.pausedTime === 'number' && parsed.pausedTime >= 0) {
+                state.pausedTime = parsed.pausedTime;
+            }
+            if (parsed.isRunning === true) {
+                // If it was running when saved, treat as paused on load so user can tap Resume
+                state.isRunning = false;
+                state.pausedTime = state.elapsedSeconds;
+            }
             // Only trust setupComplete if genre and name are also present
             if (parsed.setupComplete !== undefined && parsed.genre && parsed.screeningName) {
                 state.setupComplete = parsed.setupComplete;
@@ -183,6 +251,11 @@ function loadState() {
 // Save state to localStorage
 function saveState() {
     try {
+        // Keep current session in sync with timer for history and reload
+        if (state.session) {
+            state.session.elapsedSeconds = state.elapsedSeconds;
+            state.session.isRunning = state.isRunning;
+        }
         localStorage.setItem('screeningAppState', JSON.stringify({
             session: state.session,
             fps: state.fps,
@@ -191,7 +264,10 @@ function saveState() {
             screeningName: state.screeningName,
             setupComplete: state.setupComplete,
             dimLevel: state.dimLevel,
-            sessionHistory: state.sessionHistory
+            sessionHistory: state.sessionHistory,
+            elapsedSeconds: state.elapsedSeconds,
+            isRunning: state.isRunning,
+            pausedTime: state.pausedTime
         }));
     } catch (e) {
         console.error('Failed to save state:', e);
@@ -294,6 +370,7 @@ function toggleTimer() {
             clearInterval(timerInterval);
             timerInterval = null;
         }
+        saveState(); // Persist so Resume and time survive tab kill / app switch
     } else {
         // Start/Resume
         if (state.elapsedSeconds === 0) {
@@ -309,6 +386,7 @@ function toggleTimer() {
         }
         state.isRunning = true;
         timerInterval = setInterval(updateTimer, 100); // Update every 100ms
+        saveState();
     }
     updateTimer();
 }
