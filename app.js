@@ -386,6 +386,7 @@ function toggleTimer() {
         }
         state.isRunning = true;
         timerInterval = setInterval(updateTimer, 100); // Update every 100ms
+        requestWakeLock(); // Request in response to user tap so it's allowed (required on iOS)
         saveState();
     }
     updateTimer();
