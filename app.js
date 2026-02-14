@@ -1967,8 +1967,22 @@ function setupEventListeners() {
         exportNotesBtn.addEventListener('click', async () => {
             const notesText = exportToNotes();
             if (notesText) {
-                const filename = `${(state.session.name || 'Screening Notes').replace(/[^a-z0-9]/gi, '_')}.txt`;
-                await shareOrDownload(notesText, filename, 'text/plain');
+                if (navigator.share) {
+                    try {
+                        await navigator.share({
+                            text: notesText,
+                            title: `${state.session.name || 'Screening Notes'}`
+                        });
+                    } catch (e) {
+                        if (e.name !== 'AbortError') {
+                            // Fallback to copy if share fails
+                            await copyToClipboard(notesText);
+                        }
+                    }
+                } else {
+                    // Fallback to copy if Web Share API not available
+                    await copyToClipboard(notesText);
+                }
             }
         });
     }
