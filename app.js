@@ -957,10 +957,10 @@ function exportForEmail() {
     emailText += '─'.repeat(40) + '\n\n';
     
     state.session.notes.forEach((note, index) => {
-        emailText += `${index + 1}. ${note.timecode} - ${note.label}\n`;
+        emailText += `${index + 1}. ${note.timecode} - ${note.label}\n\n`;
     });
     
-    emailText += '\n' + '─'.repeat(40) + '\n';
+    emailText += '─'.repeat(40) + '\n';
     emailText += `Total Notes: ${state.session.notes.length}\n`;
     
     return emailText;
@@ -1946,14 +1946,16 @@ function setupEventListeners() {
                         if (e.name !== 'AbortError') {
                             // Fallback to mailto link if share fails
                             const subject = encodeURIComponent(`Screening Notes: ${state.session.name || 'Untitled Screening'}`);
-                            const body = encodeURIComponent(emailText);
+                            const bodyForMailto = emailText.replace(/\n/g, '\r\n');
+                            const body = encodeURIComponent(bodyForMailto);
                             window.location.href = `mailto:?subject=${subject}&body=${body}`;
                         }
                     }
                 } else {
                     // Fallback to mailto link if Web Share API not available
                     const subject = encodeURIComponent(`Screening Notes: ${state.session.name || 'Untitled Screening'}`);
-                    const body = encodeURIComponent(emailText);
+                    const bodyForMailto = emailText.replace(/\n/g, '\r\n');
+                    const body = encodeURIComponent(bodyForMailto);
                     window.location.href = `mailto:?subject=${subject}&body=${body}`;
                 }
             }
@@ -1965,22 +1967,8 @@ function setupEventListeners() {
         exportNotesBtn.addEventListener('click', async () => {
             const notesText = exportToNotes();
             if (notesText) {
-                if (navigator.share) {
-                    try {
-                        await navigator.share({
-                            text: notesText,
-                            title: `${state.session.name || 'Screening Notes'}`
-                        });
-                    } catch (e) {
-                        if (e.name !== 'AbortError') {
-                            // Fallback to copy if share fails
-                            await copyToClipboard(notesText);
-                        }
-                    }
-                } else {
-                    // Fallback to copy if Web Share API not available
-                    await copyToClipboard(notesText);
-                }
+                const filename = `${(state.session.name || 'Screening Notes').replace(/[^a-z0-9]/gi, '_')}.txt`;
+                await shareOrDownload(notesText, filename, 'text/plain');
             }
         });
     }
